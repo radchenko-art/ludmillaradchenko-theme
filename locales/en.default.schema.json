@@ -741,6 +741,7 @@
     // Icon option for washing machine or laundry symbol
     "washing": "Washing",
     "wide": "Wide",
+    "hover": "Hover",
     "youtube": "YouTube",
     "with_hints": "With hints",
     "below_media": "Below media"
@@ -748,6 +749,7 @@
   "settings": {
     "accordion": "Accordion",
     "account": "Account",
+    "account_menu_behavior": "Account menu open",
     "alignment": "Alignment",
     "alignment_mobile": "Mobile alignment",
     "align_baseline": "Align text baseline",

@@ -1,0 +1,39 @@
+{% liquid
+  assign show_language = block.settings.show_language
+  if localization.available_languages.size <= 1
+    assign show_language = false
+  endif
+
+  assign show_country = block.settings.show_country
+  if localization.available_countries.size <= 1
+    assign show_country = false
+  endif
+
+  assign search_style = 'none'
+  if block.settings.show_search
+    assign search_style = 'modal'
+  endif
+%}
+
+<div
+  class="logo-and-customer__actions"
+  style="--logo-and-customer-actions-gap: {{ block.settings.icons_gap | default: '1rem' }}"
+  {{ block.shopify_attributes }}
+>
+  {% if block.settings.show_search %}
+    {% render 'search', style: search_style, class: 'logo-and-customer__search' %}
+  {% endif %}
+  {% if show_country or show_language %}
+    {% render 'header-localization-markup',
+      show_country: show_country,
+      show_language: show_language,
+      country_selector_style: block.settings.country_selector_style,
+      color_scheme: block.settings.color_scheme,
+      localization_font: block.settings.localization_font,
+      localization_font_size: block.settings.localization_font_size,
+      localization_position: block.settings.localization_position,
+      form_id: block.id
+    %}
+  {% endif %}
+  {% render 'header-actions', account_label: block.settings.account_label, account_menu_behavior: block.settings.account_menu_behavior %}
+</div>

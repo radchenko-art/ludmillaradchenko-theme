@@ -31,12 +31,26 @@ export class AnchoredPopoverComponent extends Component {
   interaction_delay = 200;
   #popoverTrigger = /** @type {number | null} */ (null);
 
+  #isHoverPanel = () => this.hasAttribute('data-hover-triggered');
+
   #onTriggerEnter = () => {
     const { trigger, popover } = this.refs;
     trigger.dataset.hoverActive = 'true';
-    if (!popover.matches(':popover-open')) {
+    if (this.#isHoverPanel()) {
+      if (!popover.classList.contains('is-open')) {
+        this.#popoverTrigger = setTimeout(() => {
+          if (trigger.matches('[data-hover-active]')) {
+            this.#updatePosition();
+            popover.classList.add('is-open');
+          }
+        }, this.interaction_delay);
+      }
+    } else if (!popover.matches(':popover-open')) {
       this.#popoverTrigger = setTimeout(() => {
-        if (trigger.matches('[data-hover-active]')) popover.showPopover();
+        if (trigger.matches('[data-hover-active]')) {
+          this.#updatePosition();
+          popover.showPopover();
+        }
       }, this.interaction_delay);
     }
   };
@@ -45,7 +59,13 @@ export class AnchoredPopoverComponent extends Component {
     const { trigger, popover } = this.refs;
     delete trigger.dataset.hoverActive;
     if (this.#popoverTrigger) clearTimeout(this.#popoverTrigger);
-    if (popover.matches(':popover-open')) {
+    if (this.#isHoverPanel()) {
+      if (popover.classList.contains('is-open')) {
+        this.#popoverTrigger = setTimeout(() => {
+          popover.classList.remove('is-open');
+        }, this.interaction_delay);
+      }
+    } else if (popover.matches(':popover-open')) {
       this.#popoverTrigger = setTimeout(() => {
         popover.hidePopover();
       }, this.interaction_delay);
@@ -59,24 +79,52 @@ export class AnchoredPopoverComponent extends Component {
   #onPopoverLeave = () => {
     const { popover } = this.refs;
     this.#popoverTrigger = setTimeout(() => {
-      popover.hidePopover();
+      if (this.#isHoverPanel()) popover.classList.remove('is-open');
+      else popover.hidePopover();
     }, this.interaction_delay);
   };
 
   /**
    * Updates the popover position by calculating trigger element bounds
    * and setting CSS custom properties on the popover element.
+   *
+   * - Hover: panel stays in DOM, position absolute relative to component → scrolls with page.
+   * - Modal: panel is in top layer (viewport = containing block) → use fixed + viewport coords,
+   *   and we update position on scroll so the panel follows the trigger.
    */
-  #updatePosition = async () => {
+  #updatePosition = () => {
     const { popover, trigger } = this.refs;
     if (!popover || !trigger) return;
-    const positions = trigger.getBoundingClientRect();
-    popover.style.setProperty('--anchor-top', `${positions.top}`);
-    popover.style.setProperty('--anchor-right', `${window.innerWidth - positions.right}`);
-    popover.style.setProperty('--anchor-bottom', `${window.innerHeight - positions.bottom}`);
-    popover.style.setProperty('--anchor-left', `${positions.left}`);
-    popover.style.setProperty('--anchor-height', `${positions.height}`);
-    popover.style.setProperty('--anchor-width', `${positions.width}`);
+    const rect = trigger.getBoundingClientRect();
+    const parentRect = this.getBoundingClientRect();
+    popover.style.setProperty('--anchor-top', `${rect.top}`);
+    popover.style.setProperty('--anchor-right', `${window.innerWidth - rect.right}`);
+    popover.style.setProperty('--anchor-bottom', `${window.innerHeight - rect.bottom}`);
+    popover.style.setProperty('--anchor-left', `${rect.left}`);
+    popover.style.setProperty('--anchor-height', `${rect.height}`);
+    popover.style.setProperty('--anchor-width', `${rect.width}`);
+    const gap = 8;
+    const rightFromParent = parentRect.right - rect.right;
+    if (this.#isHoverPanel()) {
+      const topFromParent = rect.bottom - parentRect.top + gap;
+      popover.style.setProperty('position', 'absolute');
+      popover.style.setProperty('top', `${topFromParent}px`);
+      popover.style.setProperty('right', `${rightFromParent}px`);
+      popover.style.removeProperty('left');
+    } else if (this.classList.contains('account-popover')) {
+      const rightViewport = window.innerWidth - rect.right;
+      popover.style.setProperty('position', 'fixed', 'important');
+      popover.style.setProperty('inset', 'auto', 'important');
+      popover.style.setProperty('top', `${rect.bottom + gap}px`, 'important');
+      popover.style.setProperty('right', `${rightViewport}px`, 'important');
+      popover.style.setProperty('bottom', 'auto', 'important');
+      popover.style.setProperty('left', 'auto', 'important');
+      popover.style.setProperty('margin', '0', 'important');
+    }
+  };
+
+  #scrollListener = () => {
+    if (this.refs.popover?.matches(':popover-open')) this.#updatePosition();
   };
 
   /**
@@ -85,7 +133,10 @@ export class AnchoredPopoverComponent extends Component {
    */
   #resizeListener = debounce(() => {
     const popover = /** @type {HTMLElement} */ (this.refs.popover);
-    if (popover && popover.matches(':popover-open')) {
+    if (!popover) return;
+    if (this.#isHoverPanel()) {
+      if (popover.classList.contains('is-open')) popover.classList.remove('is-open');
+    } else if (popover.matches(':popover-open')) {
       popover.hidePopover();
     }
   }, 100);
@@ -96,25 +147,44 @@ export class AnchoredPopoverComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
     const { popover, trigger } = this.refs;
-    if (this.dataset.closeOnResize) {
-      popover.addEventListener('beforetoggle', (event) => {
-        const evt = /** @type {ToggleEvent} */ (event);
-        window[evt.newState === 'open' ? 'addEventListener' : 'removeEventListener']('resize', this.#resizeListener);
-      });
-    }
-    if (this.dataset.hoverTriggered) {
+    if (this.hasAttribute('data-hover-triggered')) {
       trigger.addEventListener('pointerenter', this.#onTriggerEnter);
       trigger.addEventListener('pointerleave', this.#onTriggerLeave);
       popover.addEventListener('pointerenter', this.#onPopoverEnter);
       popover.addEventListener('pointerleave', this.#onPopoverLeave);
+      if (this.dataset.closeOnResize) {
+        window.addEventListener('resize', this.#resizeListener);
+      }
+    } else {
+      if (this.dataset.closeOnResize) {
+        popover.addEventListener('beforetoggle', (event) => {
+          const evt = /** @type {ToggleEvent} */ (event);
+          window[evt.newState === 'open' ? 'addEventListener' : 'removeEventListener']('resize', this.#resizeListener);
+        });
+      }
     }
-    if (!CSS.supports('position-anchor: --trigger')) {
-      popover.addEventListener('beforetoggle', () => {
-        this.#updatePosition();
-      });
-      requestIdleCallback(() => {
-        this.#updatePosition();
-      });
+    if (!this.hasAttribute('data-hover-triggered')) {
+      if (!CSS.supports('position-anchor: --trigger')) {
+        popover.addEventListener('beforetoggle', () => {
+          this.#updatePosition();
+        });
+        requestIdleCallback(() => {
+          this.#updatePosition();
+        });
+      }
+      // account-popover в modal: top layer → fixed + viewport coords; scroll → обновляем позицию
+      if (this.classList.contains('account-popover')) {
+        popover.addEventListener('beforetoggle', (event) => {
+          const evt = /** @type {ToggleEvent} */ (event);
+          if (evt.newState === 'open') {
+            this.#updatePosition();
+            requestAnimationFrame(() => this.#updatePosition());
+            window.addEventListener('scroll', this.#scrollListener, { passive: true });
+          } else {
+            window.removeEventListener('scroll', this.#scrollListener);
+          }
+        });
+      }
     }
   }
 
@@ -124,6 +194,7 @@ export class AnchoredPopoverComponent extends Component {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this.#resizeListener);
+    window.removeEventListener('scroll', this.#scrollListener);
   }
 }
 

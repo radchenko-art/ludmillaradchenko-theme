@@ -1,0 +1,27 @@
+{% liquid
+  assign position = block.settings.position | default: 'left'
+  if settings.logo != blank
+    assign logo_width = settings.logo_height | times: settings.logo.aspect_ratio | ceil
+    assign logo_width_mobile = settings.logo_height_mobile | times: settings.logo.aspect_ratio | ceil
+    assign logo_style = '--logo-image-width: ' | append: logo_width | append: 'px; --logo-image-width-mobile: ' | append: logo_width_mobile | append: 'px; --logo-image-height: ' | append: settings.logo_height | append: 'px; --logo-image-height-mobile: ' | append: settings.logo_height_mobile | append: 'px;'
+  endif
+%}
+
+<div
+  class="logo-and-customer__logo logo-and-customer__logo--{{ position }}"
+  {{ block.shopify_attributes }}
+>
+  <a href="{{ routes.root_url }}" class="logo-and-customer__logo-link" style="{{ logo_style }}">
+    {% if settings.logo != blank %}
+      {% render 'image',
+        image: settings.logo,
+        class: 'logo-and-customer__logo-image',
+        height: settings.logo_height,
+        text_fallback: shop.name,
+        style: logo_style
+      %}
+    {% else %}
+      <span class="logo-and-customer__logo-text">{{ shop.name }}</span>
+    {% endif %}
+  </a>
+</div>

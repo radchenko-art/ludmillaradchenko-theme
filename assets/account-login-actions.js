@@ -16,18 +16,46 @@ class AccountLoginActions extends Component {
     this.shopLoginButton = this.querySelector('shop-login-button');
 
     if (this.shopLoginButton) {
-      // We don't have control over the shop-login-button markup, so we need to set additional attributes here
       this.shopLoginButton.setAttribute('full-width', 'true');
       this.shopLoginButton.setAttribute('persist-after-sign-in', 'true');
-      // Do this only if New Customer Account is ALWAYS the sign in option (and never Classic Customer Account)
       this.shopLoginButton.setAttribute('analytics-context', 'loginWithShopSelfServe');
       this.shopLoginButton.setAttribute('flow-version', 'account-actions-popover');
       this.shopLoginButton.setAttribute('return-uri', window.location.href);
 
-      // Reload the page after the login is completed, otherwise the page state is incorrect
       this.shopLoginButton.addEventListener('completed', () => {
         window.location.reload();
       });
+    }
+
+    const bindCustomTrigger = () => {
+      const customTrigger =
+        this.parentElement?.querySelector('[data-shop-login-trigger]') ||
+        document.querySelector('.account-actions__sign-in-shop-wrap [data-shop-login-trigger]');
+
+      if (!customTrigger) return;
+      if (!this.shopLoginButton) {
+        customTrigger.style.display = 'none';
+        return;
+      }
+
+      customTrigger.addEventListener('click', () => {
+        const inner =
+          this.shopLoginButton.shadowRoot?.querySelector(
+            'button, [role="button"], a, [tabindex="0"]'
+          ) ?? null;
+        console.log('[account-login-actions] inner in shadowRoot:', inner);
+        if (inner) {
+          inner.click();
+        } else {
+          this.shopLoginButton.click();
+        }
+      });
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindCustomTrigger);
+    } else {
+      requestAnimationFrame(bindCustomTrigger);
     }
   }
 }

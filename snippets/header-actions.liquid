@@ -24,7 +24,7 @@
 {% endcapture %}
 
 <header-actions
-  {{- block.shopify_attributes -}}
+  {% if block %}{{ block.shopify_attributes }}{% endif %}
 >
   {% if shop.customer_accounts_enabled %}
     <script
@@ -35,12 +35,17 @@
     <anchored-popover-component
       data-close-on-resize="true"
       class="account-popover mobile:hidden"
+      {% if account_menu_behavior == 'hover' %}data-hover-triggered{% endif %}
     >
-      {% render 'account-button' with 'account-popover' as popover_id %}
+      {% if account_menu_behavior == 'hover' %}
+        {% render 'account-button', label: account_label %}
+      {% else %}
+        {% render 'account-button', popover_id: 'account-popover', label: account_label %}
+      {% endif %}
       <div
-        class="account-popover__panel details-content color-{{ settings.popover_color_scheme }}"
+        class="account-popover__panel details-content color-{{ settings.popover_color_scheme }}{% if account_menu_behavior == 'hover' %} account-popover__panel--hover{% endif %}"
         id="account-popover"
-        popover="auto"
+        {% unless account_menu_behavior == 'hover' %}popover="auto"{% endunless %}
         ref="popover"
       >
         {% render 'account-actions' %}
@@ -49,9 +54,9 @@
 
     <dialog-component
       class="account-drawer"
-      {{ block.shopify_attributes }}
+      {% if block %}{{ block.shopify_attributes }}{% endif %}
     >
-      {% render 'account-button', attributes: 'on:click="/showDialog"' %}
+      {% render 'account-button', attributes: 'on:click="/showDialog"', label: account_label %}
       <dialog
         ref="dialog"
         class="color-{{ settings.popover_color_scheme }} dialog-modal dialog-drawer account-drawer__dialog"
@@ -117,7 +122,7 @@
 
     <cart-drawer-component
       class="cart-drawer"
-      {{ block.shopify_attributes }}
+      {% if block %}{{ block.shopify_attributes }}{% endif %}
       {% if settings.auto_open_cart_drawer %}
         auto-open
       {% endif %}
@@ -215,8 +220,32 @@
 
 {% stylesheet %}
   .account-popover {
-    --account-popover-min-width: 22rem;
-    --account-actions-max-width: 22rem;
+    --account-popover-min-width: 200px;
+    --account-actions-max-width: 200px;
+    position: relative;
+  }
+
+  .account-popover__panel::before,
+  .account-popover__panel::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    right: 1.25rem;
+    border: 6px solid transparent;
+    border-top: none;
+    border-bottom-width: 12px;
+    pointer-events: none;
+  }
+  .account-popover__panel::after {
+    border-bottom-color: #eee;
+    transform: translateY(-1px);
+    z-index: 0;
+  }
+  .account-popover__panel::before {
+    border-bottom-color: var(--color-background);
+    transform: translateY(4px);
+    z-index: 1;
+    filter: drop-shadow(0 -2px 4px rgb(var(--color-shadow-rgb) / 0.15));
   }
 
   .account-popover__summary {
@@ -240,7 +269,7 @@
     box-shadow: var(--shadow-popover);
     border: var(--style-border-popover);
     background-color: var(--color-background);
-    overflow-y: hidden;
+    overflow: visible;
     opacity: var(--account-popover-opacity);
     translate: 0 var(--account-popover-y);
     transition-property: display, opacity, translate;
@@ -250,13 +279,37 @@
     top: calc(anchor(bottom) + var(--header-padding));
     right: anchor(right);
 
+    /* Caret: ::after — обводка #eee на 1px выше, ::before — заливка */
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      right: 1.25rem;
+      border: 12px solid transparent;
+      border-top: none;
+      border-bottom-width: 12px;
+      pointer-events: none;
+    }
+    &::after {
+      border-bottom-color: #eee;
+      transform: translateY(-1px);
+      z-index: 0;
+    }
+    &::before {
+      border-bottom-color: var(--color-background);
+      z-index: 1;
+    }
+
     &:popover-open {
       --account-popover-opacity: 1;
       --account-popover-y: 0px;
     }
 
+    /* Fallback для тем без position-anchor (JS для .account-popover задаёт absolute и координаты) */
     @supports not (position-anchor: --account-button-trigger) {
-      top: calc(var(--anchor-top) * 1px + var(--minimum-touch-target) + var(--header-padding));
+      position: fixed;
+      top: calc(var(--anchor-top) * 1px + var(--anchor-height) * 1px + var(--header-padding));
       right: calc(var(--anchor-right) * 1px);
     }
 
@@ -266,6 +319,23 @@
         --account-popover-y: 0px;
       }
     }
+  }
+
+  /* Hover: панель без [popover] — absolute относительно .account-popover, скроллится с триггером */
+  .account-popover__panel--hover {
+    position: absolute;
+    z-index: 100;
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, translate 0.2s ease;
+  }
+  .account-popover__panel--hover.is-open {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+    --account-popover-opacity: 1;
+    --account-popover-y: 0;
   }
 
   @starting-style {

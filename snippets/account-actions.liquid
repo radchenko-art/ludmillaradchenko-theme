@@ -1,15 +1,19 @@
 <div class="account-actions">
   <div class="account-actions__main-menu">
-    <header class="account-actions__header">
-      <h2
-        id="account-drawer-heading"
-        class="account-actions__title h5"
-      >
-        {% if customer and customer.first_name != blank %}
-          {{ 'content.account_title_personalized' | t: first_name: customer.first_name }}
-        {% else %}
-          {{ 'content.account_title' | t }}
+    <header class="account-actions__header" id="account-drawer-heading">
+      <h2 class="account-actions__title h5 account-actions__title-row">
+        {% if customer %}
+          <span class="account-actions__icon" aria-hidden="true">
+            {{- 'icon-account.svg' | inline_asset_content -}}
+          </span>
         {% endif %}
+        <span>
+          {% if customer and customer.first_name != blank %}
+            {{ 'content.account_title_personalized' | t: first_name: customer.first_name }}
+          {% else %}
+            {{ 'content.account_title' | t }}
+          {% endif %}
+        </span>
       </h2>
       {% if customer %}
         <span class="account-actions__email">
@@ -32,14 +36,29 @@
           type="module"
           fetchpriority="low"
         ></script>
-        <account-login-actions class="account-actions__shop-login">
-          {{ shop | login_button }}
-        </account-login-actions>
+        <div class="account-actions__sign-in-shop-wrap">
+          <account-login-actions class="account-actions__shop-login">
+            {{ shop | login_button }}
+          </account-login-actions>
+          <button
+            type="button"
+            class="account-actions__sign-in-shop-custom button"
+            data-shop-login-trigger
+            aria-label="{{ 'actions.sign_in_with_shop' | t }}"
+          >
+            {{ 'actions.sign_in_with_shop' | t }}
+          </button>
+        </div>
 
         <a
           href="{% if request.design_mode %}{{ routes.account_url }}{% else %}{{ routes.storefront_login_url }}{% endif %}"
-          class="account-actions__link button"
+          class="account-actions__link account-actions__link--primary button"
+          target="_top"
+          rel="noopener"
         >
+          <span class="account-actions__icon" aria-hidden="true">
+            {{- 'icon-account.svg' | inline_asset_content -}}
+          </span>
           <span class="account-actions__sign-in-text">
             {{ 'actions.sign_in_options' | t }}
           </span>
@@ -50,31 +69,29 @@
       </div>
     {% endunless %}
 
-    <nav class="account-actions__nav">
+    <nav class="account-actions__nav" aria-label="{{ 'content.account_title' | t }}">
       <ul class="account-actions__list">
+        {% if customer %}
+          <li class="account-actions__list-item">
+            <a href="{{ routes.account_logout_url }}" class="account-actions__link account-actions__row">
+              <span class="account-actions__icon" aria-hidden="true">
+                {{- 'icon-account.svg' | inline_asset_content -}}
+              </span>
+              {{ 'actions.log_out' | t }}
+            </a>
+          </li>
+        {% endif %}
         <li class="account-actions__list-item">
-          <a
-            href="{{ routes.account_url }}"
-            class="account-actions__link button-secondary"
-          >
-            <span
-              class="account-actions__icon"
-              aria-hidden="true"
-            >
+          <a href="{{ routes.account_url }}" class="account-actions__link account-actions__row">
+            <span class="account-actions__icon" aria-hidden="true">
               {{- 'icon-orders.svg' | inline_asset_content -}}
             </span>
             {{ 'content.account_orders' | t }}
           </a>
         </li>
         <li class="account-actions__list-item">
-          <a
-            href="{{ routes.account_addresses_url }}"
-            class="account-actions__link button-secondary"
-          >
-            <span
-              class="account-actions__icon"
-              aria-hidden="true"
-            >
+          <a href="{{ routes.account_addresses_url }}" class="account-actions__link account-actions__row">
+            <span class="account-actions__icon" aria-hidden="true">
               {{- 'icon-account.svg' | inline_asset_content -}}
             </span>
             {{ 'content.account_profile' | t }}
@@ -99,20 +116,29 @@
   }
 
   .account-actions__header {
-    padding: var(--padding-xl);
+    padding: var(--padding-md) var(--padding-xl);
+    padding-block-end: var(--gap-sm);
     display: flex;
     flex-direction: column;
     gap: var(--gap-2xs);
   }
 
   .account-actions__title {
-    /* Ideally we set the font-size here, but specificity issues make this necessary */
     --font-h5--size: var(--font-size--lg);
-
     margin: 0;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+  }
+
+  .account-actions__title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+  }
+
+  .account-actions__title-row .account-actions__icon {
+    flex-shrink: 0;
   }
 
   .account-actions__email {
@@ -158,38 +184,86 @@
     --buttons-radius: var(--style-border-radius-buttons-primary);
   }
 
+  /* Своя кнопка поверх, оригинал Shop Pay скрыт — клик делегируется в JS */
+  .account-actions__sign-in-shop-wrap {
+    position: relative;
+  }
+  .account-actions__sign-in-shop-wrap .account-actions__shop-login {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .account-actions__sign-in-shop-wrap .account-actions__shop-login shop-login-button {
+    width: 100%;
+    height: 100%;
+  }
+  .account-actions__sign-in-shop-custom {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+  /* Если Shop Pay нет, скрыть обёртку с кастомной кнопкой (покажет только «Other sign in options») */
+  .account-actions__sign-ins:not(:has(shop-login-button)) .account-actions__sign-in-shop-wrap {
+    display: none;
+  }
+
   .account-actions__nav {
-    padding: var(--padding-xl);
+    padding: var(--padding-sm) var(--padding-xl) var(--padding-md);
     padding-block-start: 0;
   }
 
   .account-actions__list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--gap-sm);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     width: 100%;
     list-style: none;
     margin: 0;
     padding: 0;
-
-    @media screen and (max-width: 300px) {
-      grid-template-columns: 1fr;
-    }
   }
 
-  .account-actions__link {
-    width: auto;
+  .account-actions__list-item {
+    border-block-start: 1px solid rgb(var(--color-border-rgb) / 0.2);
+  }
+
+  .account-actions__list-item:first-child {
+    border-block-start: none;
+  }
+
+  .account-actions__row,
+  .account-actions__link.account-actions__row {
     display: flex;
-    justify-content: center;
     align-items: center;
-    gap: var(--gap-2xs);
+    gap: var(--gap-sm);
+    width: 100%;
+    padding: var(--padding-sm) 0;
+    text-align: start;
+    text-decoration: none;
+    color: inherit;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .account-actions__link.account-actions__row:hover {
+    color: var(--color-foreground);
+  }
+
+  .account-actions__link--primary.button {
+    margin-block-end: var(--gap-sm);
+  }
+
+  .account-actions__link.account-actions__row {
+    min-height: var(--minimum-touch-target);
   }
 
   .account-actions__icon {
     display: flex;
+    flex-shrink: 0;
     width: var(--icon-size-sm);
     height: var(--icon-size-sm);
-    margin-block: -4px;
   }
 
   /* This triggers iOS < 16.4. The outline bug is not recognized as a lack of @supports */
