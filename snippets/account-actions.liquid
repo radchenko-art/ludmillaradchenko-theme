@@ -42,17 +42,20 @@
           </account-login-actions>
           <button
             type="button"
-            class="account-actions__sign-in-shop-custom button"
+            class="account-actions__sign-in-shop-custom button-unstyled account-actions__row p-0"
             data-shop-login-trigger
             aria-label="{{ 'actions.sign_in_with_shop' | t }}"
           >
+            <span class="account-actions__icon" aria-hidden="true">
+              {{- 'icon-lock.svg' | inline_asset_content -}}
+            </span>
             {{ 'actions.sign_in_with_shop' | t }}
           </button>
         </div>
 
         <a
           href="{% if request.design_mode %}{{ routes.account_url }}{% else %}{{ routes.storefront_login_url }}{% endif %}"
-          class="account-actions__link account-actions__link--primary button"
+          class="account-actions__link account-actions__link--primary button-unstyled account-actions__row"
           target="_top"
           rel="noopener"
         >
@@ -151,12 +154,9 @@
   }
 
   .account-actions__sign-ins {
-    padding: var(--padding-xl);
-    padding-block-start: 0;
-    padding-block-end: var(--padding-md);
+    padding: 0 var(--padding-xl);
     display: flex;
     flex-direction: column;
-    gap: var(--gap-sm);
   }
 
   .account-actions__sign-in-text {
@@ -237,7 +237,7 @@
     align-items: center;
     gap: var(--gap-sm);
     width: 100%;
-    padding: var(--padding-sm) 0;
+    padding: 0;
     text-align: start;
     text-decoration: none;
     color: inherit;
@@ -245,6 +245,7 @@
     border: none;
     font: inherit;
     cursor: pointer;
+    font-size: 9.75pt
   }
 
   .account-actions__link.account-actions__row:hover {
@@ -253,10 +254,6 @@
 
   .account-actions__link--primary.button {
     margin-block-end: var(--gap-sm);
-  }
-
-  .account-actions__link.account-actions__row {
-    min-height: var(--minimum-touch-target);
   }
 
   .account-actions__icon {
