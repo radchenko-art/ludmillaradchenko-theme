@@ -1,31 +1,5 @@
 <div class="account-actions">
   <div class="account-actions__main-menu">
-    <header class="account-actions__header" id="account-drawer-heading">
-      <h2 class="account-actions__title h5 account-actions__title-row">
-        {% if customer %}
-          <span class="account-actions__icon" aria-hidden="true">
-            {{- 'icon-account.svg' | inline_asset_content -}}
-          </span>
-        {% endif %}
-        <span>
-          {% if customer and customer.first_name != blank %}
-            {{ 'content.account_title_personalized' | t: first_name: customer.first_name }}
-          {% else %}
-            {{ 'content.account_title' | t }}
-          {% endif %}
-        </span>
-      </h2>
-      {% if customer %}
-        <span class="account-actions__email">
-          {% if customer.email %}
-            {{ customer.email }}
-          {% elsif customer.phone %}
-            {{ customer.phone }}
-          {% endif %}
-        </span>
-      {% endif %}
-    </header>
-
     {% unless customer %}
       <div
         class="account-actions__sign-ins"
@@ -76,6 +50,20 @@
       <ul class="account-actions__list">
         {% if customer %}
           <li class="account-actions__list-item">
+            <span class="account-actions__row account-actions__row--identity">
+              <span class="account-actions__icon" aria-hidden="true">
+                {{- 'icon-account.svg' | inline_asset_content -}}
+              </span>
+              {% if customer.first_name != blank %}
+                {{ customer.first_name }}
+              {% elsif customer.email != blank %}
+                {{ customer.email }}
+              {% else %}
+                {{ customer.phone }}
+              {% endif %}
+            </span>
+          </li>
+          <li class="account-actions__list-item">
             <a href="{{ routes.account_logout_url }}" class="account-actions__link account-actions__row">
               <span class="account-actions__icon" aria-hidden="true">
                 {{- 'icon-account.svg' | inline_asset_content -}}
@@ -100,6 +88,19 @@
             {{ 'content.account_profile' | t }}
           </a>
         </li>
+        <li class="account-actions__list-item">
+          <a
+            href="#st-wishlist-details-button"
+            class="account-actions__link account-actions__row"
+            title="{{ 'actions.wishlist' | t }}"
+            aria-label="{{ 'actions.wishlist' | t }}"
+          >
+            <span class="account-actions__icon" aria-hidden="true">
+              {{- 'icon-heart.svg' | inline_asset_content -}}
+            </span>
+            {{ 'actions.wishlist' | t }}
+          </a>
+        </li>
       </ul>
     </nav>
   </div>
@@ -118,43 +119,12 @@
     }
   }
 
-  .account-actions__header {
-    padding: var(--padding-md) var(--padding-xl);
-    padding-block-end: var(--gap-sm);
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-2xs);
-  }
-
-  .account-actions__title {
-    --font-h5--size: var(--font-size--lg);
-    margin: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-
-  .account-actions__title-row {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
-  }
-
-  .account-actions__title-row .account-actions__icon {
-    flex-shrink: 0;
-  }
-
-  .account-actions__email {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-2xs);
-    color: rgb(var(--color-foreground-rgb) / var(--opacity-60));
-    max-width: var(--account-actions-max-width);
-    word-break: break-all;
+  .account-actions__row--identity {
+    cursor: default;
   }
 
   .account-actions__sign-ins {
-    padding: 0 var(--padding-xl);
+    padding: 0;
     display: flex;
     flex-direction: column;
   }
@@ -209,7 +179,7 @@
   }
 
   .account-actions__nav {
-    padding: var(--padding-sm) var(--padding-xl) var(--padding-md);
+    padding: 0;
     padding-block-start: 0;
   }
 
@@ -221,14 +191,6 @@
     list-style: none;
     margin: 0;
     padding: 0;
-  }
-
-  .account-actions__list-item {
-    border-block-start: 1px solid rgb(var(--color-border-rgb) / 0.2);
-  }
-
-  .account-actions__list-item:first-child {
-    border-block-start: none;
   }
 
   .account-actions__row,
@@ -245,7 +207,8 @@
     border: none;
     font: inherit;
     cursor: pointer;
-    font-size: 9.75pt
+    font-size: 9.75pt;
+    padding: 0.313rem 1.125rem;
   }
 
   .account-actions__link.account-actions__row:hover {

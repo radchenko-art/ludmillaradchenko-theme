@@ -99,33 +99,31 @@
             ref="menuitem"
           >
             <span class="menu-list__link-title">{{- link.title -}}</span>
+            {%- if link.links != blank -%}
+              <span class="menu-list__link-chevron icon-caret" aria-hidden="true">
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </span>
+            {%- endif -%}
           </a>
           {%- if link.links != blank -%}
-            <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]">
+            <div class="menu-list__submenu{{ color_scheme_classes }}" ref="submenu[]" style="{% render 'submenu-font-styles', settings: block_settings %}">
               <div
                 id="submenu-{{ forloop.index }}"
                 class="menu-list__submenu-inner"
-                style="{% render 'submenu-font-styles', settings: block_settings %}"
               >
-                {% assign list_id = 'MegaMenuList-' | append: forloop.index %}
-                <div class="mega-menu section section--full-width-margin section--{{ section.settings.section_width }}">
-                  <div
-                    class="mega-menu__grid"
-                    data-menu-grid-id="{{ list_id }}"
-                  >
-                    {% render 'mega-menu-list',
-                      parent_link: link,
-                      id: list_id,
-                      section: section,
-                      grid_columns_count: 6,
-                      grid_columns_count_tablet: 4,
-                      grid_columns_count_collection_images: 8,
-                      menu_content_type: menu_content_type,
-                      content_aspect_ratio: ratio,
-                      image_border_radius: image_border_radius
-                    %}
-                  </div>
-                </div>
+                <ul class="menu-list__submenu-list list-unstyled" role="list">
+                  {% for child_link in link.links %}
+                    <li>
+                      <a
+                        href="{{ child_link.url }}"
+                        class="menu-list__submenu-link"
+                        {% if child_link.current %}aria-current="page"{% endif %}
+                      >
+                        {{- child_link.title -}}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
               </div>
             </div>
           {%- endif -%}
@@ -262,6 +260,7 @@
     --menu-vertical-gap: var(--gap-xl);
 
     display: flex;
+    margin-bottom: 60px;
   }
 
   .menu-list__list {
@@ -304,6 +303,17 @@
     }
   }
 
+  .menu-list__link-chevron {
+    display: inline-flex;
+    color: currentColor;
+    margin-inline-start: 0.25rem;
+  }
+
+  .menu-list__link-chevron svg {
+    width: 0.75em;
+    height: 0.75em;
+  }
+
   /*
       High specificity selectors to subdue non-hovered links without javascript.
       If the need for js-generated `hovered` and `focused` classes arises for another reason we can simplify these.
@@ -334,23 +344,34 @@
     background-color: transparent;
     padding: var(--focus-outline-size);
     margin: calc(-1 * var(--focus-outline-size));
+    min-height: 50px;
+    align-items: center;
   }
 
-  /* the submenu background element to animate */
+  .overflow-menu::before {
+    content: "";
+    border-top: 1px solid #e6e6e6;
+    border-bottom: 1px solid #e6e6e6;
+    position: absolute;
+    top: 0;
+    bottom: -1px;
+    width: 750px;
+    height: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  /* Full-width submenu bar hidden when using dropdown submenus (main list only) */
   .overflow-menu::after {
     content: '';
     position: absolute;
     top: calc(100% - 1px + var(--border-bottom-width));
     left: 0;
     width: 100%;
-    height: var(--submenu-height);
-    background-color: var(--color-background);
-    box-shadow: var(--shadow-popover);
-    clip-path: inset(0.5px 0 -100px 0); /* stylelint-disable-line */
-    opacity: var(--submenu-opacity, 1);
-    transition: height var(--submenu-animation-speed) var(--ease-out-cubic),
-      opacity var(--animation-speed-slow) var(--ease-out-cubic) var(--animation-speed-fast);
-    z-index: calc(var(--layer-header-menu) - 1);
+    height: 0;
+    pointer-events: none;
+    visibility: hidden;
   }
 
   /** mega menu **/
@@ -369,7 +390,66 @@
     }
   }
 
-  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu,
+  /* Main list: submenu as dropdown under the item (like account popover), does not stretch parent */
+  .menu-list__list-item:where(:not([slot='overflow'])) {
+    position: relative;
+  }
+
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu {
+    --submenu-content-opacity: 0;
+    --submenu-content-animation: opacity calc(var(--submenu-animation-speed) * 0.75) var(--animation-easing);
+
+    visibility: hidden;
+    position: absolute;
+    top: calc(100% + var(--header-padding, 0px));
+    left: 0;
+    z-index: var(--layer-header-menu);
+    width: max-content;
+    min-width: 12rem;
+    max-width: min(22rem, 90vw);
+    padding: 0.625rem 0;
+    background-color: var(--color-background);
+    border-radius: var(--style-border-radius-popover);
+    box-shadow: var(--shadow-popover);
+    border: var(--style-border-popover);
+    overflow: visible;
+    opacity: var(--submenu-content-opacity);
+    transform: translateY(-4px);
+    transition: opacity var(--submenu-animation-speed) var(--animation-easing),
+      transform var(--submenu-animation-speed) var(--animation-easing);
+  }
+
+  .menu-list__list-item:has([aria-expanded='true']) > .menu-list__submenu,
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu:is(:hover) {
+    --submenu-content-opacity: 1;
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Dropdown caret — те же размеры, что у .account-popover__panel */
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::before,
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 1.25rem;
+    border: 12px solid transparent;
+    border-top: none;
+    border-bottom-width: 12px;
+    pointer-events: none;
+  }
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::after {
+    border-bottom-color: #eee;
+    transform: translateY(-1px);
+    z-index: 0;
+  }
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::before {
+    border-bottom-color: var(--color-background);
+    transform: translateY(1px);
+    z-index: 1;
+  }
+
   .overflow-menu::part(overflow) {
     --submenu-content-opacity: 0;
     --submenu-content-animation: opacity calc(var(--submenu-animation-speed) * 0.75) var(--animation-easing);
@@ -388,22 +468,60 @@
 
   /* Show the submenus on hover */
   .menu-list__list-item:has([aria-expanded='true']) > .menu-list__submenu,
-  /* Show the overflow menu when a menu item is hovered */
   .overflow-menu:has([slot="overflow"] [aria-expanded='true'])::part(overflow),
-  /* Keep the submenus open when they are hovered */
   .menu-list__submenu:is(:hover),
   .overflow-menu::part(overflow):hover {
     --submenu-content-opacity: 1;
+  }
 
+  .overflow-menu:has([slot="overflow"] [aria-expanded='true'])::part(overflow),
+  .overflow-menu::part(overflow):hover {
     visibility: visible;
   }
 
-  .menu-list__submenu-inner,
   .overflow-menu::part(overflow-list) {
     grid-column: 2;
     padding-block-start: var(--submenu-padding-block-start);
     padding-block-end: var(--submenu-padding-block-end);
     padding-inline: var(--section-padding-inline);
+  }
+
+  .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu .menu-list__submenu-inner {
+    display: block;
+    padding: var(--padding-sm) var(--padding-md);
+    opacity: var(--submenu-content-opacity);
+    transition: var(--submenu-content-animation);
+  }
+
+  .menu-list__submenu-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .menu-list__submenu-list li {
+    margin: 0;
+  }
+
+  .menu-list__submenu-link {
+    display: block;
+    padding: var(--padding-2xs) 0;
+    color: var(--menu-child-font-color, var(--color-foreground));
+    text-decoration: none;
+    font-size: var(--menu-child-font-size, inherit);
+    line-height: var(--menu-child-font-line-height, inherit);
+    transition: color var(--animation-speed) var(--animation-easing);
+  }
+
+  .menu-list__submenu-link:hover {
+    color: var(--menu-child-active-font-color, var(--color-foreground));
+  }
+
+  .menu-list__submenu-link[aria-current='page'] {
+    font-weight: 600;
   }
 
   .overflow-menu::part(overflow) {
