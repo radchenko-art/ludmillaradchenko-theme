@@ -236,6 +236,9 @@
   "names": {
     "column": "Column",
     "product_title": "Product title",
+    "product_vendor": "Brand",
+    "product_metafields": "Product metafields",
+    "metafield_exclusion": "Excluded key",
     "custom_liquid": "Custom Liquid",
     "404": "404",
     "accelerated_checkout": "Accelerated checkout",
@@ -437,6 +440,8 @@
   "options": {
     "above_carousel": "Above carousel",
     "accent": "Accent",
+    "accent_second": "Accent second",
+    "accent_third": "Accent third",
     "all": "All",
     "always": "Always",
     "apple": "Apple",
@@ -968,6 +973,7 @@
     "motion": "Motion",
     "motion_direction": "Motion direction",
     "movement_direction": "Movement direction",
+    "metafield_key": "Metafield key",
     "navigation": "Navigation",
     "navigation_bar": "Navigation bar",
     "navigation_bar_color_scheme": "Navigation bar color scheme",
@@ -1093,6 +1099,7 @@
     // Font size or element dimensions setting
     "size": "Size",
     "skus": "SKUs",
+    "sku_highlight_after_title": "Style as main reference (border after title)",
     "size_mobile": "Mobile size",
     "slide_spacing": "Slide gap",
     "slide_width": "Slide width",

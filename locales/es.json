@@ -318,7 +318,8 @@
       "quantity_maximum": "Máximo de {{ maximum }}",
       "in_cart": "en el carrito",
       "default_title": "Título predeterminado",
-      "sticky_add_to_cart": "Barra de agregar rápido al carrito"
+      "sticky_add_to_cart": "Barra de agregar rápido al carrito",
+      "brand": "Marca"
     }
   },
   "fields": {

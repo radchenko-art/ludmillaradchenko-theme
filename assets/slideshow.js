@@ -292,6 +292,9 @@ export class Slideshow extends Component {
 
     const previousIndex = this.current;
 
+    for (const s of this.refs.slides) {
+      s.setAttribute('aria-hidden', 'true');
+    }
     slide.setAttribute('aria-hidden', 'false');
 
     if (this.#scroll) {
@@ -584,6 +587,7 @@ export class Slideshow extends Component {
             visibleSlidesAmount = 1;
           }
         }
+        this.#updateThumbnailArrowsVisibility();
       });
 
       this.#resizeObserver = new ResizeObserver(async () => {
@@ -596,10 +600,30 @@ export class Slideshow extends Component {
         if (this.hasAttribute('auto-hide-controls')) {
           this.#updateControlsVisibility();
         }
+        this.#updateThumbnailArrowsVisibility();
       });
 
       this.#resizeObserver.observe(this.refs.slideshowContainer);
     });
+  }
+
+  /**
+   * Hide thumbnail strip arrows when all thumbnails fit (no overflow).
+   */
+  #updateThumbnailArrowsVisibility() {
+    const { slideshowControls, thumbnailsContainer } = this.refs;
+    if (!slideshowControls?.hasAttribute('thumbnails') || !thumbnailsContainer || !(thumbnailsContainer instanceof HTMLElement)) {
+      return;
+    }
+    const vertical = slideshowControls.getAttribute('scroll-mode') === 'vertical';
+    const noOverflow = vertical
+      ? thumbnailsContainer.scrollHeight <= thumbnailsContainer.clientHeight
+      : thumbnailsContainer.scrollWidth <= thumbnailsContainer.clientWidth;
+    if (noOverflow) {
+      slideshowControls.setAttribute('thumbnails-no-overflow', '');
+    } else {
+      slideshowControls.removeAttribute('thumbnails-no-overflow');
+    }
   }
 
   /**
@@ -917,6 +941,42 @@ export class Slideshow extends Component {
       block: 'center',
       inline: 'center',
     });
+  }
+
+  /**
+   * Scrolls the thumbnails strip up by one thumbnail height.
+   */
+  scrollThumbnailsUp() {
+    this.#scrollThumbnailsBy(-1);
+  }
+
+  /**
+   * Scrolls the thumbnails strip down by one thumbnail height.
+   */
+  scrollThumbnailsDown() {
+    this.#scrollThumbnailsBy(1);
+  }
+
+  /**
+   * @param {number} direction - -1 for up, 1 for down
+   */
+  #scrollThumbnailsBy(direction) {
+    const { thumbnailsContainer, thumbnails } = this.refs;
+    if (!thumbnailsContainer || !(thumbnailsContainer instanceof HTMLElement) || !thumbnails?.length) return;
+
+    const first = thumbnails[0];
+    if (!(first instanceof HTMLElement)) return;
+
+    const inner = first.parentElement;
+    const gapPx = inner ? parseFloat(getComputedStyle(inner).gap) || 4 : 4;
+    const thumbnailWidthStr = getComputedStyle(first).getPropertyValue('--thumbnail-width').trim();
+    const thumbnailWidthPx = thumbnailWidthStr ? parseFloat(thumbnailWidthStr) : first.offsetWidth;
+    const aspectRatio = parseFloat(getComputedStyle(first).aspectRatio) || 1;
+    const thumbnailHeightPx = thumbnailWidthPx / aspectRatio;
+    const step = thumbnailHeightPx + gapPx;
+    const amount = direction * step;
+
+    thumbnailsContainer.scrollBy({ top: amount, behavior: 'smooth' });
   }
 
   #updateVisibleSlides() {

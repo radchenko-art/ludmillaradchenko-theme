@@ -1,0 +1,80 @@
+{% comment %}
+  Product disclaimer block. Displays a hardcoded notice (replacement for PrestaShop short description disclaimer).
+  English text matches the PrestaShop notice from detail1521737380.tpl.
+{% endcomment %}
+
+<div
+  class="product-disclaimer spacing-style rte"
+  {{ block.shopify_attributes }}
+  style="{% render 'spacing-padding', settings: block.settings %}"
+>
+  <p class="product-disclaimer__text">
+    <em><strong>***ATTENTION:***</strong> The prices indicated for the works reflect their value and market quotation. Any discounts managed by private galleries are not our responsibility.</em>
+  </p>
+</div>
+
+{% stylesheet %}
+  .product-disclaimer,
+  .product-disclaimer * {
+    color: #f80610 !important;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product disclaimer",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product disclaimer",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

@@ -335,7 +335,8 @@
       "quantity_maximum": "Maximum: {{ maximum }}",
       "in_cart": "a kosárban",
       "default_title": "Alapértelmezett cím",
-      "sticky_add_to_cart": "Gyors hozzáadás a kosárhoz sáv"
+      "sticky_add_to_cart": "Gyors hozzáadás a kosárhoz sáv",
+      "brand": "Márka"
     }
   }
 }

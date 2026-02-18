@@ -1,7 +1,14 @@
 
 
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
-<div class="section page-width-content color-{{ section.settings.color_scheme }}">
+<div class="section {% if section.settings.content_width == 'normal' %}page-width-narrow{% else %}page-width-content{% endif %} color-{{ section.settings.color_scheme }}">
+  {%- liquid
+    assign bg_image = page.metafields.custom.background_image.value
+    assign bg_image_url = ''
+    if bg_image != blank
+      assign bg_image_url = bg_image | image_url: width: 1920
+    endif
+  -%}
   <div
     class="
       spacing-style
@@ -9,15 +16,59 @@
       layout-panel-flex--column
       section-content-wrapper
       mobile-column
+      {% if bg_image_url != blank %}section-content-wrapper--has-bg{% endif %}
     "
     style="
       {% render 'layout-panel-style', settings: section.settings %}
       {% render 'spacing-style', settings: section.settings %}
+      {% if bg_image_url != blank %}
+        background-image: url('{{ bg_image_url }}');
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        background-size: cover;
+        color: #fff;
+      {% endif %}
     "
   >
     {% content_for 'blocks' %}
   </div>
 </div>
+
+{% stylesheet %}
+  .section-content-wrapper--has-bg {
+    position: relative;
+  }
+
+  .section-content-wrapper--has-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.54);
+    pointer-events: none;
+  }
+
+  .section-content-wrapper--has-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-content-wrapper--has-bg,
+  .section-content-wrapper--has-bg h1,
+  .section-content-wrapper--has-bg h2,
+  .section-content-wrapper--has-bg h3,
+  .section-content-wrapper--has-bg h4,
+  .section-content-wrapper--has-bg .rte,
+  .section-content-wrapper--has-bg .rte p,
+  .section-content-wrapper--has-bg .rte a,
+  .section-content-wrapper--has-bg .rte li,
+  .section-content-wrapper--has-bg .text-block {
+    color: #fff;
+  }
+
+  .section-content-wrapper--has-bg .rte a:not(.page-content__download-link) {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -38,6 +89,22 @@
     "groups": ["header"]
   },
   "settings": [
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "t:settings.content_width",
+      "options": [
+        {
+          "value": "content",
+          "label": "t:options.narrow"
+        },
+        {
+          "value": "normal",
+          "label": "t:options.page"
+        }
+      ],
+      "default": "content"
+    },
     {
       "type": "select",
       "id": "content_direction",

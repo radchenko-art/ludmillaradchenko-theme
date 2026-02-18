@@ -1,0 +1,187 @@
+{%- comment -%}
+  Breadcrumbs. Renders on all pages except index.
+  Uses collection metafield: custom.parent_collection (reference) for hierarchy.
+  Include in layout: {% unless template.name == 'index' %}{% render 'breadcrumbs' %}{% endunless %}
+{%- endcomment -%}
+
+{%- liquid
+  assign show_breadcrumbs = false
+  assign crumb_handles = '' | split: ','
+  if template.name == 'collection'
+    assign c = collection
+    assign handles_arr = ''
+    for i in (1..15)
+      if c == blank
+        break
+      endif
+      assign handles_arr = handles_arr | append: c.handle | append: ','
+      assign parent = c.metafields.custom.parent_collection.value
+      if parent == blank
+        break
+      endif
+      assign c = parent
+    endfor
+    assign crumb_handles = handles_arr | split: ',' | reverse
+    assign show_breadcrumbs = true
+  elsif template.name == 'product'
+    assign show_breadcrumbs = true
+    assign prod_collection = product.collections | first
+    if prod_collection != blank
+      assign c = prod_collection
+      assign handles_arr = ''
+      for i in (1..15)
+        if c == blank
+          break
+        endif
+        assign handles_arr = handles_arr | append: c.handle | append: ','
+        assign parent = c.metafields.custom.parent_collection.value
+        if parent == blank
+          break
+        endif
+        assign c = parent
+      endfor
+      assign crumb_handles = handles_arr | split: ',' | reverse
+    endif
+  elsif template.name == 'page' or template.name == 'blog' or template.name == 'article' or template.name == 'search' or template.name == 'cart'
+    assign show_breadcrumbs = true
+  endif
+-%}
+
+{%- if show_breadcrumbs -%}
+  <nav aria-label="{{ 'accessibility.breadcrumb' | t | default: 'Breadcrumb' }}" class="breadcrumbs">
+    <div class="breadcrumbs__inner page-width">
+      <ol class="breadcrumbs__list" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="{{ routes.root_url }}" itemprop="item" class="breadcrumbs__link link"><span itemprop="name">{%- assign home_label = 'general.breadcrumbs.home' | t -%}{%- if home_label contains 'Translation missing' -%}Home{%- else -%}{{ home_label }}{%- endif -%}</span></a>
+          <meta itemprop="position" content="1">
+        </li>
+        {%- if template.name == 'collection' -%}
+          {%- assign position = 2 -%}
+          {%- for handle in crumb_handles -%}
+            {%- if handle == blank -%}{% continue %}{%- endif -%}
+            {%- assign crumb_collection = collections[handle] -%}
+            {%- if crumb_collection == blank -%}{% continue %}{%- endif -%}
+            <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              {%- if crumb_collection.handle == collection.handle -%}
+                <span itemprop="name">{{ crumb_collection.title }}</span>
+              {%- else -%}
+                <a href="{{ crumb_collection.url }}" itemprop="item"  class="breadcrumbs__link link">
+                    <span itemprop="name">{{ crumb_collection.title }}</span>
+                </a>
+              {%- endif -%}
+              <meta itemprop="position" content="{{ position }}">
+            </li>
+            {%- assign position = position | plus: 1 -%}
+          {%- endfor -%}
+        {%- elsif template.name == 'product' -%}
+          {%- assign position = 2 -%}
+          {%- for handle in crumb_handles -%}
+            {%- if handle == blank -%}{% continue %}{%- endif -%}
+            {%- assign crumb_collection = collections[handle] -%}
+            {%- if crumb_collection == blank -%}{% continue %}{%- endif -%}
+            <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+            <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+              <a href="{{ crumb_collection.url }}" itemprop="item" class="breadcrumbs__link link">
+                  <span itemprop="name">{{ crumb_collection.title }}</span>
+              </a>
+              <meta itemprop="position" content="{{ position }}">
+            </li>
+            {%- assign position = position | plus: 1 -%}
+          {%- endfor -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ product.title }}</span>
+            <meta itemprop="position" content="{{ position }}">
+          </li>
+        {%- elsif template.name == 'page' -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ page.title }}</span>
+            <meta itemprop="position" content="2">
+          </li>
+        {%- elsif template.name == 'blog' -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ blog.title }}</span>
+            <meta itemprop="position" content="2">
+          </li>
+        {%- elsif template.name == 'article' -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <a href="{{ blog.url }}" itemprop="item" class="breadcrumbs__link link">
+                <span itemprop="name">{{ blog.title }}</span>
+            </a>
+            <meta itemprop="position" content="2">
+          </li>
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ article.title }}</span>
+            <meta itemprop="position" content="3">
+          </li>
+        {%- elsif template.name == 'search' -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ 'general.breadcrumbs.search' | t | default: 'Search' }}</span>
+            <meta itemprop="position" content="2">
+          </li>
+        {%- elsif template.name == 'cart' -%}
+          <li class="breadcrumbs__separator" aria-hidden="true"> / </li>
+          <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+            <span itemprop="name">{{ 'general.breadcrumbs.cart' | t | default: 'Cart' }}</span>
+            <meta itemprop="position" content="2">
+          </li>
+        {%- endif -%}
+      </ol>
+    </div>
+  </nav>
+{%- endif -%}
+
+{% stylesheet %}
+  .breadcrumbs {
+    background-color: #f2f2f2;
+    padding-block: 10px;
+    margin-bottom: 40px;
+  }
+
+  .breadcrumbs__inner {
+    max-width: var(--page-width, 1200px);
+    margin-inline: auto;
+    padding-inline: var(--page-margin);
+  }
+
+  .breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.8125rem;
+    color: #4a4a4a;
+    white-space: normal;
+  }
+
+  .breadcrumbs__link {
+    color: #999;
+    text-decoration: none;
+  }
+
+  .breadcrumbs__link:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumbs__separator {
+    color: #888;
+    user-select: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .breadcrumbs__list {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+      padding: 0 15px;
+    }
+  }
+{% endstylesheet %}

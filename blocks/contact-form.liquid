@@ -16,115 +16,181 @@
   "
   {{ block.shopify_attributes }}
 >
-  {% assign form_id = block.id | default: section.id | prepend: 'ContactForm-' %}
-  {%- form 'contact', id: form_id, class: 'contact-form__form' -%}
-    <input
-      name="contact[id]"
-      type="hidden"
-      value="{{ form_id }}"
-    >
+  {%- liquid
+    assign modal_mode = block.settings.modal_mode
+    assign show_out_of_stock = block.settings.show_out_of_stock
+    assign is_out_of_stock = false
 
-    {%- if form.errors and form.id == form_id -%}
-      <div
-        class="contact-form__error"
-        tabindex="-1"
-        autofocus
+    if show_out_of_stock and product
+      unless product.available
+        assign is_out_of_stock = true
+      endunless
+    endif
+  -%}
+
+  {%- if is_out_of_stock -%}
+    <div class="contact-form__stock-label">OUT-OF-STOCK</div>
+  {%- endif -%}
+
+  {% capture contact_form_markup %}
+    {% assign form_id = block.id | default: section.id | prepend: 'ContactForm-' %}
+    {%- form 'contact', id: form_id, class: 'contact-form__form' -%}
+      <input
+        name="contact[id]"
+        type="hidden"
+        value="{{ form_id }}"
       >
-        {{- 'icon-error.svg' | inline_asset_content -}}
 
-        {{- form.errors.translated_fields.email | capitalize }}
-        {{ form.errors.messages.email -}}
+      {%- if form.errors and form.id == form_id -%}
+        <div
+          class="contact-form__error"
+          tabindex="-1"
+          autofocus
+        >
+          {{- 'icon-error.svg' | inline_asset_content -}}
+
+          {{- form.errors.translated_fields.email | capitalize }}
+          {{ form.errors.messages.email -}}
+        </div>
+      {%- endif -%}
+
+      {%- if form.posted_successfully? and form.id == form_id -%}
+        <div
+          class="contact-form__success"
+          tabindex="-1"
+          autofocus
+        >
+          {{- 'icon-checkmark.svg' | inline_asset_content -}}
+          {{- 'blocks.contact_form.post_success' | t -}}
+        </div>
+      {%- endif -%}
+
+      <div class="contact-form__form-row">
+        <label
+          class="visually-hidden"
+          for="ContactForm-name"
+        >
+          {{- 'blocks.contact_form.name' | t -}}
+        </label>
+        <input
+          type="text"
+          id="ContactForm-name"
+          class="contact-form__input"
+          autocomplete="name"
+          name="contact[name]"
+          value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+          placeholder="{{ 'blocks.contact_form.name' | t }}"
+        >
+
+        <label
+          class="visually-hidden"
+          for="ContactForm-email"
+        >
+          {{- 'blocks.contact_form.email' | t -}}
+          <span aria-hidden="true">*</span></label
+        >
+        <input
+          type="email"
+          id="ContactForm-email"
+          class="contact-form__input"
+          autocomplete="email"
+          name="contact[email]"
+          spellcheck="false"
+          autocapitalize="off"
+          value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+          aria-required="true"
+          {% if form.errors contains 'email' and form.id == form_id %}
+            aria-invalid="true"
+            aria-describedby="ContactForm-email-error"
+          {% endif %}
+          placeholder="{{ 'blocks.contact_form.email' | t }}"
+        >
       </div>
-    {%- endif -%}
 
-    {%- if form.posted_successfully? and form.id == form_id -%}
-      <div
-        class="contact-form__success"
-        tabindex="-1"
-        autofocus
-      >
-        {{- 'icon-checkmark.svg' | inline_asset_content -}}
-        {{- 'blocks.contact_form.post_success' | t -}}
-      </div>
-    {%- endif -%}
-
-    <div class="contact-form__form-row">
       <label
         class="visually-hidden"
-        for="ContactForm-name"
+        for="ContactForm-phone"
       >
-        {{- 'blocks.contact_form.name' | t -}}
+        {{- 'blocks.contact_form.phone' | t -}}
       </label>
       <input
-        type="text"
-        id="ContactForm-name"
+        type="tel"
+        id="ContactForm-phone"
         class="contact-form__input"
-        autocomplete="name"
-        name="contact[name]"
-        value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
-        placeholder="{{ 'blocks.contact_form.name' | t }}"
+        autocomplete="tel"
+        name="contact[phone]"
+        pattern="[0-9\\-]*"
+        value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+        placeholder="{{ 'blocks.contact_form.phone' | t }}"
       >
 
       <label
         class="visually-hidden"
-        for="ContactForm-email"
+        for="ContactForm-body"
       >
-        {{- 'blocks.contact_form.email' | t -}}
-        <span aria-hidden="true">*</span></label
+        {{- 'blocks.contact_form.comment' | t -}}
+      </label>
+      <textarea
+        rows="10"
+        id="ContactForm-body"
+        class="contact-form__input contact-form__input--textarea"
+        name="contact[body]"
+        placeholder="{{ 'blocks.contact_form.comment' | t }}"
       >
-      <input
-        type="email"
-        id="ContactForm-email"
-        class="contact-form__input"
-        autocomplete="email"
-        name="contact[email]"
-        spellcheck="false"
-        autocapitalize="off"
-        value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
-        aria-required="true"
-        {% if form.errors contains 'email' and form.id == form_id %}
-          aria-invalid="true"
-          aria-describedby="ContactForm-email-error"
-        {% endif %}
-        placeholder="{{ 'blocks.contact_form.email' | t }}"
+        {{- form.body -}}
+      </textarea>
+
+      {{ submit_button }}
+    {%- endform -%}
+  {% endcapture %}
+
+  {%- if modal_mode -%}
+    {%- assign dialog_id = 'ContactFormDialog-' | append: block.id -%}
+    <dialog-component>
+      <button
+        type="button"
+        class="button contact-form__open-button"
+        aria-haspopup="dialog"
+        aria-controls="{{ dialog_id }}"
+        on:click="/showDialog"
       >
-    </div>
+        <span class="contact-form__open-button-icon">
+          {{- 'icon-help.svg' | inline_asset_content -}}
+        </span>
+        {{ block.settings.button_text }}
+      </button>
 
-    <label
-      class="visually-hidden"
-      for="ContactForm-phone"
-    >
-      {{- 'blocks.contact_form.phone' | t -}}
-    </label>
-    <input
-      type="tel"
-      id="ContactForm-phone"
-      class="contact-form__input"
-      autocomplete="tel"
-      name="contact[phone]"
-      pattern="[0-9\-]*"
-      value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
-      placeholder="{{ 'blocks.contact_form.phone' | t }}"
-    >
+      <dialog
+        id="{{ dialog_id }}"
+        ref="dialog"
+        class="dialog-modal dialog-drawer color-{{ settings.drawer_color_scheme }}"
+        scroll-lock
+        aria-labelledby="contact-form-dialog-heading-{{ block.id }}"
+        data-testid="contact-form-dialog"
+      >
+        <h2
+          id="contact-form-dialog-heading-{{ block.id }}"
+          class="visually-hidden"
+        >
+          {{ 't:names.contact_form' | t }}
+        </h2>
+        <button
+          ref="closeButton"
+          on:click="/closeDialog"
+          class="button button-unstyled close-button"
+          aria-label="{{ 'actions.close_dialog' | t }}"
+        >
+          <span class="svg-wrapper">
+            {{- 'icon-close.svg' | inline_asset_content -}}
+          </span>
+        </button>
 
-    <label
-      class="visually-hidden"
-      for="ContactForm-body"
-    >
-      {{- 'blocks.contact_form.comment' | t -}}
-    </label>
-    <textarea
-      rows="10"
-      id="ContactForm-body"
-      class="contact-form__input contact-form__input--textarea"
-      name="contact[body]"
-      placeholder="{{ 'blocks.contact_form.comment' | t }}"
-    >
-      {{- form.body -}}
-    </textarea>
-
-    {{ submit_button }}
-  {%- endform -%}
+        {{ contact_form_markup }}
+      </dialog>
+    </dialog-component>
+  {%- else -%}
+    {{ contact_form_markup }}
+  {%- endif -%}
 </div>
 
 {% stylesheet %}
@@ -168,6 +234,42 @@
     align-items: center;
     gap: var(--gap-xs);
   }
+
+  .contact-form__stock-label {
+    padding-top: 15px;
+    margin-bottom: 20px;
+    color: #ff9a52;
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  .contact-form__open-button {
+    height: 40px;
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--gap-xs, 8px);
+  }
+
+  .contact-form__open-button-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .contact-form__open-button-icon svg {
+    width: 20px;
+    height: 20px;
+    color: inherit;
+  }
+
+  .contact-form__open-button-icon path {
+    stroke: currentColor;
+    stroke-width: 2px;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -175,6 +277,25 @@
   "name": "t:names.contact_form",
   "tag": null,
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "modal_mode",
+      "label": "Mode modal",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_out_of_stock",
+      "label": "Show out-of-stock",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "t:names.contact_form",
+      "visible_if": "{{ block.settings.modal_mode }}"
+    },
     {
       "type": "select",
       "id": "width",

@@ -312,7 +312,8 @@
       "quantity_maximum": "Максимум: {{ maximum }}",
       "in_cart": "в количката",
       "default_title": "Заглавие по подразбиране",
-      "sticky_add_to_cart": "Лента за бързо добавяне в количката"
+      "sticky_add_to_cart": "Лента за бързо добавяне в количката",
+      "brand": "Марка"
     }
   },
   "fields": {

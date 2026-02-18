@@ -1,5 +1,11 @@
-
-
+<script>
+  (function () {
+    const wrapper = document.querySelector('[data-collection-layout-wrapper]');
+    if (!wrapper) return;
+    wrapper.classList.remove('section--page-width', 'section--full-width');
+    wrapper.classList.add('section--{% if section.settings.product_grid_width == 'full-width' %}full-width{% else %}page-width{% endif %}');
+  })();
+</script>
 <script
   src="{{ 'results-list.js' | asset_url }}"
   type="module"
@@ -77,12 +83,88 @@
 </results-list>
 
 {% stylesheet %}
+  /* Collection layout: 3 sections in __center — sidebar (1st), heading (2nd), main (3rd). */
+  .collection-layout-wrapper {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .collection-layout-wrapper.section--page-width {
+    --full-page-grid-central-column-width: min(
+      var(--page-width) - var(--page-margin) * 2,
+      calc(100% - var(--page-margin) * 2)
+    );
+    --full-page-grid-margin: minmax(var(--page-margin), 1fr);
+    grid-template-columns: var(--full-page-grid-margin) minmax(0, var(--full-page-grid-central-column-width)) var(--full-page-grid-margin);
+  }
+
+  .collection-layout-wrapper.section--page-width > .collection-layout-wrapper__center {
+    grid-column: 2;
+    min-width: 0;
+    gap: 0;
+  }
+
+  .collection-layout-wrapper.section--full-width > .collection-layout-wrapper__center {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .collection-layout-wrapper__center {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .collection-layout-wrapper__center > .shopify-section:first-child:has(.collection-sidebar-section--hidden) {
+    display: none;
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) {
+      grid-template-columns: 360px 1fr;
+      grid-template-rows: auto 1fr;
+    }
+
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) > .shopify-section:nth-child(1) {
+      grid-column: 1;
+      grid-row: 1 / -1;
+      align-self: stretch;
+      min-width: 0;
+    }
+
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) > .shopify-section:nth-child(2) {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) > .shopify-section:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+  }
+
   .main-collection-grid {
     grid-column: var(--grid-column--mobile);
 
     @media screen and (min-width: 750px) {
       grid-column: var(--grid-column--desktop);
     }
+  }
+
+  /* With sidebar: remove .section grid from content and set padding 0 15px (no JS, no layout shift) */
+  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container,
+  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width {
+    display: block;
+    padding: 0 15px;
+    grid-template-columns: unset;
+    grid-template-rows: unset;
+  }
+
+  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width > *,
+  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container > * {
+    grid-column: unset;
   }
 {% endstylesheet %}
 

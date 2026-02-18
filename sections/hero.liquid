@@ -493,12 +493,12 @@
   {% endif %}
 
   {% comment %}
-    Контент Hero в центре сетки section--page-width (ширина из --page-width, --page-margin).
+    Hero content centered in section--page-width grid (width from --page-width, --page-margin).
   {% endcomment %}
 
   <div
     class="hero__container spacing-style"
-    style="{% render 'spacing-style', settings: section.settings %}"
+    style="{% render 'spacing-style', settings: section.settings %} padding-left: {{ section.settings.padding_left | default: 0 }}px; padding-right: {{ section.settings.padding_right | default: 0 }}px;"
   >
     {%- if section.settings.link != blank -%}
       <a
@@ -1192,6 +1192,26 @@
     {
       "type": "header",
       "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "range",

@@ -13,10 +13,36 @@
     &copy; {{ 'now' | date: '%Y' }}
     {{ shop.name | link_to: routes.root_url -}}
     {%- if block_settings.show_powered_by -%}
-      , {{ powered_by_link }}
+      {%- if block_settings.powered_by_text != blank -%}
+        – {{ block_settings.powered_by_text }}
+      {%- else -%}
+        – {{ powered_by_link }}
+      {%- endif -%}
     {%- endif -%}
   </span>
+  {% if block_settings.custom_html != blank %}
+    <div class="footer-utilities__custom-html">
+      {{ block_settings.custom_html }}
+    </div>
+  {% endif %}
 </div>
+
+{% stylesheet %}
+  .footer-utilities__group-copyright.custom-typography,
+  .footer-utilities__group-copyright.custom-typography * {
+    font-family: var(--font-paragraph--family);
+    font-size: 13px;
+    color: rgb(102, 102, 102);
+  }
+
+  .footer-utilities__group-copyright {
+    text-align: center;
+  }
+
+  .footer-utilities__custom-html {
+    margin-top: 0;
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
@@ -28,6 +54,18 @@
       "id": "show_powered_by",
       "label": "t:settings.show_powered_by_shopify",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "powered_by_text",
+      "label": "Powered by text",
+      "info": "Shown instead of \"Powered by Shopify\" when filled"
+    },
+    {
+      "type": "html",
+      "id": "custom_html",
+      "label": "Custom HTML",
+      "info": "Shown below the copyright line"
     },
     {
       "type": "paragraph",

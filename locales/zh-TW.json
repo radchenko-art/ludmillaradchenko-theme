@@ -335,7 +335,8 @@
       "quantity_maximum": "最多 {{ maximum }} 個",
       "in_cart": "在購物車中",
       "default_title": "預設標題",
-      "sticky_add_to_cart": "快速加入購物車列"
+      "sticky_add_to_cart": "快速加入購物車列",
+      "brand": "品牌"
     }
   }
 }

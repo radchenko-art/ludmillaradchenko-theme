@@ -254,8 +254,8 @@ export class ProductCard extends Component {
 
     const selectedImageId = this.variantPicker?.selectedOption.dataset.optionMediaId;
 
-    if (slideshow && selectedImageId) {
-      const { slides = [] } = slideshow.refs;
+    if (slideshow && selectedImageId && typeof slideshow.select === 'function') {
+      const { slides = [] } = slideshow.refs || {};
 
       for (const slide of slides) {
         if (slide.getAttribute('variant-image') == null) continue;
@@ -302,7 +302,7 @@ export class ProductCard extends Component {
   previewVariant(id) {
     const { slideshow } = this.refs;
 
-    if (!slideshow) return;
+    if (!slideshow || typeof slideshow.select !== 'function') return;
 
     this.resetVariant.cancel();
     slideshow.select({ id }, undefined, { animate: false });
@@ -321,10 +321,16 @@ export class ProductCard extends Component {
 
     this.resetVariant.cancel();
 
-    if (this.#previousSlideIndex != null && this.#previousSlideIndex > 0) {
+    const hasSelect = typeof slideshow.select === 'function';
+    const hasNext = typeof slideshow.next === 'function';
+
+    if (this.#previousSlideIndex != null && this.#previousSlideIndex > 0 && hasSelect) {
       slideshow.select(this.#previousSlideIndex, undefined, { animate: false });
-    } else {
+    } else if (hasNext) {
       slideshow.next(undefined, { animate: false });
+      setTimeout(() => this.#preloadNextPreviewImage());
+    } else if (hasSelect) {
+      slideshow.select(1, undefined, { animate: false });
       setTimeout(() => this.#preloadNextPreviewImage());
     }
   }
@@ -336,11 +342,21 @@ export class ProductCard extends Component {
   resetImage(event) {
     if (event.pointerType !== 'mouse') return;
 
+    // Keep hover image only when pointer moved to one of the action buttons (compare, wishlist, add to cart)
+    const toButton =
+      event.relatedTarget instanceof Node &&
+      event.relatedTarget.closest?.('.compare-button-block, .wishlist-button-block, quick-add-component');
+    if (toButton && this.contains(event.relatedTarget)) return;
+
     const { slideshow } = this.refs;
 
     if (!this.variantPicker) {
       if (!slideshow) return;
-      slideshow.previous(undefined, { animate: false });
+      if (typeof slideshow.previous === 'function') {
+        slideshow.previous(undefined, { animate: false });
+      } else if (typeof slideshow.select === 'function') {
+        slideshow.select(0, undefined, { animate: false });
+      }
     } else {
       this.#resetVariant();
     }
@@ -354,8 +370,11 @@ export class ProductCard extends Component {
 
     if (!slideshow) return;
 
+    const hasSelect = typeof slideshow.select === 'function';
+    const hasPrevious = typeof slideshow.previous === 'function';
+
     // If we have a selected variant, always use its image
-    if (this.variantPicker?.selectedOption) {
+    if (this.variantPicker?.selectedOption && hasSelect) {
       const id = this.variantPicker.selectedOption.dataset.optionMediaId;
       if (id) {
         slideshow.select({ id }, undefined, { animate: false });
@@ -364,15 +383,21 @@ export class ProductCard extends Component {
     }
 
     // No variant selected - use initial slide if it's valid
-    const initialSlide = slideshow.initialSlide;
-    const slideId = initialSlide?.getAttribute('slide-id');
-    if (initialSlide && slideshow.slides?.includes(initialSlide) && slideId) {
-      slideshow.select({ id: slideId }, undefined, { animate: false });
-      return;
+    if (hasSelect) {
+      const initialSlide = slideshow.initialSlide;
+      const slideId = initialSlide?.getAttribute('slide-id');
+      if (initialSlide && slideshow.slides?.includes(initialSlide) && slideId) {
+        slideshow.select({ id: slideId }, undefined, { animate: false });
+        return;
+      }
     }
 
-    // No valid initial slide or selected variant - go to previous
-    slideshow.previous(undefined, { animate: false });
+    // No valid initial slide or selected variant - go to first/previous
+    if (hasPrevious) {
+      slideshow.previous(undefined, { animate: false });
+    } else if (hasSelect) {
+      slideshow.select(0, undefined, { animate: false });
+    }
   };
 
   /**

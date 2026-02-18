@@ -1,0 +1,128 @@
+{%- comment -%}
+  Collection hierarchy sidebar: shows child collections or sibling collections.
+  Uses metafields: custom.parent_collection, custom.chaild_collections (list).
+  Renders only when current collection has children OR has siblings (same parent).
+  Width 360px is applied by the wrapper in main-collection.liquid.
+{%- endcomment -%}
+
+{%- liquid
+  assign sidebar_collections = '' | split: ','
+  assign list_title = ''
+  assign parent_metafield = collection.metafields.custom.parent_collection
+  assign parent = parent_metafield.value
+  assign children_metafield = collection.metafields.custom.chaild_collections
+  assign children = children_metafield.value
+  assign parent_children = ''
+  if parent != blank
+    assign parent_children = parent.metafields.custom.chaild_collections.value
+  endif
+  if children != blank and children.size > 0
+    assign sidebar_collections = children
+    assign list_title = collection.title
+  elsif parent != blank and parent_children != blank and parent_children.size > 0
+    assign sidebar_collections = parent_children
+    assign list_title = collection.title
+  endif
+-%}
+
+{%- if sidebar_collections.size > 0 -%}
+  <aside class="collection-hierarchy-sidebar" aria-label="{{ list_title }}">
+    <div class="collection-hierarchy-sidebar__inner">
+      <h4 class="collection-hierarchy-sidebar__title">{{ list_title }}</h4>
+      <ul class="collection-hierarchy-sidebar__list">
+        {%- for col in sidebar_collections -%}
+          {%- if col == blank -%}{% continue %}{%- endif -%}
+          {%- assign is_current = false -%}
+          {%- if col.handle == collection.handle -%}
+            {%- assign is_current = true -%}
+          {%- endif -%}
+          <li class="collection-hierarchy-sidebar__item">
+            {%- if is_current -%}
+              <span class="collection-hierarchy-sidebar__link collection-hierarchy-sidebar__link--current">{{ col.title }}</span>
+            {%- else -%}
+              <a href="{{ col.url }}" class="collection-hierarchy-sidebar__link link">{{ col.title }}</a>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </aside>
+{%- endif -%}
+
+{% stylesheet %}
+  .collection-hierarchy-sidebar {
+    width: 100%;
+    max-width: 360px;
+    min-width: 0;
+    border: 1px solid #e4e4e4;
+    background-color: #ffffff;
+  }
+
+  .collection-hierarchy-sidebar__inner {
+    padding: 16px 24px;
+    text-align: left;
+  }
+
+  .collection-hierarchy-sidebar__title {
+    margin: 0 0 14px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #1a1a1a;
+    line-height: 1.3;
+  }
+
+  .collection-hierarchy-sidebar__list {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+    list-style: disc;
+  }
+
+  .collection-hierarchy-sidebar__item {
+    margin-bottom: 6px;
+    padding-left: 0;
+    position: static;
+  }
+
+  .collection-hierarchy-sidebar__link {
+    display: block;
+    padding: 6px 0;
+    font-size: 0.8125rem;
+    color: #4a4a4a;
+    text-decoration: none;
+  }
+
+  /* All list items including first: gray link + gray marker by default, black on hover (higher specificity) */
+  .collection-hierarchy-sidebar .collection-hierarchy-sidebar__list .collection-hierarchy-sidebar__item::marker {
+    color: rgb(229, 229, 229);
+  }
+
+  .collection-hierarchy-sidebar .collection-hierarchy-sidebar__list .collection-hierarchy-sidebar__item:hover::marker {
+    color: #000;
+  }
+
+  .collection-hierarchy-sidebar .collection-hierarchy-sidebar__list .collection-hierarchy-sidebar__item .collection-hierarchy-sidebar__link {
+    color: rgb(102, 102, 102);
+    text-decoration: none;
+  }
+
+  .collection-hierarchy-sidebar .collection-hierarchy-sidebar__list .collection-hierarchy-sidebar__item:hover .collection-hierarchy-sidebar__link {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .collection-hierarchy-sidebar .link {
+    text-align: left;
+  }
+
+  .collection-hierarchy-sidebar .collection-hierarchy-sidebar__list .collection-hierarchy-sidebar__item .collection-hierarchy-sidebar__link:hover {
+    color: #000;
+    text-decoration: none;
+  }
+
+  .collection-hierarchy-sidebar__link--current {
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+{% endstylesheet %}

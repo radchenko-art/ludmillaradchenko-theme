@@ -179,6 +179,17 @@
     },
     {
       "type": "range",
+      "id": "thumbnail_visible_count",
+      "label": "Visible thumbnails (slider)",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "info": "Number of thumbnails visible at once; strip scrolls with arrows when there are more.",
+      "visible_if": "{{ block.settings.slideshow_controls_style == 'thumbnails' }}"
+    },
+    {
+      "type": "range",
       "id": "thumbnail_radius",
       "label": "t:settings.corner_radius",
       "min": 0,

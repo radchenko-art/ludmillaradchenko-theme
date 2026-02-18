@@ -1,0 +1,80 @@
+{%- comment -%}
+  Renders collection description. Uses global `collection` on collection template.
+  Supports block typography and spacing like the text block.
+{%- endcomment -%}
+
+{%- liquid
+  assign desc_collection = collection
+  if closest.collection != blank
+    assign desc_collection = closest.collection
+  endif
+-%}
+
+{%- if desc_collection.description != blank -%}
+  <div
+    class="collection-description rte spacing-style"
+    {{ block.shopify_attributes }}
+    style="{% render 'spacing-style', settings: block.settings %}"
+  >
+    {{ desc_collection.description }}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Collection description",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection description",
+      "category": "t:categories.collection"
+    }
+  ]
+}
+{% endschema %}

@@ -47,11 +47,16 @@
   "
   {{ block.shopify_attributes }}
 >
-  {% render 'price',
-    show_unit_price: true,
-    product_resource: product_resource,
-    show_sale_price_first: block_settings.show_sale_price_first
-  %}
+  <div class="product-price__row">
+    {% render 'price',
+      show_unit_price: true,
+      product_resource: product_resource,
+      show_sale_price_first: block_settings.show_sale_price_first
+    %}
+    {% if block_settings.tax_info != blank %}
+      <span class="product-price__tax-info">{{ block_settings.tax_info }}</span>
+    {% endif %}
+  </div>
 
   {% if block_settings.show_tax_info %}
     <div class="tax-note">
@@ -86,6 +91,35 @@
 
 {% # theme-check-disable %}
 {% stylesheet %}
+  product-price {
+    text-transform: uppercase;
+    font-size: 14px;
+  }
+
+  /* Product page only: price row — one line, Montserrat, bold; price 26px uppercase, tax info 13px with 20px gap */
+  .product-information product-price .product-price__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 20px;
+    font-family: Montserrat, var(--font-body--family);
+    font-weight: bold;
+  }
+
+  .product-information product-price .product-price__row [ref='priceContainer'],
+  .product-information product-price .product-price__row .price {
+    font-size: 26px;
+    text-transform: uppercase;
+    font-family: Montserrat, var(--font-body--family);
+    font-weight: bold;
+  }
+
+  .product-information product-price .product-price__tax-info {
+    font-size: 13px;
+    font-family: Montserrat, var(--font-body--family);
+    font-weight: bold;
+  }
+
   .tax-note:empty {
     display: none;
   }
@@ -145,6 +179,12 @@
       "id": "show_tax_info",
       "label": "t:settings.show_tax_info",
       "default": false
+    },
+    {
+      "type": "text",
+      "id": "tax_info",
+      "label": "Tax info",
+      "info": "Shown on one line after the price (product page)."
     },
     {
       "type": "header",

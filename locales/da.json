@@ -312,7 +312,9 @@
       "quantity_maximum": "Maksimum på {{ maximum }}",
       "in_cart": "i indkøbskurv",
       "default_title": "Standardtitel",
-      "sticky_add_to_cart": "Bjælken “Læg hurtigt i indkøbskurv”"
+      "sticky_add_to_cart": "Bjælken “Læg hurtigt i indkøbskurv”",
+      "brand": "Brand",
+      "reference": "Reference"
     }
   },
   "fields": {

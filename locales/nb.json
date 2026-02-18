@@ -335,7 +335,8 @@
       "quantity_maximum": "Maksimum {{ maximum }}",
       "in_cart": "i handlekurv",
       "default_title": "Standardtittel",
-      "sticky_add_to_cart": "Hurtiglinje for «Legg i handlekurv»"
+      "sticky_add_to_cart": "Hurtiglinje for «Legg i handlekurv»",
+      "brand": "Merke"
     }
   }
 }

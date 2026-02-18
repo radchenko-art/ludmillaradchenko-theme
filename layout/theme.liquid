@@ -38,7 +38,7 @@
     {{ content_for_header }}
   </head>
 
-  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
+  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}{% if template.name == 'index' %} template-index{% endif %}{% if template.name == 'page' and template.suffix != blank %} template-page-{{ template.suffix }}{% endif %}">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
     <div id="header-group">
       {% sections 'header-group' %}
@@ -113,7 +113,18 @@
       data-product-transition="{{ settings.transition_to_main_product }}"
       data-template="{{ template }}"
     >
-      {{ content_for_layout }}
+      {%- unless template.name == 'index' -%}
+        {%- render 'breadcrumbs' -%}
+      {%- endunless -%}
+      {%- if template.name == 'collection' -%}
+        <div class="collection-layout-wrapper section--page-width" data-collection-layout-wrapper>
+          <div class="collection-layout-wrapper__center">
+            {{ content_for_layout }}
+          </div>
+        </div>
+      {%- else -%}
+        {{ content_for_layout }}
+      {%- endif -%}
     </main>
 
     {% sections 'footer-group' %}

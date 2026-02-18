@@ -1,7 +1,14 @@
 
 
 <div
-  class="social-icons__wrapper"
+  class="
+    social-icons__wrapper
+    {% if block.settings.display_inline %} social-icons__wrapper--inline{% endif %}
+    {% if block.settings.show_icon == false %} social-icons__wrapper--hide-icon{% endif %}
+    {% if block.settings.show_text == false %} social-icons__wrapper--hide-text{% endif %}
+    {% if block.settings.text_uppercase %} social-icons__wrapper--uppercase{% endif %}
+  "
+  style="--social-icons-gap: {{ block.settings.gap | default: 8 }}px"
   {{ block.shopify_attributes }}
 >
   {% liquid
@@ -89,7 +96,7 @@
             {% endunless %}
           >
             <span class="social-icons__icon-label">{{ platform | capitalize }}</span>
-            {% if render_icon %}
+            {% if render_icon and block.settings.show_icon != false %}
               <svg
                 class="social-icons__icon icon-default"
                 aria-hidden="true"
@@ -110,7 +117,7 @@
 {% stylesheet %}
   .social-icons__wrapper {
     display: flex;
-    gap: var(--gap-sm);
+    gap: var(--social-icons-gap, var(--gap-sm));
     flex-wrap: wrap;
     justify-content: center;
 
@@ -150,6 +157,35 @@
     }
   }
 
+  .social-icons__wrapper--inline {
+    justify-content: center;
+    flex-direction: row;
+  }
+
+  .social-icons__wrapper--hide-icon .social-icons__icon {
+    display: none !important;
+  }
+
+  .social-icons__wrapper--hide-icon .social-icons__icon-wrapper {
+    width: auto;
+  }
+
+  .social-icons__wrapper--hide-icon .social-icons__icon-label {
+    display: inline !important;
+  }
+
+  .social-icons__wrapper:not(.social-icons__wrapper--hide-text) .social-icons__icon-label {
+    display: inline;
+  }
+
+  .social-icons__wrapper--hide-text .social-icons__icon-label {
+    display: none !important;
+  }
+
+  .social-icons__wrapper--uppercase .social-icons__icon-label {
+    text-transform: uppercase;
+  }
+
   /* Disabled state for editor */
   .shopify-design-mode .social-icons__icon-wrapper--disabled {
     opacity: var(--disabled-opacity, 0.5);
@@ -166,6 +202,40 @@
   "name": "t:names.social_media_links",
   "tag": null,
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "display_inline",
+      "label": "Display inline",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_icon",
+      "label": "Show icon",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "Show text",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "text_uppercase",
+      "label": "Text uppercase",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Gap",
+      "default": 8
+    },
     {
       "type": "url",
       "id": "facebook_url",

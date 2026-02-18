@@ -312,7 +312,8 @@
       "quantity_maximum": "最大{{ maximum }}",
       "in_cart": "カート内",
       "default_title": "デフォルトのタイトル",
-      "sticky_add_to_cart": "クイック「カートに追加」バー"
+      "sticky_add_to_cart": "クイック「カートに追加」バー",
+      "brand": "ブランド"
     }
   },
   "fields": {

@@ -143,6 +143,11 @@
     text-wrap: balance;
   }
 
+  /* Product page: title wraps by line length, not balanced (avoid early break after first phrase) */
+  .product-information .product-details .text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) > * {
+    text-wrap: auto;
+  }
+
   /* Hide underline unless text is using paragraph styles. */
   .text-block:is(.h1, .h2, .h3, .h4, .h5, .h6) a {
     text-decoration-color: transparent;

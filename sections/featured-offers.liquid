@@ -1,0 +1,667 @@
+{% comment %}
+  Featured offers — donor: 5th ApRow docs/example.html + styles from docs/example.css .box-banner1.
+  Layout: wrapper #f2f2f2, container, row box-banner1; col-left (8/12) two ApImage img-left + img-right; col-right (4/12) one ApImage img-top.
+  Each card: 50% image (linked) + 50% text panel .image_description (h3, h4, p, CTA link).
+{% endcomment %}
+<div class="section-background featured-offers__background" style="background-color: {{ section.settings.background_color }};"></div>
+<div
+  class="featured-offers section section--{{ section.settings.section_width }}"
+  style="--featured-offers-bg: {{ section.settings.background_color }}; --featured-padding-top: {{ section.settings.padding_top | default: 30 }}px; --featured-padding-bottom: {{ section.settings.padding_bottom | default: 30 }}px; --featured-padding-left: {{ section.settings.padding_left | default: 0 }}px; --featured-padding-right: {{ section.settings.padding_right | default: 0 }}px;"
+  data-testid="featured-offers-{{ section.id }}"
+>
+  <div class="featured-offers__wrapper" style="background: {{ section.settings.background_color }} no-repeat;">
+    <div class="featured-offers__container">
+      <div class="featured-offers__inner spacing-style">
+        {% for block in section.blocks %}
+          {% if block.type == 'featured_offers' %}
+            <div
+              class="featured-offers__block"
+              {{ block.shopify_attributes }}
+            >
+              <div class="row box-banner1 no-margin">
+                {% comment %} Left column: 8/12 — two blocks img-left, img-right {% endcomment %}
+                <div class="featured-offers__col-left">
+                  <div class="block img-left ApImage">
+                    {% if block.settings.link_1 != blank %}
+                      <a href="{{ block.settings.link_1 }}">
+                    {% endif %}
+                    {% if block.settings.image_1 != blank %}
+                      {{
+                        block.settings.image_1
+                        | image_url: width: 800
+                        | image_tag: loading: 'lazy', widths: '400,600,800', sizes: '(min-width: 992px) 50vw, 100vw'
+                      }}
+                    {% endif %}
+                    {% if block.settings.link_1 != blank %}
+                      </a>
+                    {% endif %}
+                    <div class="image_description">
+                      {% if block.settings.title_1 != blank %}
+                        <h3>{{ block.settings.title_1 }}</h3>
+                      {% endif %}
+                      {% if block.settings.subtitle_1 != blank %}
+                        <h4>{{ block.settings.subtitle_1 }}</h4>
+                      {% endif %}
+                      {% if block.settings.paragraph_1 != blank %}
+                        <p>{{ block.settings.paragraph_1 }}</p>
+                      {% endif %}
+                      {% if block.settings.link_1 != blank %}
+                        <p><a href="{{ block.settings.link_1 }}">{{ block.settings.cta_text_1 | default: 'Learn more' }}</a></p>
+                      {% endif %}
+                    </div>
+                  </div>
+                  <div class="block img-right ApImage">
+                    {% if block.settings.link_2 != blank %}
+                      <a href="{{ block.settings.link_2 }}">
+                    {% endif %}
+                    {% if block.settings.image_2 != blank %}
+                      {{
+                        block.settings.image_2
+                        | image_url: width: 800
+                        | image_tag: loading: 'lazy', widths: '400,600,800', sizes: '(min-width: 992px) 50vw, 100vw'
+                      }}
+                    {% endif %}
+                    {% if block.settings.link_2 != blank %}
+                      </a>
+                    {% endif %}
+                    <div class="image_description">
+                      {% if block.settings.title_2 != blank %}
+                        <h3>{{ block.settings.title_2 }}</h3>
+                      {% endif %}
+                      {% if block.settings.subtitle_2 != blank %}
+                        <h4>{{ block.settings.subtitle_2 }}</h4>
+                      {% endif %}
+                      {% if block.settings.paragraph_2 != blank %}
+                        <p>{{ block.settings.paragraph_2 }}</p>
+                      {% endif %}
+                      {% if block.settings.link_2 != blank %}
+                        <p><a href="{{ block.settings.link_2 }}">{{ block.settings.cta_text_2 | default: 'Learn more' }}</a></p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+                <div class="featured-offers__col-right">
+                  <div class="block img-top ApImage">
+                    {% if block.settings.link_3 != blank %}
+                      <a href="{{ block.settings.link_3 }}">
+                    {% endif %}
+                    {% if block.settings.image_3 != blank %}
+                      {{
+                        block.settings.image_3
+                        | image_url: width: 600
+                        | image_tag: loading: 'lazy', widths: '400,600', sizes: '(min-width: 992px) 33vw, 100vw'
+                      }}
+                    {% endif %}
+                    {% if block.settings.link_3 != blank %}
+                      </a>
+                    {% endif %}
+                    <div class="image_description">
+                      {% if block.settings.title_3 != blank %}
+                        <h3>{{ block.settings.title_3 }}</h3>
+                      {% endif %}
+                      {% if block.settings.subtitle_3 != blank %}
+                        <h4>{{ block.settings.subtitle_3 }}</h4>
+                      {% endif %}
+                      {% if block.settings.paragraph_3 != blank %}
+                        <p>{{ block.settings.paragraph_3 }}</p>
+                      {% endif %}
+                      {% if block.settings.link_3 != blank %}
+                        <p><a href="{{ block.settings.link_3 }}">{{ block.settings.cta_text_3 | default: 'Learn more' }}</a></p>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  /* Layout: section + wrapper + container (from donor) */
+  .featured-offers__background {
+    background-color: var(--featured-offers-bg);
+  }
+
+  .featured-offers {
+    position: relative;
+    background-color: var(--featured-offers-bg);
+  }
+
+  .featured-offers__wrapper {
+    width: 100%;
+  }
+
+  .featured-offers__container {
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+    padding-left: var(--padding-inline-start, var(--section-inline-padding));
+    padding-right: var(--padding-inline-end, var(--section-inline-padding));
+  }
+
+  .featured-offers.section--full-width .featured-offers__container {
+    max-width: none;
+  }
+
+  .featured-offers__inner {
+    padding-top: var(--padding-block-start, var(--section-block-padding-top, 0));
+    padding-bottom: var(--padding-block-end, var(--section-block-padding-bottom, 0));
+  }
+
+  /* Row: two columns 8/12 + 4/12 (donor .row.box-banner1) */
+  .featured-offers .row.box-banner1 {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: -10px;
+    margin-right: -10px;
+  }
+
+  .featured-offers__col-left {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .featured-offers__col-right {
+    padding-left: 0;
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .featured-offers .box-banner1 .ApImage.img-left {
+    margin-bottom: 0;
+  }
+
+  @media (min-width: 992px) {
+    .featured-offers .row.box-banner1 {
+      flex-wrap: nowrap;
+    }
+
+    .featured-offers__col-left {
+      width: 66.666667%;
+    }
+
+    .featured-offers__col-right {
+      width: 33.333333%;
+    }
+  }
+
+  .featured-offers__block {
+    padding-left: var(--featured-padding-left, 0);
+    padding-right: var(--featured-padding-right, 0);
+  }
+
+  /* ----- Exact .box-banner1 styles from docs/example.css (scoped under .featured-offers) ----- */
+  .featured-offers .row.box-banner1.no-margin {
+    padding-top: var(--featured-padding-top, 30px);
+    padding-bottom: var(--featured-padding-bottom, 30px);
+  }
+
+  @media (max-width: 991px) {
+    .featured-offers .row.box-banner1.no-margin {
+      padding-top: var(--featured-padding-top, 30px);
+      padding-bottom: var(--featured-padding-bottom, 30px);
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage {
+    position: relative;
+    padding-bottom: 50%;
+    margin: 0;
+    background: #fff;
+  }
+
+  @media (min-width: 992px) {
+    .featured-offers .box-banner1 .ApImage > a:before {
+      content: "";
+    }
+
+    .featured-offers .box-banner1 .ApImage:hover .image_description {
+      box-shadow: 0 0 0 20px rgba(0, 0, 0, 1) inset;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage > a {
+    display: block;
+  }
+
+  @media (min-width: 601px) {
+    .featured-offers .box-banner1 .ApImage.img-left > a {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .featured-offers .box-banner1 .ApImage.img-right > a {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: auto;
+      width: 50%;
+      height: 100%;
+      z-index: 1;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .featured-offers .box-banner1 .ApImage.img-top > a {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      z-index: 1;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .featured-offers .box-banner1 .ApImage > a {
+      display: block;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage img {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover;
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 60px;
+    text-align: center;
+    transition: all 0.4s;
+  }
+
+  @media (max-width: 1199px) {
+    .featured-offers .box-banner1 .ApImage .image_description {
+      padding: 10px 30px;
+    }
+  }
+
+  @media (max-width: 991px) {
+    .featured-offers .box-banner1 .ApImage .image_description {
+      padding: 10px 20px;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description h3,
+  .featured-offers .box-banner1 .ApImage .image_description h4,
+  .featured-offers .box-banner1 .ApImage .image_description p {
+    width: 100%;
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description h3 {
+    color: #000000;
+    font-size: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 1600px) {
+    .featured-offers .box-banner1 .ApImage .image_description h3 {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 1400px) {
+    .featured-offers .box-banner1 .ApImage .image_description h3 {
+      font-size: 30px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .featured-offers .box-banner1 .ApImage .image_description h3 {
+      font-size: 30px;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description h4 {
+    font-size: 20px;
+    color: #464646;
+    font-weight: normal;
+    position: relative;
+    padding: 0 0 40px;
+    margin: 0 0 40px;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1600px) {
+    .featured-offers .box-banner1 .ApImage .image_description h4 {
+      font-size: 30px;
+      padding: 0 0 30px;
+      margin: 0 0 30px;
+    }
+  }
+
+  @media (max-width: 1400px) {
+    .featured-offers .box-banner1 .ApImage .image_description h4 {
+      font-size: 24px;
+      padding: 0 0 20px;
+      margin: 0 0 20px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .featured-offers .box-banner1 .ApImage .image_description h4 {
+      font-size: 20px;
+      padding: 0 0 15px;
+      margin: 0 0 15px;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description h4:before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background: #ddd;
+    width: 200px;
+    height: 1px;
+    max-width: 90%;
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description a {
+    display: inline-block;
+    padding: 10px 0;
+    color: #000;
+    border-bottom: 1px solid;
+    letter-spacing: 3px;
+    margin-top: 40px;
+  }
+
+  @media (max-width: 1400px) {
+    .featured-offers .box-banner1 .ApImage .image_description a {
+      margin-top: 30px;
+    }
+  }
+
+  @media (max-width: 1200px) {
+    .featured-offers .box-banner1 .ApImage .image_description a {
+      margin-top: 0;
+    }
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description a:hover {
+    color: #000;
+  }
+
+  @media (min-width: 601px) {
+    .featured-offers .box-banner1 .ApImage.img-right img {
+      left: auto;
+      right: 0;
+    }
+
+    .featured-offers .box-banner1 .ApImage.img-right .image_description {
+      right: auto;
+      left: 0;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .featured-offers .box-banner1 .ApImage.img-top {
+      padding-bottom: 200%;
+    }
+
+    .featured-offers .box-banner1 .ApImage.img-top img {
+      width: 100% !important;
+      height: 50% !important;
+    }
+
+    .featured-offers .box-banner1 .ApImage.img-top .image_description {
+      top: 50%;
+      width: 100%;
+      height: 50%;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .featured-offers .box-banner1 .ApImage {
+      padding-bottom: 0;
+    }
+
+    .featured-offers .box-banner1 .ApImage img {
+      width: 100% !important;
+      height: auto !important;
+      position: static;
+    }
+
+    .featured-offers .box-banner1 .ApImage .image_description {
+      position: static;
+      width: 100%;
+      height: auto;
+      padding: 20px 0 40px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Featured offers",
+  "tag": "section",
+  "class": "section-wrapper featured-offers-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f2f2f2"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "Page"
+        },
+        {
+          "value": "full-width",
+          "label": "Full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_left",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_right",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured_offers",
+      "name": "Featured offers",
+      "settings": [
+        {
+          "type": "header",
+          "content": "Item 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_1",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link_1",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "title_1",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle_1",
+          "label": "Subtitle"
+        },
+        {
+          "type": "textarea",
+          "id": "paragraph_1",
+          "label": "Paragraph"
+        },
+        {
+          "type": "text",
+          "id": "cta_text_1",
+          "label": "Button text",
+          "default": "Learn more"
+        },
+        {
+          "type": "header",
+          "content": "Item 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_2",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link_2",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "title_2",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle_2",
+          "label": "Subtitle"
+        },
+        {
+          "type": "textarea",
+          "id": "paragraph_2",
+          "label": "Paragraph"
+        },
+        {
+          "type": "text",
+          "id": "cta_text_2",
+          "label": "Button text",
+          "default": "Learn more"
+        },
+        {
+          "type": "header",
+          "content": "Item 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_3",
+          "label": "Image"
+        },
+        {
+          "type": "url",
+          "id": "link_3",
+          "label": "Link"
+        },
+        {
+          "type": "text",
+          "id": "title_3",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "subtitle_3",
+          "label": "Subtitle"
+        },
+        {
+          "type": "textarea",
+          "id": "paragraph_3",
+          "label": "Paragraph"
+        },
+        {
+          "type": "text",
+          "id": "cta_text_3",
+          "label": "Button text",
+          "default": "Learn more"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured offers",
+      "blocks": [
+        {
+          "type": "featured_offers",
+          "settings": {
+            "title_1": "Title 1",
+            "subtitle_1": "Subtitle 1",
+            "paragraph_1": "First block text.",
+            "title_2": "Title 2",
+            "subtitle_2": "Subtitle 2",
+            "paragraph_2": "Second block text.",
+            "title_3": "Title 3",
+            "subtitle_3": "Subtitle 3",
+            "paragraph_3": "Third block text."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,19 @@
+{% if product.vendor != blank %}
+  <div class="product-vendor rte" {{ block.shopify_attributes }}>
+    <span class="product-vendor__label">{{ 'products.product.brand' | t }}</span>
+    <span class="product-vendor__value">{{ product.vendor }}</span>
+  </div>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Brand",
+  "tag": null,
+  "settings": [],
+  "presets": [
+    {
+      "name": "Brand"
+    }
+  ]
+}
+{% endschema %}

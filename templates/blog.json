@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "main-blog",
@@ -41,30 +42,18 @@
           "type": "_blog-post-card",
           "static": true,
           "settings": {
-            "alignment": "left"
+            "alignment": "center"
           },
           "blocks": {
-            "heading": {
-              "type": "_heading",
-              "name": "t:names.title",
+            "image": {
+              "type": "_blog-post-image",
               "static": true,
               "settings": {
-                "type_preset": "h4",
-                "font": "var(--font-primary--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "",
-                "text": "",
-                "read_only": true,
-                "alignment": "left",
-                "show_alignment": false,
-                "padding-block-start": 0,
-                "padding-block-end": 10,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
+                "height": "large",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0
               },
               "blocks": {}
             },
@@ -74,24 +63,13 @@
               "static": true,
               "settings": {
                 "show_date": true,
+                "date_format": "dd_mm_yyyy",
                 "show_author": false,
                 "type_preset": "",
                 "alignment": "left",
                 "show_alignment": false,
                 "padding-block-start": 0,
                 "padding-block-end": 0
-              },
-              "blocks": {}
-            },
-            "image": {
-              "type": "_blog-post-image",
-              "static": true,
-              "settings": {
-                "height": "large",
-                "border": "none",
-                "border_width": 1,
-                "border_opacity": 100,
-                "border_radius": 4
               },
               "blocks": {}
             }
@@ -104,6 +82,8 @@
       ],
       "settings": {
         "color_scheme": "",
+        "columns_gap": 36,
+        "rows_gap": 36,
         "padding-block-start": 0,
         "padding-block-end": 48
       }

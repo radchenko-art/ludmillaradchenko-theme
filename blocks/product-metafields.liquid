@@ -1,0 +1,143 @@
+{% comment %}
+  Renders product metafields (namespace: custom). Only metafields with a value are shown.
+  Excluded keys are set via child blocks "Excluded key" (default: short_description).
+  Format: "Metafield name: value"
+{% endcomment %}
+
+{% liquid
+  assign excl_keys_str = ''
+  for b in block.blocks
+    if b.type == '_metafield-exclusion' and b.settings.key != blank
+      assign key_stripped = b.settings.key | strip | downcase
+      if key_stripped != ''
+        assign excl_keys_str = excl_keys_str | append: key_stripped | append: ','
+      endif
+    endif
+  endfor
+  if excl_keys_str != ''
+    assign excl_keys = excl_keys_str | split: ',' | uniq
+  else
+    assign excl_keys = 'short_description' | split: ','
+  endif
+%}
+
+{% comment %}
+  product.metafields.custom when iterated yields item where item[0] = key, item[1] = value.
+{% endcomment %}
+
+{% assign has_visible = false %}
+{% for item in product.metafields.custom %}
+  {% assign mf_key = item[0] %}
+  {% assign mf_value = item[1].value | default: item[1] %}
+  {% assign mf_key_down = mf_key | downcase %}
+  {% assign skip = false %}
+  {% for ek in excl_keys %}
+    {% if ek == mf_key_down %}
+      {% assign skip = true %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  {% if skip == false and mf_value != blank %}
+    {% assign has_visible = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if has_visible %}
+  <div class="product-metafields" {{ block.shopify_attributes }}>
+    {% if block.settings.heading != blank %}
+      <h6 class="product-metafields__heading">{{ block.settings.heading }}</h6>
+    {% endif %}
+    <dl class="data-sheet">
+      {% for item in product.metafields.custom %}
+        {% assign mf_key = item[0] %}
+        {% assign mf_value = item[1].value | default: item[1] %}
+        {% assign mf_key_down = mf_key | downcase %}
+        {% assign skip = false %}
+        {% for ek in excl_keys %}
+          {% if ek == mf_key_down %}
+            {% assign skip = true %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+        {% if skip == false and mf_value != blank %}
+          <dt class="name">{{ item[0] | capitalize }}</dt>
+          <dd class="value">{{ mf_value }}</dd>
+        {% endif %}
+      {% endfor %}
+    </dl>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  /* data-sheet: styles from PrestaShop (product-features > dl.data-sheet) */
+  .product-metafields {
+    margin-top: 20px;
+  }
+
+  .product-metafields__heading {
+    margin-bottom: 8px;
+  }
+
+  .product-metafields .data-sheet {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .product-metafields .data-sheet dd.value,
+  .product-metafields .data-sheet dt.name {
+    flex: 1 0 40%;
+    font-weight: normal;
+    background: #ebebeb;
+    padding: 10px;
+    margin-right: 10px;
+    min-height: 40px;
+    word-break: break-all;
+  }
+
+  .product-metafields .data-sheet dd.value:nth-of-type(even),
+  .product-metafields .data-sheet dt.name:nth-of-type(even) {
+    background: #f6f6f6;
+  }
+
+  .product-metafields .data-sheet dt.name {
+    text-transform: capitalize;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.product_metafields",
+  "tag": null,
+  "blocks": [
+    {
+      "type": "_metafield-exclusion"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:settings.heading",
+      "default": "Details"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.product_metafields",
+      "settings": {
+        "heading": "Details"
+      },
+      "blocks": [
+        {
+          "type": "_metafield-exclusion",
+          "settings": {
+            "key": "short_description"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

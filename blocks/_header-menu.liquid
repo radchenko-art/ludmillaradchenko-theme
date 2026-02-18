@@ -153,7 +153,7 @@
       <div class="header-menu__inner">
         <nav header-menu>
           <div
-            class="menu-list"
+            class="menu-list{% if template.name == 'index' %} menu-list--home{% endif %}"
             style="{% render 'menu-font-styles', settings: block_settings %}"
           >
             {% assign class = 'overflow-menu' | append: color_scheme_classes %}
@@ -204,6 +204,12 @@
 
     & a {
       color: var(--color-foreground);
+    }
+
+    & a:hover,
+    & a:focus,
+    & a[aria-current='page'] {
+      color: #888;
     }
   }
 
@@ -260,7 +266,13 @@
     --menu-vertical-gap: var(--gap-xl);
 
     display: flex;
-    margin-bottom: 60px;
+    margin-bottom: 0;
+  }
+
+  @media screen and (min-width: 750px) {
+    .menu-list.menu-list--home {
+      margin-bottom: 60px;
+    }
   }
 
   .menu-list__list {
@@ -327,10 +339,21 @@
   }
 
   /* stylelint-disable-next-line selector-max-specificity */
-  .menu-list:not(:has(.menu-list__list-item:hover)) .menu-list__link--active,
   .menu-list .menu-list__list-item:where(:hover, :focus-within) .menu-list__link,
   .menu-list .menu-list__list-item[slot='overflow'] .menu-list__link[aria-expanded='true'] {
     color: var(--menu-top-level-font-color);
+  }
+
+  .menu-list .menu-list__list-item .menu-list__link:hover,
+  .menu-list .menu-list__list-item .menu-list__link:focus,
+  .menu-list .menu-list__list-item .menu-list__link--active {
+    color: #888;
+  }
+
+  .menu-list__submenu-link:hover,
+  .menu-list__submenu-link:focus,
+  .menu-list__submenu-link[aria-current='page'] {
+    color: #888;
   }
 
   .overflow-menu::part(list) {
@@ -351,7 +374,6 @@
   .overflow-menu::before {
     content: "";
     border-top: 1px solid #e6e6e6;
-    border-bottom: 1px solid #e6e6e6;
     position: absolute;
     top: 0;
     bottom: -1px;
@@ -360,6 +382,10 @@
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
+  }
+
+  body.template-index .overflow-menu::before {
+    border-bottom: 1px solid #e6e6e6;
   }
 
   /* Full-width submenu bar hidden when using dropdown submenus (main list only) */
@@ -427,7 +453,7 @@
     transform: translateY(0);
   }
 
-  /* Dropdown caret — те же размеры, что у .account-popover__panel */
+  /* Dropdown caret: same dimensions as .account-popover__panel */
   .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::before,
   .menu-list__list-item:where(:not([slot='overflow'])) > .menu-list__submenu::after {
     content: '';
@@ -785,6 +811,14 @@
   .mega-menu__submenu {
     /* preserves the inherited grid layout when this submenu wrapper is used */
     display: contents;
+  }
+
+  .menu-list__link,
+  .menu-list__submenu-link,
+  .mega-menu__link,
+  .mega-menu__link--parent {
+    font-family: Montserrat, sans-serif;
+    font-weight: normal;
   }
 {% endstylesheet %}
 

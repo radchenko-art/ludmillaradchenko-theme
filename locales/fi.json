@@ -312,7 +312,8 @@
       "quantity_maximum": "Enimmäismäärä {{ maximum }}",
       "in_cart": "ostoskorissa",
       "default_title": "Oletusotsikko",
-      "sticky_add_to_cart": "Pikalisäys ostoskoririville"
+      "sticky_add_to_cart": "Pikalisäys ostoskoririville",
+      "brand": "Brändi"
     }
   },
   "fields": {

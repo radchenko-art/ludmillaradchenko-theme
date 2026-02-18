@@ -312,7 +312,8 @@
       "quantity_maximum": "Μέγιστο όριο {{ maximum }}",
       "in_cart": "στο καλάθι",
       "default_title": "Προεπιλεγμένος τίτλος",
-      "sticky_add_to_cart": "Γρήγορη προσθήκη στο καλάθι"
+      "sticky_add_to_cart": "Γρήγορη προσθήκη στο καλάθι",
+      "brand": "Εμπορικό σήμα"
     }
   },
   "fields": {

@@ -312,7 +312,8 @@
       "quantity_maximum": "จำนวนสูงสุดคือ {{ maximum }}",
       "in_cart": "ในตะกร้าสินค้า",
       "default_title": "ชื่อเริ่มต้น",
-      "sticky_add_to_cart": "แถบเพิ่มลงในตะกร้าสินค้าแบบด่วน"
+      "sticky_add_to_cart": "แถบเพิ่มลงในตะกร้าสินค้าแบบด่วน",
+      "brand": "แบรนด์"
     }
   },
   "fields": {

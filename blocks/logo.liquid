@@ -28,48 +28,56 @@
 <div
   class="
     logo-block
-    spacing-style
-  "
-  style="
-    {% if block_settings.unit == 'percent' %}
-      --logo-width: {{ block_settings.percent_width }}%;
-    {% else %}
-      {% if image %}
-        --logo-width: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height }}px;
-      {% else %}
-        --logo-width: {{ shop.name.size | times: 0.65 }}em;
-        --logo-height: {{ block_settings.pixel_height }}px;
-      {% endif %}
-    {% endif %}
-
-    {% if block_settings.custom_mobile_size %}
-      {% if block_settings.unit_mobile == 'percent' %}
-        --logo-width-mobile: {{ block_settings.percent_width_mobile }}%;
-        --logo-height-mobile: auto;
-      {% else %}
-        {% if image %}
-          --logo-width-mobile: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height_mobile }}px;
-          {% else %}
-            --logo-width-mobile: {{ shop.name.size | times: 0.65 }}em;
-            --logo-height-mobile: {{ block_settings.pixel_height_mobile }}px;
-        {% endif %}
-      {% endif %}
-    {% endif %}
-    {% render 'spacing-style', settings: block_settings %}
+    {% if block_settings.align_center %} logo-block--align-center{% endif %}
   "
   {{ block.shopify_attributes }}
 >
-  {% if logo_image %}
-    <div class="logo-block__image-wrapper">
-      {{ logo_image }}
-    </div>
-  {% else %}
-    {% render 'jumbo-text', text: shop.name %}
-  {% endif %}
+  <div
+    class="logo-block__inner spacing-style"
+    style="
+      {% if block_settings.unit == 'percent' %}
+        --logo-width: {{ block_settings.percent_width }}%;
+      {% else %}
+        {% if image %}
+          --logo-width: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height }}px;
+        {% else %}
+          --logo-width: {{ shop.name.size | times: 0.65 }}em;
+          --logo-height: {{ block_settings.pixel_height }}px;
+        {% endif %}
+      {% endif %}
+
+      {% if block_settings.custom_mobile_size %}
+        {% if block_settings.unit_mobile == 'percent' %}
+          --logo-width-mobile: {{ block_settings.percent_width_mobile }}%;
+          --logo-height-mobile: auto;
+        {% else %}
+          {% if image %}
+            --logo-width-mobile: {{ image.width | times: 1.00 | divided_by: image.height | times: block_settings.pixel_height_mobile }}px;
+          {% else %}
+            --logo-width-mobile: {{ shop.name.size | times: 0.65 }}em;
+            --logo-height-mobile: {{ block_settings.pixel_height_mobile }}px;
+          {% endif %}
+        {% endif %}
+      {% endif %}
+      {% render 'spacing-style', settings: block_settings %}
+    "
+  >
+    {% if logo_image %}
+      <div class="logo-block__image-wrapper">
+        {{ logo_image }}
+      </div>
+    {% else %}
+      {% render 'jumbo-text', text: shop.name %}
+    {% endif %}
+  </div>
 </div>
 
 {% stylesheet %}
   .logo-block {
+    display: flex;
+  }
+
+  .logo-block__inner {
     width: calc(var(--logo-width) + var(--padding-inline-start) + var(--padding-inline-end));
     max-width: 100%;
     max-height: calc(var(--logo-height, 100%) + var(--padding-block-start) + var(--padding-block-end));
@@ -98,6 +106,10 @@
     object-fit: contain;
     width: 100%;
   }
+
+  .logo-block--align-center {
+    margin: 0 auto;
+  }
 {% endstylesheet %}
 
 {% schema %}
@@ -105,6 +117,12 @@
   "name": "t:names.logo",
   "tag": null,
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "align_center",
+      "label": "Align center",
+      "default": false
+    },
     {
       "type": "checkbox",
       "label": "t:settings.use_inverse_logo",

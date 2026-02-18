@@ -342,7 +342,8 @@
       "quantity_maximum": "Massimo di {{ maximum }}",
       "in_cart": "nel carrello",
       "default_title": "Titolo predefinito",
-      "sticky_add_to_cart": "Barra per l'aggiunta rapida al carrello"
+      "sticky_add_to_cart": "Barra per l'aggiunta rapida al carrello",
+      "brand": "Marca"
     }
   }
 }

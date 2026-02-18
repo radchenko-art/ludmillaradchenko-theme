@@ -172,7 +172,7 @@ export class AnchoredPopoverComponent extends Component {
           this.#updatePosition();
         });
       }
-      // account-popover в modal: top layer → fixed + viewport coords; scroll → обновляем позицию
+      // account-popover in modal: top layer → fixed + viewport coords; on scroll we update position
       if (this.classList.contains('account-popover')) {
         popover.addEventListener('beforetoggle', (event) => {
           const evt = /** @type {ToggleEvent} */ (event);

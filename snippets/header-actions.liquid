@@ -279,7 +279,7 @@
     right: anchor(right);
     padding: 0.625rem 0;
 
-    /* Caret: ::after — обводка #eee на 1px выше, ::before — заливка */
+    /* Caret: ::after — #eee 1px stroke on top, ::before — fill */
     &::before,
     &::after {
       content: '';
@@ -307,7 +307,7 @@
       --account-popover-y: 0px;
     }
 
-    /* Fallback для тем без position-anchor (JS для .account-popover задаёт absolute и координаты) */
+    /* Fallback for themes without position-anchor (JS for .account-popover sets absolute and coordinates) */
     @supports not (position-anchor: --account-button-trigger) {
       position: fixed;
       top: calc(var(--anchor-top) * 1px + var(--anchor-height) * 1px + var(--header-padding));
@@ -322,7 +322,7 @@
     }
   }
 
-  /* Hover: панель без [popover] — absolute относительно .account-popover, скроллится с триггером */
+  /* Hover: panel without [popover] — absolute relative to .account-popover, scrolls with trigger */
   .account-popover__panel--hover {
     position: absolute;
     z-index: 100;

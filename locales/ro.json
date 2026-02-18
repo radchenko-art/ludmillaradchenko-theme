@@ -342,7 +342,8 @@
       "quantity_maximum": "Maxim {{ maximum }}",
       "in_cart": "în coș",
       "default_title": "Titlu implicit",
-      "sticky_add_to_cart": "Bara de adăugare rapidă în coș"
+      "sticky_add_to_cart": "Bara de adăugare rapidă în coș",
+      "brand": "Marcă"
     }
   }
 }

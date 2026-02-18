@@ -38,6 +38,34 @@
   {% endif %}
 ></script>
 
+{% if settings.show_second_image_on_hover and template.name == 'collection' %}
+<script>
+  (function() {
+    function hasMultipleSlides(slideshow) {
+      var slides = slideshow.querySelectorAll && slideshow.querySelectorAll('slideshow-slide');
+      return slides && slides.length >= 2;
+    }
+    document.addEventListener('pointerenter', function(e) {
+      var slideshow = e.target.closest && e.target.closest('slideshow-component');
+      if (!slideshow || !slideshow.closest('.card-gallery--hover-image')) return;
+      if (e.relatedTarget && slideshow.contains(e.relatedTarget)) return;
+      if (typeof slideshow.select !== 'function' || !hasMultipleSlides(slideshow)) return;
+      slideshow.select(1, undefined, { animate: false });
+    }, true);
+    document.addEventListener('pointerleave', function(e) {
+      var slideshow = e.target.closest && e.target.closest('slideshow-component');
+      if (!slideshow || !slideshow.closest('.card-gallery--hover-image')) return;
+      var productCard = slideshow.closest && slideshow.closest('product-card');
+      var toButton = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest('.compare-button-block, .wishlist-button-block, quick-add-component');
+      if (e.relatedTarget && productCard && productCard.contains(e.relatedTarget) && toButton) return;
+      if (slideshow && typeof slideshow.select === 'function') {
+        slideshow.select(0, undefined, { animate: false });
+      }
+    }, true);
+  })();
+</script>
+{% endif %}
+
 <link
   rel="modulepreload"
   href="{{ 'utilities.js' | asset_url }}"

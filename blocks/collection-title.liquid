@@ -1,11 +1,18 @@
 
 
-{% if closest.collection == blank %}
+{%- liquid
+  assign title_collection = closest.collection
+  assign tag = block.settings.heading_tag | default: 'p'
+  if tag == blank
+    assign tag = 'p'
+  endif
+-%}
+{% if title_collection == blank %}
   {% assign text = 'placeholders.collection_title' | t %}
-  {% assign collection_title = '<p>' | append: text | append: '</p>' %}
+  {% assign collection_title = '<' | append: tag | append: '>' | append: text | append: '</' | append: tag | append: '>' %}
   {% render 'text', fallback_text: collection_title, block: block %}
-{% elsif closest.collection != blank %}
-  {% assign collection_title = '<p>' | append: closest.collection.title | append: '</p>' %}
+{% elsif title_collection != blank %}
+  {% assign collection_title = '<' | append: tag | append: '>' | append: title_collection.title | append: '</' | append: tag | append: '>' %}
   {% render 'text', fallback_text: collection_title, block: block %}
 {% endif %}
 
@@ -17,6 +24,19 @@
     {
       "type": "paragraph",
       "content": "t:content.resource_reference_collection_title"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading tag",
+      "info": "Use H1 for the main collection page (one per page).",
+      "options": [
+        { "value": "h1", "label": "H1" },
+        { "value": "h2", "label": "H2" },
+        { "value": "h3", "label": "H3" },
+        { "value": "p", "label": "Paragraph" }
+      ],
+      "default": "h2"
     },
     {
       "type": "header",

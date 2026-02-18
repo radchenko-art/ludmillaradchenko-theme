@@ -335,7 +335,8 @@
       "quantity_maximum": "Maximum van {{ maximum }}",
       "in_cart": "in winkelwagen",
       "default_title": "Standaardtitel",
-      "sticky_add_to_cart": "Balk voor snel toevoegen aan winkelwagen"
+      "sticky_add_to_cart": "Balk voor snel toevoegen aan winkelwagen",
+      "brand": "Merk"
     }
   }
 }

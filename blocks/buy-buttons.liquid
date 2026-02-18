@@ -71,6 +71,7 @@
           style="{% render 'spacing-style', settings: block_settings %}"
           ref="productFormButtons"
         >
+          <div class="product-form-buttons__main-row">
           {%- liquid
             assign has_quantity_rules = false
             if variant.quantity_rule.min > 1 or variant.quantity_rule.increment > 1 or variant.quantity_rule.max != null
@@ -223,6 +224,9 @@
             add_to_cart_text: add_to_cart_text
           %}
 
+          {% content_for 'blocks' %}
+          </div>
+
           {% content_for 'block',
             type: 'accelerated-checkout',
             id: 'accelerated-checkout',
@@ -362,17 +366,25 @@
 
 {% stylesheet %}
   .buy-buttons-block {
-    --buy-button-preferred-width: 185px;
+    --buy-button-preferred-width: 200px;
 
     width: 100%;
   }
 
   .product-form-buttons {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: var(--gap-sm);
   }
 
-  .product-form-buttons:not(:has(.quantity-rules)) {
+  .product-form-buttons__main-row {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .product-form-buttons__main-row:not(:has(.quantity-rules)) {
     gap: calc(var(--gap-sm) / 2);
 
     @media screen and (min-width: 750px) {
@@ -380,14 +392,28 @@
     }
   }
 
-  .product-form-buttons > *:not(.quantity-selector-wrapper, .quantity-rules, .quantity-label, .volume-pricing) {
+  .product-form-buttons__main-row > *:not(.quantity-selector-wrapper, .quantity-rules, .quantity-label, .volume-pricing) {
     flex: 1 1 var(--buy-button-preferred-width, 0);
     min-width: fit-content;
   }
 
-  .product-form-buttons--stacked
-    > *:not(.quantity-selector-wrapper, .quantity-rules, .quantity-label, .volume-pricing) {
+  .product-form-buttons__main-row > *:has(.add-to-cart-button) {
+    flex: 0 0 auto;
+  }
+
+  .product-form-buttons__main-row > .wishlist-button-block,
+  .product-form-buttons__main-row > .compare-button-block {
+    flex: 0 0 auto;
+    width: fit-content;
+  }
+
+  .product-form-buttons--stacked > .product-form-buttons__main-row,
+  .product-form-buttons--stacked > .accelerated-checkout-block {
     flex-basis: 51%;
+  }
+
+  .product-form-buttons > .accelerated-checkout-block {
+    width: 100%;
   }
 
   .product-form-buttons button {
@@ -395,10 +421,145 @@
     padding-block: var(--padding-lg);
   }
 
-  .quantity-selector {
+  /* Quantity selector: 100px × 64px, 2px border #ddd, no radius */
+  .buy-buttons-block .quantity-selector,
+  .buy-buttons-block quantity-selector-component.quantity-selector {
     flex-grow: 0;
     flex-shrink: 0;
-    height: var(--height-buy-buttons);
+    width: 100px;
+    height: 64px;
+    min-height: 64px;
+    border: 2px solid #ddd;
+    border-radius: 0;
+  }
+
+  .buy-buttons-block .quantity-selector .quantity-minus,
+  .buy-buttons-block .quantity-selector .quantity-plus {
+    border-radius: 0;
+  }
+
+  /* Add to cart / Sold out: 200px × 64px, no radius, uppercase */
+  .buy-buttons-block .add-to-cart-button {
+    width: 200px;
+    min-width: 200px;
+    height: 64px;
+    border-radius: 0;
+    text-transform: uppercase;
+  }
+
+  .buy-buttons-block .add-to-cart-button.button {
+    background-color: #f11d21;
+    border-color: #f11d21;
+    color: #fff;
+  }
+
+  .buy-buttons-block .add-to-cart-button.button:hover:not(:disabled) {
+    background-color: #cc1115;
+    border-color: #cc1115;
+  }
+
+  .buy-buttons-block .add-to-cart-button.button:disabled {
+    background-color: #f11d21;
+    border-color: #f11d21;
+    color: #fff;
+    opacity: 0.65;
+  }
+
+  /* Product page only: wishlist & compare inside buy-buttons — inline, icon-only, no border/animation */
+  .product-information .buy-buttons-block .wishlist-button-block,
+  .product-information .buy-buttons-block .compare-button-block {
+    position: static;
+    display: inline-flex;
+    align-items: center;
+    width: 40px;
+    min-width: 40px;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block {
+    margin-left: 10px;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button,
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button[data-type="details"] {
+    position: static;
+    border: none !important;
+    background: transparent !important;
+    backdrop-filter: none;
+    border-radius: 0;
+    transition: none;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button:hover,
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button:focus-visible,
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button:active {
+    scale: none;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button::before,
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button:hover::before,
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button:focus-visible::before {
+    display: none;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button .st-label {
+    display: none !important;
+  }
+
+  .product-information .buy-buttons-block .wishlist-button-block .st-wishlist-button .st-wishlist-icon {
+    width: 20px;
+    height: 20px;
+    transform: none;
+    margin: 0;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .button,
+  .product-information .buy-buttons-block .compare-button-block a,
+  .product-information .buy-buttons-block .compare-button-block button,
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable {
+    position: static;
+    border: none;
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
+    transition: none;
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable:hover,
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable:focus-visible,
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable:active {
+    scale: none;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable:hover::before,
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable:focus-visible::before {
+    display: none;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparison-label {
+    display: none !important;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable .svg-wrapper {
+    width: 20px;
+    height: 20px;
+    transform: none;
+  }
+
+  .product-information .buy-buttons-block .compare-button-block .add-to-comparable .svg-wrapper svg {
+    width: 20px;
+    height: 20px;
   }
 
   .quantity-label {
@@ -425,7 +586,7 @@
     margin-block-end: var(--gap);
   }
 
-  .product-form-buttons:has(~ .volume-pricing .volume-pricing__title) .quantity-rules {
+  .product-form-buttons:has(.volume-pricing .volume-pricing__title) .quantity-rules {
     margin-block-end: var(--gap-md);
   }
 
@@ -672,6 +833,23 @@
 {
   "name": "t:names.product_buy_buttons",
   "tag": null,
+  "blocks": [
+    {
+      "type": "quantity"
+    },
+    {
+      "type": "add-to-cart"
+    },
+    {
+      "type": "accelerated-checkout"
+    },
+    {
+      "type": "compare-button"
+    },
+    {
+      "type": "wishlist-button"
+    }
+  ],
   "settings": [
     {
       "type": "paragraph",

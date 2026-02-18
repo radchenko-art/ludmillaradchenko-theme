@@ -78,8 +78,8 @@
 
 <div class="section-background color-{{ settings.color_scheme }}"></div>
 <div
-  class="product-information section section--{{ content_width }} spacing-style color-{{ settings.color_scheme }} relative"
-  style="{% render 'spacing-style', settings: settings %} --gap: {{ settings.gap }}px;"
+  class="product-information section section--{{ content_width }} spacing-style color-{{ settings.color_scheme }} relative{% if settings.media_max_width > 0 %} product-information--media-limited{% endif %}"
+  style="{% render 'spacing-style', settings: settings %} --gap: {{ settings.gap }}px;{% if settings.media_max_width > 0 %} --media-width: 100%; --media-max-width: {{ settings.media_max_width }}px; --media-min-width: 0;{% else %} --media-width: 0; --media-max-width: none; --media-min-width: 100%;{% endif %}"
   data-testid="product-information"
 >
   {% if settings.desktop_media_position == 'left' and product_has_media and request.page_type == 'product' %}
@@ -153,6 +153,12 @@
 
   /* Desktop styles */
   @media screen and (min-width: 750px) {
+    .product-information__grid:not(.product-information--media-none) .product-information__media {
+      width: var(--media-width);
+      min-width: var(--media-min-width);
+      max-width: var(--media-max-width);
+    }
+
     .product-information__grid {
       grid-column: 2;
     }
@@ -177,6 +183,7 @@
 
         .product-details {
           padding-left: calc(var(--gap, 0) / 2);
+          padding-right: calc(var(--gap, 0) / 2);
         }
 
         &:has(.media-gallery--extend) {
@@ -296,6 +303,15 @@
         .product-information--media-none
       ).product-information--media-right {
       grid-template-columns: 1fr 2fr;
+    }
+
+    /* When media max width is set: equal columns + padding */
+    .product-information--media-limited .product-information__grid:not(
+        .product-information__grid--half,
+        .product-information--media-none
+      ).product-information--media-left {
+      grid-template-columns: 1fr 1fr;
+      padding: 0 15px;
     }
   }
 

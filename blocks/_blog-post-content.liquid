@@ -1,7 +1,7 @@
 
 
-<div class="blog-post-content rte">
-  <rte-formatter>
+<div class="blog-post-content-block blog-post-content-block--{{ block.id }} blog-post-content rte" {{ block.shopify_attributes }}>
+  <rte-formatter class="block">
     {{ article.content }}
   </rte-formatter>
 </div>

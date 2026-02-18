@@ -1,4 +1,33 @@
-import { debounce, throttle, prefersReducedMotion } from '@theme/utilities';
+/**
+ * Local helpers to avoid dependency on @theme/utilities (fixes load order / export resolution in some environments).
+ */
+function debounce(fn, wait) {
+  let timeout;
+  function debounced(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), wait);
+  }
+  debounced.cancel = () => clearTimeout(timeout);
+  return debounced;
+}
+
+function throttle(fn, delay) {
+  let lastCall = 0;
+  function throttled(...args) {
+    const now = performance.now();
+    if (now - lastCall >= delay) {
+      lastCall = now;
+      fn.apply(this, args);
+    }
+  }
+  throttled.cancel = () => { lastCall = performance.now(); };
+  return throttled;
+}
+
+const reducedMotionQuery = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+function prefersReducedMotion() {
+  return reducedMotionQuery ? reducedMotionQuery.matches : false;
+}
 
 /**
  * Timeout duration (in milliseconds) after which scroll is considered to have ended.
@@ -396,22 +425,7 @@ class ScrollHint extends HTMLElement {
   };
 
   #update = () => {
-    const { scrollTop, scrollHeight, clientHeight, scrollLeft, scrollWidth, clientWidth } = this;
-    const scrollDirection = scrollWidth > clientWidth ? 'horizontal' : 'vertical';
-    const scrollPercentage =
-      scrollDirection === 'vertical'
-        ? scrollTop / (scrollHeight - clientHeight)
-        : scrollLeft / (scrollWidth - clientWidth);
-
-    this.style.maskImage = Number.isNaN(scrollPercentage)
-      ? ''
-      : `linear-gradient(
-        to ${scrollDirection === 'vertical' ? 'bottom' : 'right'},
-        transparent ${scrollPercentage > 0 ? 1 : 0}%,
-        black ${scrollPercentage < 0.1 ? scrollPercentage * 100 : 10}%,
-        black ${scrollPercentage > 0.9 ? scrollPercentage * 100 : 90}%,
-        transparent 100%
-      )`;
+    this.style.maskImage = '';
   };
 
   #resizeObserver = new ResizeObserver(this.#update);

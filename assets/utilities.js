@@ -542,15 +542,23 @@ function getCardsToAnimate(grid, cards) {
   const detailsSize = ((parseInt(gridStyle.fontSize) || 16) + 2) * 2;
 
   const isMobile = window.innerWidth < 750;
+  const isRowsView = grid.getAttribute('product-grid-view') === 'rows';
 
-  // Always use the zoom-out state card width
-  const cardWidth = isMobile ? Math.round((gridRect.width - gridGap) / 2) : 100;
-  const cardHeight = Math.round(cardWidth / aspectRatio) + cardGap + detailsSize;
+  let cardWidth;
+  let cardHeight;
+  let columnsInGrid;
 
-  // Calculate the number of cards that fit in the visible area:
-  // - The width estimation is pretty accurate, we can ignore decimals.
-  // - The height estimation needs to account for peeking rows, so we round up.
-  const columnsInGrid = isMobile ? 2 : Math.floor((gridRect.width + gridGap) / (cardWidth + gridGap));
+  if (isRowsView) {
+    cardWidth = gridRect.width;
+    cardHeight = 240 + gridGap;
+    columnsInGrid = 1;
+  } else {
+    // Use compact card size as common denominator for transition animation count
+    cardWidth = isMobile ? Math.round((gridRect.width - gridGap) / 2) : 100;
+    cardHeight = Math.round(cardWidth / aspectRatio) + cardGap + detailsSize;
+    columnsInGrid = isMobile ? 2 : Math.floor((gridRect.width + gridGap) / (cardWidth + gridGap));
+  }
+
   const rowsInGrid = Math.ceil((visibleHeight - gridGap) / (cardHeight + gridGap));
 
   return columnsInGrid * rowsInGrid;

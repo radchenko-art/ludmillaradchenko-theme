@@ -312,7 +312,8 @@
       "quantity_maximum": "Maximal {{ maximum }}",
       "in_cart": "im Warenkorb",
       "default_title": "Standardtitel",
-      "sticky_add_to_cart": "Leiste „Schnell in den Warenkorb“"
+      "sticky_add_to_cart": "Leiste „Schnell in den Warenkorb“",
+      "brand": "Marke"
     }
   },
   "fields": {

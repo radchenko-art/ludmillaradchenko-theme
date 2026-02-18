@@ -23,7 +23,13 @@
     assign default_sort_by = results.default_sort_by
     for option in results.sort_options
       if option.value == sort_by
-        assign status = option.name
+        assign sort_key = 'collections.sorting.' | append: option.value | replace: '-', '_'
+        assign sort_label = sort_key | t
+        if sort_label != sort_key
+          assign status = sort_label
+        else
+          assign status = option.name
+        endif
       endif
     endfor
   %}
@@ -33,7 +39,7 @@
       for="sort-select-{{ section_id }}"
       class="facets__label"
     >
-      {{- 'actions.sort' | t -}}
+      {{- 'actions.sort_by' | t -}}
     </label>
     <div class="sorting-filter__select-wrapper">
       <select
@@ -45,13 +51,15 @@
         {% endif %}
       >
         {% for option in results.sort_options %}
+          {% assign sort_option_key = 'collections.sorting.' | append: option.value | replace: '-', '_' %}
+          {% assign sort_option_label = sort_option_key | t %}
           <option
             value="{{ option.value }}"
             {% if option.value == sort_by %}
               selected
             {% endif %}
           >
-            {{ option.name }}
+            {% if sort_option_label != sort_option_key %}{{ sort_option_label }}{% else %}{{ option.name }}{% endif %}
           </option>
         {% endfor %}
       </select>
@@ -83,7 +91,7 @@
       on:toggle="/handleToggle"
     >
       <summary
-        class="facets__summary"
+        class="facets__summary sorting-filter__summary"
         role="button"
         aria-expanded="false"
         aria-controls="sorting-options-{{ section_id }}"
@@ -93,26 +101,29 @@
           class="facets__label"
           id="sort-label-{{ section_id }}"
         >
-          {{- 'actions.sort' | t -}}
+          {{- 'actions.sort_by' | t -}}
         </span>
-        <span
-          class="facets__status h6 desktop:hidden"
-        >
-          {{- status -}}
-        </span>
-        <span class="svg-wrapper icon-caret icon-animated">
-          {{- 'icon-caret.svg' | inline_asset_content -}}
-        </span>
-      </summary>
-      <floating-panel-component
-        id="sorting-options-{{ section_id }}"
-        class="sorting-filter__options color-{{ settings.popover_color_scheme }}"
-        role="listbox"
-        aria-labelledby="sort-label-{{ section_id }}"
-        ref="listbox"
-      >
-        <div class="sorting-filter__options-inner">
+        <div class="sorting-filter__trigger-wrapper">
+          <span class="sorting-filter__trigger-box">
+            <span class="sorting-filter__status" aria-hidden="true">{{- status -}}</span>
+            <span class="svg-wrapper icon-caret icon-animated">
+              {{- 'icon-caret.svg' | inline_asset_content -}}
+            </span>
+          </span>
+          <floating-panel-component
+            id="sorting-options-{{ section_id }}"
+            class="sorting-filter__options color-{{ settings.popover_color_scheme }}"
+            role="listbox"
+            aria-labelledby="sort-label-{{ section_id }}"
+            ref="listbox"
+          >
+            <div class="sorting-filter__options-inner">
           {% for option in results.sort_options %}
+            {% assign sort_option_key = 'collections.sorting.' | append: option.value | replace: '-', '_' %}
+            {% assign sort_option_label = sort_option_key | t %}
+            {% if sort_option_label == sort_option_key %}
+              {% assign sort_option_label = option.name %}
+            {% endif %}
             <label
               for="sort-option-{{ option.value }}-{{ section_id }}"
             >
@@ -131,7 +142,7 @@
                   {% endif %}
                   value="{{ option.value }}"
                   class="sorting-filter__input"
-                  data-option-name="{{ option.name }}"
+                  data-option-name="{{ sort_option_label }}"
                   {% if option.value == sort_by %}
                     checked
                   {% endif %}
@@ -140,12 +151,14 @@
                 <span class="svg-wrapper icon-checkmark sorting-filter__checkmark">
                   {{- 'icon-checkmark.svg' | inline_asset_content -}}
                 </span>
-                <span class="sorting-filter__label">{{ option.name }}</span>
+                <span class="sorting-filter__label">{{ sort_option_label }}</span>
               </div>
             </label>
           {% endfor %}
+            </div>
+          </floating-panel-component>
         </div>
-      </floating-panel-component>
+      </summary>
     </details>
   </accordion-custom>
 </sorting-filter-component>
@@ -168,10 +181,12 @@
   .sorting-filter__select-wrapper {
     display: flex;
     position: relative;
-    border-radius: var(--variant-picker-button-radius);
+    border-radius: 6px;
     align-items: center;
     overflow: clip;
     padding: var(--padding-2xs) var(--padding-xs);
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+    min-width: 120px;
   }
 
   .sorting-filter__select-wrapper:has(:focus-visible) {
@@ -189,11 +204,15 @@
     margin: 0;
     cursor: pointer;
     width: 100%;
-    padding-inline-end: var(--icon-size-2xs);
-    text-align: right;
+    padding-inline-end: 24px;
+    padding-inline-start: var(--padding-sm);
+    text-align: left;
+    background: transparent;
+    font-size: var(--font-paragraph--size);
+    color: var(--color-foreground);
 
     /* Needed for Safari */
-    text-align-last: right;
+    text-align-last: left;
   }
 
   .sorting-filter__select .icon {
@@ -206,10 +225,86 @@
     pointer-events: none;
   }
 
+  .sorting-filter__summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .sorting-filter__trigger-wrapper {
+    position: relative;
+    min-width: 0;
+    flex: 1 1 0;
+    max-width: 375px;
+  }
+
+  .sorting-filter__trigger-wrapper .sorting-filter__trigger-box {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sorting-filter__trigger-box {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--padding-2xs);
+    height: 35px;
+    padding: 5px 35px 5px 15px;
+    border-radius: 20px;
+    background-color: rgb(var(--color-foreground-rgb) / var(--opacity-8));
+    min-width: 0;
+    max-width: 375px;
+    flex: 1 1 0;
+    position: relative;
+    box-sizing: border-box;
+    white-space: nowrap;
+  }
+
+  .sorting-filter__trigger-box .icon-caret {
+    margin-top: 0;
+    position: absolute;
+    right: var(--padding-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .sorting-filter__summary .facets__label {
+    color: #888;
+  }
+
+  .sorting-filter__status {
+    font-size: var(--font-paragraph--size);
+    color: #888;
+    transition: color var(--animation-speed) var(--animation-easing);
+  }
+
+  .sorting-filter__summary:hover .sorting-filter__status {
+    color: var(--color-foreground);
+  }
+
   .sorting-filter {
+    min-width: 0;
+    display: flex;
+    width: 100%;
     @media screen and (min-width: 750px) {
       z-index: var(--facets-upper-z-index);
     }
+  }
+
+  /* Width chain: container → accordion-custom → details → summary → trigger-box */
+  .sorting-filter accordion-custom {
+    flex: 1 1 0;
+    min-width: 0;
+    display: block;
+  }
+
+  .sorting-filter accordion-custom details {
+    width: 100%;
+  }
+
+  .sorting-filter accordion-custom .sorting-filter__summary {
+    width: 100%;
   }
 
   .sorting-filter__options {
@@ -218,15 +313,16 @@
     opacity: 0;
     position: absolute;
     top: 100%;
+    left: 0;
     right: 0;
+    width: 100%;
+    min-width: 0;
     color: var(--color-foreground);
     z-index: var(--facets-upper-z-index);
     box-shadow: var(--shadow-popover);
     border: var(--style-border-popover);
     background-color: var(--color-background);
     border-radius: var(--style-border-radius-popover);
-    width: max-content;
-    min-width: var(--facets-panel-min-width);
     min-height: 0;
 
     transition: grid-template-rows var(--animation-speed-slow) var(--animation-easing),

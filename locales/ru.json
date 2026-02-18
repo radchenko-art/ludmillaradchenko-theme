@@ -117,6 +117,7 @@
     "sign_up": "Регистрация",
     "open_image_in_full_screen": "Открыть изображение во весь экран",
     "sort": "Сортировать",
+    "sort_by": "Сортировать по:",
     "show_all_options": "Показать все варианты",
     "open": "Открыть",
     "wishlist": "Мой вишлист"
@@ -178,6 +179,7 @@
     "grid_view": {
       "default_view": "По умолчанию",
       "grid_fieldset": "Сетка столбцов",
+      "rows": "Строки",
       "single_item": "Одиночный",
       "zoom_out": "Уменьшить"
     },
@@ -255,9 +257,10 @@
     "terms_and_policies": "Условия и политики",
     "pagination": {
       "nav_label": "Постраничная навигация",
-      "previous": "Назад",
       "next": "Далее",
-      "page": "Страница {{ page }}"
+      "page": "Страница {{ page }}",
+      "previous": "Назад",
+      "showing": "Показано {{ start }}-{{ end }} из {{ total }}"
     },
     "volume_pricing_available": "Доступны установление цены в зависимости от объема операций",
     "volume_pricing": "Установление цены в зависимости от объема операций",
@@ -319,7 +322,8 @@
       "post": "Добавить комментарий",
       "success_moderated": "Комментарий отправлен на модерацию",
       "success": "Комментарий опубликован"
-    }
+    },
+    "view_now": "СМОТРЕТЬ"
   },
   "fields": {
     "separator": "–"
@@ -350,7 +354,21 @@
       "quantity_maximum": "Максимум: {{ maximum }}",
       "in_cart": "в корзине",
       "default_title": "Название по умолчанию",
-      "sticky_add_to_cart": "Быстрое добавление в корзину"
+      "sticky_add_to_cart": "Быстрое добавление в корзину",
+      "brand": "Бренд",
+      "reference": "Артикул"
+    }
+  },
+  "collections": {
+    "sorting": {
+      "manual": "Select",
+      "best_selling": "По популярности",
+      "title_ascending": "По названию, А–Я",
+      "title_descending": "По названию, Я–А",
+      "price_ascending": "Сначала дешевле",
+      "price_descending": "Сначала дороже",
+      "created_descending": "Сначала новинки",
+      "created_ascending": "Сначала старые"
     }
   }
 }

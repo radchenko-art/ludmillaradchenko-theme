@@ -1,0 +1,117 @@
+<div class="compare-button-block" {{ block.shopify_attributes }}>
+  {% if block.settings.custom_liquid != blank %}
+    {{ block.settings.custom_liquid }}
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .compare-button-block {
+    position: absolute;
+  }
+
+  /* Match quick-add button: round pill, icon-only by default, expand with text on hover */
+  .compare-button-block .button,
+  .compare-button-block a,
+  .compare-button-block button,
+  .compare-button-block .add-to-comparable {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(var(--color-background) 0 100%) padding-box;
+    padding: 0;
+    border-radius: 50px;
+    border: 2px solid hsl(0 0% 0% / 0.15);
+    height: var(--button-size-md);
+    cursor: pointer;
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-family: var(--font-paragraph--family);
+    font-size: var(--font-paragraph--size);
+    backdrop-filter: blur(20px) saturate(180%);
+    overflow: hidden;
+    transition: scale var(--animation-speed) var(--animation-easing);
+  }
+
+  .compare-button-block .add-to-comparison-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--padding-xs);
+    overflow: hidden;
+    max-width: calc(var(--button-size-md) - 4px);
+    height: 100%;
+    padding-inline: 0;
+    padding-inline-end: 0;
+    border-radius: 50px;
+    background: var(--color-background);
+    white-space: nowrap;
+    transition-property: max-width, padding-inline-end;
+    transition-duration: var(--animation-speed);
+    transition-timing-function: var(--ease-out-cubic);
+  }
+
+  .compare-button-block .add-to-comparable:hover .add-to-comparison-label,
+  .compare-button-block .add-to-comparable:focus-visible .add-to-comparison-label {
+    max-width: 20em;
+    padding-inline-end: var(--padding-sm);
+  }
+
+  .compare-button-block .add-to-comparable .svg-wrapper {
+    flex-shrink: 0;
+    width: calc(var(--button-size-md) - 4px);
+    height: calc(var(--button-size-md) - 4px);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(5px);
+  }
+
+  .compare-button-block .add-to-comparable .svg-wrapper svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .compare-button-block .add-to-comparable:hover,
+  .compare-button-block .add-to-comparable:focus-visible {
+    scale: 1.03;
+  }
+
+  .compare-button-block .add-to-comparable:hover::before,
+  .compare-button-block .add-to-comparable:focus-visible::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    z-index: -1;
+  }
+
+  .compare-button-block .add-to-comparable:active {
+    scale: 0.99;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .compare-button-block .add-to-comparison-label {
+      max-width: 20em;
+      padding-inline-end: var(--padding-sm);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Compare Button",
+  "tag": null,
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "Custom HTML / Liquid",
+      "info": "Supports Liquid (e.g. {{ product.id }}, {{ closest.product.title }})"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Compare Button",
+      "category": "t:categories.product"
+    }
+  ]
+}
+{% endschema %}

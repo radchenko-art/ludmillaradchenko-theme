@@ -108,7 +108,8 @@
     "sign_up": "Sign up",
     "submit": "Submit",
     "view_store_information": "View store information",
-    "sort": "Sort"
+    "sort": "Sort",
+    "sort_by": "Sort by:"
   },
   "blocks": {
     "contact_form": {
@@ -148,6 +149,14 @@
       "post": "Post comment",
       "success_moderated": "Comment posted, awaiting moderation",
       "success": "Comment posted"
+    },
+    "view_now": "VIEW NOW"
+  },
+  "general": {
+    "breadcrumbs": {
+      "home": "Home",
+      "search": "Search",
+      "cart": "Cart"
     }
   },
   "content": {
@@ -184,6 +193,7 @@
     "grid_view": {
       "default_view": "Default",
       "grid_fieldset": "Column grid",
+      "rows": "Rows",
       "single_item": "Single",
       "zoom_out": "Zoom out"
     },
@@ -207,9 +217,10 @@
     "page_placeholder_content": "Select a page to display its content.",
     "pagination": {
       "nav_label": "Pagination navigation",
-      "previous": "Previous",
       "next": "Next",
-      "page": "Page {{ page }}"
+      "page": "Page {{ page }}",
+      "previous": "Previous",
+      "showing": "Showing {{ start }}-{{ end }} of {{ total }} item(s)"
     },
     "pickup_available_at_html": "Pickup available at <b>{{ location }}</b>",
     "pickup_available_in": "Pickup available, {{ pickup_time }}",
@@ -355,7 +366,21 @@
       "quantity_maximum": "Maximum of {{ maximum }}",
       "in_cart": "in cart",
       "default_title": "Default Title",
-      "sticky_add_to_cart": "Quick add to cart bar"
+      "sticky_add_to_cart": "Quick add to cart bar",
+      "brand": "Brand",
+      "reference": "Reference"
+    }
+  },
+  "collections": {
+    "sorting": {
+      "manual": "Select",
+      "best_selling": "Best selling",
+      "title_ascending": "Alphabetically, A-Z",
+      "title_descending": "Alphabetically, Z-A",
+      "price_ascending": "Price, low to high",
+      "price_descending": "Price, high to low",
+      "created_descending": "Date, new to old",
+      "created_ascending": "Date, old to new"
     }
   }
 }

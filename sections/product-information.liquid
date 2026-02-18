@@ -177,6 +177,15 @@
 %}
 
 {% stylesheet %}
+  .product-information .product-details .text-block:first-of-type > * {
+    text-transform: capitalize;
+  }
+
+  .product-information .accordion rte-formatter {
+    --width: 100% !important;
+    --max-width: none !important;
+  }
+
   .sticky-add-to-cart__bar {
     position: fixed;
     bottom: 20px;
@@ -366,6 +375,9 @@
   "blocks": [
     {
       "type": "@app"
+    },
+    {
+      "type": "@theme"
     }
   ],
   "disabled_on": {
@@ -430,6 +442,17 @@
       "step": 4,
       "unit": "px",
       "default": 16
+    },
+    {
+      "type": "range",
+      "id": "media_max_width",
+      "label": "Media max width",
+      "info": "Max width of the media block on desktop (0 = no limit). Mobile is unchanged.",
+      "min": 0,
+      "max": 1200,
+      "step": 50,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "checkbox",

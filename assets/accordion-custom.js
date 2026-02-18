@@ -40,6 +40,7 @@ class AccordionCustom extends HTMLElement {
 
     this.#setDefaultOpenState();
 
+    this.details.addEventListener('toggle', this.#handleToggle, { signal });
     this.addEventListener('keydown', this.#handleKeyDown, { signal });
     this.summary.addEventListener('click', this.handleClick, { signal });
     mediaQueryLarge.addEventListener('change', this.#handleMediaQueryChange, { signal });
@@ -54,7 +55,32 @@ class AccordionCustom extends HTMLElement {
   }
 
   /**
+   * When this item opens, close all other accordion items in the same accordion group (only one open at a time).
+   * Preserves scroll position so the page doesn't jump when opening/closing items.
+   */
+  #handleToggle = () => {
+    if (!this.details.open) return;
+    const accordionGroup = this.closest('.accordion');
+    if (!accordionGroup) return;
+
+    const scrollX = this._savedScrollX ?? window.scrollX;
+    const scrollY = this._savedScrollY ?? window.scrollY;
+
+    const siblings = accordionGroup.querySelectorAll('accordion-custom');
+    siblings.forEach((el) => {
+      if (el !== this && el.details) el.details.open = false;
+    });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo(scrollX, scrollY);
+      });
+    });
+  };
+
+  /**
    * Handles the click event.
+   * Saves scroll position before toggle so we can restore it and prevent page jump.
    * @param {Event} event - The event.
    */
   handleClick = (event) => {
@@ -66,6 +92,9 @@ class AccordionCustom extends HTMLElement {
       event.preventDefault();
       return;
     }
+
+    this._savedScrollX = window.scrollX;
+    this._savedScrollY = window.scrollY;
   };
 
   /**

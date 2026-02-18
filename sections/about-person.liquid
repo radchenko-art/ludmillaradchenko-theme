@@ -1,0 +1,399 @@
+{%- liquid
+  assign content_raw = page.content
+  assign parts = content_raw | split: '<hr'
+  assign has_columns = false
+  assign content_before = ''
+  assign content_after = ''
+
+  if parts.size >= 2
+    assign has_columns = true
+    assign content_before = parts[0]
+    assign rest = parts[1]
+    assign rest_split = rest | split: '>'
+    assign hr_tail = rest_split[0] | append: '>'
+    assign content_after = rest | remove_first: hr_tail
+  endif
+
+  assign main_image = page.metafields.custom.main_image.value
+  assign subheading = page.metafields.custom.subtitle.value | default: page.metafields.custom.subheading.value
+  assign subheading_image = page.metafields.custom.subheading_image.value
+  assign bg_image = page.metafields.custom.background_image.value
+  assign bg_image_url = ''
+  if bg_image != blank
+    assign bg_image_url = bg_image | image_url: width: 1920
+  endif
+
+  assign show_header_row = false
+  assign show_single_row_image_text = false
+  if main_image != blank and subheading != blank and has_columns
+    assign show_header_row = true
+  endif
+  if main_image != blank and subheading == blank and has_columns == false
+    assign show_single_row_image_text = true
+  endif
+-%}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div class="section {% if section.settings.content_width == 'narrow' %}page-width-narrow{% else %}section--full-width{% endif %} color-{{ section.settings.color_scheme }}">
+  <div
+    class="about-person__inner-wrap spacing-style"
+    style="--padding-block-start: 0; --padding-block-end: 0; --padding-inline-start: {{ section.settings['padding-inline-start'] | default: 0 }}px; --padding-inline-end: {{ section.settings['padding-inline-end'] | default: 0 }}px;"
+  >
+    <div
+      class="about-person layout-panel-flex layout-panel-flex--column section-content-wrapper mobile-column spacing-style{% if bg_image_url != blank %} section-content-wrapper--has-bg about-person--has-bg{% endif %}"
+      style="
+        --flex-direction: column;
+        --padding-inline-start: 0;
+        --padding-inline-end: 0;
+        {% render 'gap-style', value: section.settings.gap %}
+        {% render 'spacing-style', settings: section.settings %}
+        {% if bg_image_url != blank %}
+          background-image: url('{{ bg_image_url }}');
+          background-attachment: fixed;
+          background-repeat: no-repeat;
+          background-size: cover;
+          color: #fff;
+        {% endif %}
+      "
+    >
+    {%- unless show_header_row -%}
+      <div class="page-content__title-wrapper">
+        <h1 class="page-content__title">{{ page.title }}</h1>
+      </div>
+    {%- endunless -%}
+
+    {%- if show_header_row -%}
+      <div class="page-content__two-columns page-content__header-row">
+        <div class="page-content__column">
+          {%- if main_image != blank -%}
+            <div class="page-content__main-image">
+              <img
+                src="{{ main_image | image_url: width: 800 }}"
+                alt=""
+                width="{{ main_image.width }}"
+                height="{{ main_image.height }}"
+                loading="lazy"
+              >
+            </div>
+          {%- endif -%}
+        </div>
+        <div class="page-content__column page-content__column--subheading">
+          <h2 class="page-content__subheading">{{ subheading }}</h2>
+          {%- if subheading_image != blank -%}
+            <div class="page-content__subheading-image">
+              <img
+                src="{{ subheading_image | image_url: width: 600 }}"
+                alt=""
+                width="{{ subheading_image.width }}"
+                height="{{ subheading_image.height }}"
+                loading="lazy"
+              >
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="page-content__title-wrapper">
+        <h1 class="page-content__title">{{ page.title }}</h1>
+      </div>
+    {%- endif -%}
+
+    {%- if show_single_row_image_text -%}
+      <div class="page-content__two-columns">
+        <div class="page-content__column">
+          <div class="page-content__main-image">
+            <img
+              src="{{ main_image | image_url: width: 800 }}"
+              alt=""
+              width="{{ main_image.width }}"
+              height="{{ main_image.height }}"
+              loading="lazy"
+            >
+          </div>
+        </div>
+        <div class="page-content__column page-content__column--text">
+          <rte-formatter>{{ content_raw }}</rte-formatter>
+        </div>
+      </div>
+    {%- elsif has_columns -%}
+      <div class="page-content__two-columns">
+        <div class="page-content__column page-content__column--text">
+          <rte-formatter>{{ content_before }}</rte-formatter>
+        </div>
+        <div class="page-content__column page-content__column--text">
+          <rte-formatter>{{ content_after }}</rte-formatter>
+        </div>
+      </div>
+    {%- else -%}
+      <rte-formatter>{{ content_raw }}</rte-formatter>
+    {%- endif -%}
+
+    {%- assign download_files = page.metafields.custom.download_files.value -%}
+    {%- if download_files != blank -%}
+      <div class="page-content__downloads">
+        {%- if download_files.url != blank -%}
+          {%- assign file_url = download_files.url -%}
+          {%- assign filename = file_url | split: '?' | first | split: '/' | last -%}
+          {%- assign ext = filename | split: '.' | last -%}
+          {%- assign suffix = '.' | append: ext -%}
+          {%- assign name_only = filename | remove: suffix -%}
+          {%- assign link_text = name_only | replace: '-', ' ' | prepend: 'Download ' -%}
+          <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
+        {%- else -%}
+          {%- for file in download_files -%}
+            {%- assign file_url = file.url | default: file -%}
+            {%- if file_url != blank -%}
+              {%- assign filename = file_url | split: '?' | first | split: '/' | last -%}
+              {%- assign ext = filename | split: '.' | last -%}
+              {%- assign suffix = '.' | append: ext -%}
+              {%- assign name_only = filename | remove: suffix -%}
+              {%- assign link_text = name_only | replace: '-', ' ' | prepend: 'Download ' -%}
+              <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .about-person--has-bg {
+    position: relative;
+  }
+
+  .about-person--has-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.54);
+    pointer-events: none;
+  }
+
+  .about-person--has-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .about-person--has-bg,
+  .about-person--has-bg h1,
+  .about-person--has-bg h2,
+  .about-person--has-bg h3,
+  .about-person--has-bg h4,
+  .about-person--has-bg .rte,
+  .about-person--has-bg .rte p,
+  .about-person--has-bg .rte a,
+  .about-person--has-bg .rte li,
+  .about-person--has-bg .text-block {
+    color: #fff;
+  }
+
+  .about-person--has-bg .rte a:not(.page-content__download-link) {
+    border-bottom-color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media screen and (min-width: 750px) {
+    .about-person.spacing-style.layout-panel-flex.layout-panel-flex--column.section-content-wrapper.mobile-column {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  }
+
+  .about-person--has-bg h1 {
+    font-family: var(--font-accent--family);
+    font-size: 54px;
+    text-transform: none;
+  }
+
+  .page-content__two-columns {
+    display: grid;
+    gap: var(--gap-lg, 1rem);
+  }
+
+  .page-content__header-row {
+    margin-bottom: var(--gap-lg, 1rem);
+  }
+
+  .page-content__subheading-image {
+    margin-top: 1rem;
+  }
+
+  .page-content__column--subheading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .page-content__subheading {
+    font-size: 30px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .page-content__title-wrapper {
+    width: 100%;
+    text-align: center;
+    margin-bottom: var(--gap-lg, 1rem);
+  }
+
+  .page-content__title {
+    margin: 0;
+    padding: 0 0 20px;
+  }
+
+  .page-content__header-row + .page-content__title-wrapper .page-content__title {
+    padding: 20px 0;
+  }
+
+  .page-content__column--text {
+    padding: 0 40px;
+    text-align: justify;
+    font-size: 15px;
+  }
+
+  .page-content__column--text p {
+    line-height: 28.5px;
+    margin-bottom: 16px;
+  }
+
+  .page-content__downloads {
+    margin-top: 2rem;
+    text-align: center;
+  }
+
+  .page-content__download-link {
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background-color: #ce2d2a;
+    border-radius: 50px;
+    padding: 15px 50px;
+    border: 3px solid #ce2d2a;
+    border-bottom-color: #ce2d2a;
+    text-decoration: none;
+    text-align: center;
+    transition: 0.5s;
+    display: inline-block;
+    line-height: 1;
+    color: #ffffff;
+  }
+
+  .page-content__download-link:hover {
+    color: #ffffff;
+    background-color: rgba(0, 0, 0, 0);
+    border: 3px solid #ffffff;
+    border-bottom-color: #ffffff;
+    font-weight: 500;
+  }
+
+  .page-content__download-link + .page-content__download-link {
+    margin-left: 1rem;
+  }
+
+  @media screen and (min-width: 750px) {
+    .page-content__two-columns {
+      grid-template-columns: 1fr 1fr;
+      max-width: 1140px;
+      margin-inline: auto;
+    }
+
+    .page-content__title-wrapper {
+      max-width: 1140px;
+      margin-inline: auto;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "About person",
+  "tag": "section",
+  "class": "section-about-person",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "content_width",
+      "label": "Content width",
+      "options": [
+        { "value": "full", "label": "Full width" },
+        { "value": "narrow", "label": "Narrow" }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between elements",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Padding top",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 100
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Padding left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Padding right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "About person"
+    }
+  ]
+}
+{% endschema %}

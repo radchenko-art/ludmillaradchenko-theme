@@ -312,7 +312,8 @@
       "quantity_maximum": "최대 {{ maximum }}개",
       "in_cart": "카트에 있음",
       "default_title": "기본 이름",
-      "sticky_add_to_cart": "빠른 카트 추가 바"
+      "sticky_add_to_cart": "빠른 카트 추가 바",
+      "brand": "브랜드"
     }
   },
   "fields": {

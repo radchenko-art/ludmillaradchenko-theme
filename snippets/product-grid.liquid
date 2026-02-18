@@ -18,9 +18,15 @@
   @media (min-width: 750px) {
     {% case section.settings.layout_type %}
       {% when 'grid' %}
-        .product-grid--{{ section.id }}:is(.product-grid--grid) {
-          --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
-        }
+        {% if section.settings.product_card_size == 'medium' %}
+          .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--grid) {
+            --product-grid-columns-desktop: repeat(3, 1fr);
+          }
+        {% else %}
+          .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--grid) {
+            --product-grid-columns-desktop: repeat(auto-fill, minmax({{ product_card_size }}, 1fr));
+          }
+        {% endif %}
 
 
       {% when 'organic' %}
@@ -28,20 +34,20 @@
         {% assign row_cycle = 3 %}
         {% assign product_cycle = row_cycle | times: 2 %}
         {% assign right_large_start_col = 3 %}
-        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 1) {
+        .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 1) {
           grid-column: 1 / span {{ large_span }};
         }
 
-        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 2),
-        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 5) {
+        .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 2),
+        .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + 5) {
           align-self: end;
         }
 
-        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + {{ product_cycle }}) {
+        .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--organic) .product-grid__item:nth-of-type({{ product_cycle }}n + {{ product_cycle }}) {
           grid-column: {{ right_large_start_col }} / span {{ large_span }};
         }
 
-        .product-grid--{{ section.id }}:not([product-grid-view='zoom-out']):is(.product-grid--organic) {
+        .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--organic) {
           --product-grid-columns-desktop: repeat(4, 1fr);
         }
     {% endcase %}
@@ -50,26 +56,16 @@
     {% case section.settings.product_card_size %}
       {% when 'extra-large' or 'large' %}
         @container product-grid (max-width: calc({{ product_card_size }} * 3 + {{ section.settings.columns_gap_horizontal }}px * 2)) {
-          .product-grid--{{ section.id }}:is(.product-grid--grid) {
+          .product-grid--{{ section.id }}:not(.product-grid--rows):is(.product-grid--grid) {
             --product-grid-columns-desktop: repeat(2, 1fr);
           }
         }
     {% endcase %}
 
-    /* When zoomed out, fit as many 100px-wide columns as possible */
-    .product-grid--{{ section.id }}[product-grid-view='zoom-out'] {
-      --product-grid-columns-desktop: repeat(auto-fill, minmax(6.25rem, 1fr));
-    }
-
-    .product-grid--{{ section.id }}[product-grid-view='zoom-out'] .product-grid-view-zoom-out--details {
-      display: block;
-    }
-
-    .product-grid--{{ section.id }}[product-grid-view='zoom-out'] .product-grid__card {
-      padding-inline-start: var(--zoom-out-padding-inline-start, 0);
-      padding-inline-end: var(--zoom-out-padding-inline-end, 0);
-      padding-block-start: var(--zoom-out-padding-block-start, 0);
-      padding-block-end: var(--zoom-out-padding-block-end, 0);
+    /* Rows view: one column, 240px row height */
+    .product-grid--{{ section.id }}.product-grid--rows .product-grid__card {
+      padding-inline-start: var(--padding-md);
+      padding-inline-end: var(--padding-md);
     }
   }
 {% endstyle %}
@@ -142,10 +138,44 @@
               // No need to read the window width if no custom layouts were saved.
               if (storedLayoutMobile === 'default' && storedLayoutDesktop === 'default') return;
 
-              const storedLayout = window.innerWidth >= 750 ? storedLayoutDesktop : storedLayoutMobile;
+              let storedLayout = window.innerWidth >= 750 ? storedLayoutDesktop : storedLayoutMobile;
+              if (storedLayout === 'zoom-out') storedLayout = 'rows';
               if (storedLayout === 'default') return;
 
               grid.setAttribute('product-grid-view', storedLayout);
+              grid.classList.add('product-grid--rows');
+              function wrapCardTextBlocks() {
+                grid.querySelectorAll('.product-grid__card').forEach(function(card) {
+                  if (card.querySelector('.product-grid__card-text')) return;
+                  var nonGallery = Array.from(card.children).filter(function(el) { return !el.classList.contains('card-gallery'); });
+                  if (nonGallery.length === 0) return;
+                  var wrapper = document.createElement('div');
+                  wrapper.className = 'product-grid__card-text';
+                  nonGallery.forEach(function(el) { wrapper.appendChild(el); });
+                  var gallery = card.querySelector('.card-gallery');
+                  var quickAdd = gallery && gallery.querySelector('quick-add-component');
+                  var wishlist = wrapper.querySelector('.wishlist-button-block');
+                  if (quickAdd) {
+                    if (wishlist) wrapper.insertBefore(quickAdd, wishlist);
+                    else wrapper.appendChild(quickAdd);
+                  }
+                  var compare = wrapper.querySelector('.compare-button-block');
+                  var quickAddInWrapper = wrapper.querySelector('quick-add-component');
+                  var wishlistInWrapper = wrapper.querySelector('.wishlist-button-block');
+                  if (compare || quickAddInWrapper || wishlistInWrapper) {
+                    var actionsWrapper = document.createElement('div');
+                    actionsWrapper.className = 'product-grid__card-actions';
+                    [quickAddInWrapper, compare, wishlistInWrapper].filter(Boolean).forEach(function(el) { actionsWrapper.appendChild(el); });
+                    wrapper.appendChild(actionsWrapper);
+                  }
+                  card.appendChild(wrapper);
+                });
+              }
+              if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', wrapCardTextBlocks);
+              } else {
+                wrapCardTextBlocks();
+              }
 
               const options = document.querySelectorAll(
                 'input[type="radio"][name="grid"], input[type="radio"][name="grid-mobile"]'
@@ -162,7 +192,21 @@
       {% if enable_infinite_scroll != false %}
         <span ref="viewMoreNext"></span>
       {% else %}
-        {% render 'pagination-controls', paginate: paginate %}
+        {% liquid
+          assign item_start = paginate.current_offset | plus: 1
+          assign item_end_calc = paginate.current_offset | plus: paginate.page_size
+          if item_end_calc > paginate.items
+            assign item_end = paginate.items
+          else
+            assign item_end = item_end_calc
+          endif
+        %}
+        <div class="pagination-wrapper">
+          <span class="pagination-wrapper__stats">
+            {{ 'content.pagination.showing' | t: start: item_start, end: item_end, total: paginate.items }}
+          </span>
+          {% render 'pagination-controls', paginate: paginate %}
+        </div>
       {% endif %}
     {% endif %}
   </div>
@@ -174,6 +218,7 @@
     --mobile-columns: 2; /* Default value */
 
     isolation: isolate;
+    margin-bottom: 2rem;
 
     @media screen and (min-width: 750px) {
       --product-grid-gap: var(--product-grid-gap-desktop);
@@ -205,6 +250,35 @@
     }
   }
 
+  .pagination-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--padding-md);
+    min-height: 100px;
+    padding: 20px 0;
+    margin: 1rem 0;
+    border-top: 1px solid #eee;
+  }
+
+  .pagination-wrapper__stats {
+    color: #888;
+    font-size: var(--font-paragraph--size);
+  }
+
+  .pagination-wrapper .pagination {
+    justify-content: flex-end;
+    margin-top: 0;
+    padding: 0;
+  }
+
+  .product-price__row .price {
+    font-family: var(--font-h4--family);
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
   .main-collection-grid__empty {
     padding-block: var(--padding-6xl);
     padding-inline: var(--page-margin);
@@ -217,5 +291,125 @@
 
   .main-collection-grid__empty-title {
     margin: 0;
+  }
+
+  /* Product card title: Accent font, single line, ellipsis, 14px (collection/search) */
+  .product-grid .product-card__content .text-block,
+  .product-grid .product-grid__card-text .text-block {
+    font-family: var(--font-accent--family);
+    font-size: 14px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .product-grid .product-card__content .text-block p,
+  .product-grid .product-grid__card-text .text-block p {
+    font-family: var(--font-h5--family);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  /* Rows view: align product name and price to the left and to the top (higher specificity than base.css) */
+  .product-grid.product-grid--rows .product-grid__card {
+    align-items: flex-start;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card > .product-grid__card-text {
+    justify-content: flex-start;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text a .text-block {
+    padding-top: 30px;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .text-block,
+  .product-grid.product-grid--rows .product-grid__card-text product-price {
+    --text-align: left;
+    text-align: left;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .text-block > *,
+  .product-grid.product-grid--rows .product-grid__card-text product-price .price {
+    text-align: left;
+  }
+
+  /* Rows view: text block stretches to full row height so margin-top: auto on actions works */
+  .product-grid.product-grid--rows .product-grid__card > .product-grid__card-text {
+    align-self: stretch;
+    min-height: 0;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-actions {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--padding-xs);
+    margin-top: auto;
+  }
+
+  .product-grid__card-actions .quick-add {
+    position: static;
+    min-width: 70px;
+  }
+
+  /* Rows view: compare and wishlist — normal flow, always visible (no absolute, no hover-only) */
+  .product-grid.product-grid--rows .product-grid__card-text .compare-button-block {
+    position: static;
+    opacity: 1;
+    bottom: auto;
+    right: auto;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .wishlist-button-block {
+    position: static;
+    opacity: 1;
+    top: auto;
+    right: auto;
+  }
+
+  /* Rows view: add to cart (quick-add) — normal flow, always visible, expanded */
+  .product-grid.product-grid--rows .product-grid__card-text .quick-add .quick-add__button {
+    position: static;
+    inset: auto;
+    right: auto;
+    bottom: auto;
+    display: flex;
+    opacity: 1;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .quick-add .quick-add__button .add-to-cart-text__content {
+    grid-template-columns: 1fr;
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .quick-add .quick-add__button .add-to-cart-text__content span span {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+
+  /* Rows view: show compare and wishlist buttons expanded (label visible) */
+  .product-grid.product-grid--rows .product-grid__card-text .compare-button-block .add-to-comparison-label {
+    max-width: 20em;
+    padding-inline-end: var(--padding-sm);
+  }
+
+  .product-grid.product-grid--rows .product-grid__card-text .wishlist-button-block .st-wishlist-button .st-label {
+    max-width: 20em;
+    padding-inline-start: var(--padding-xs);
   }
 {% endstylesheet %}

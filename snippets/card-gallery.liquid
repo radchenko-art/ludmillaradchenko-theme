@@ -65,17 +65,14 @@
 
 <div
   ref="cardGallery"
-  class="card-gallery card-gallery-{{ block.id }} spacing-style border-style{% if has_badges %} card-gallery--badge-{{ badge_position }}{% endif %}"
+  class="card-gallery card-gallery-{{ block.id }} spacing-style border-style{% if has_badges %} card-gallery--badge-{{ badge_position }}{% endif %}{% if settings.show_second_image_on_hover %} card-gallery--hover-image{% endif %}"
   style="
     {% render 'border-override', settings: block_settings %}
     {% render 'spacing-style', settings: block_settings %}
     --gallery-aspect-ratio: {{ ratio }};
   "
   data-product-id="{{ product.id }}"
-  {% if settings.show_second_image_on_hover %}
-    on:pointerenter="/previewImage"
-    on:pointerleave="/resetImage"
-  {% endif %}
+  {% comment %} Hover for second image is tied to slideshow-component (see slideshow_attributes and inline script on collection). {% endcomment %}
   {% if settings.transition_to_main_product %}
     data-view-transition-to-main-product
   {% endif %}
@@ -156,6 +153,9 @@
       if settings.product_card_carousel == false
         assign slideshow_attributes = slideshow_attributes | append: ' disabled="true"'
       endif
+      if settings.show_second_image_on_hover and template.name != 'collection'
+        assign slideshow_attributes = slideshow_attributes | append: ' on:pointerenter="/previewImage" on:pointerleave="/resetImage"'
+      endif
     %}
     <a
       class="contents"
@@ -207,6 +207,52 @@
     overflow: hidden;
     container-type: inline-size; /* Make card-gallery a container */
     container-name: card-gallery-container; /* Optional: name the container */
+  }
+
+  /* Hover second image: crossfade 400ms — slides in same place, both animate opacity */
+  .card-gallery--hover-image slideshow-component > slideshow-container > slideshow-slides {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: var(--gallery-aspect-ratio);
+    min-height: 0;
+  }
+
+  /* Override base.css (slideshow-slide and .product-media-container with position: relative) */
+  .card-gallery--hover-image slideshow-component slideshow-slide,
+  .card-gallery--hover-image slideshow-component slideshow-slide.product-media-container {
+    position: absolute !important;
+    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 400ms;
+    content-visibility: visible;
+  }
+
+  /* By default first is visible: first slide higher in stack */
+  .card-gallery--hover-image slideshow-component slideshow-slide:first-child {
+    z-index: 2;
+  }
+
+  /* Second slide: absolute top/left 0, lower in stack; hidden by default */
+  .card-gallery--hover-image slideshow-component slideshow-slide:nth-child(2),
+  .card-gallery--hover-image slideshow-component slideshow-slide.product-media-container:nth-child(2) {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1;
+    opacity: 0;
+  }
+
+  /* Specificity not lower than nth-child(2) so when aria-hidden='false' the second slide is shown */
+  .card-gallery--hover-image slideshow-component slideshow-slide[aria-hidden='false'],
+  .card-gallery--hover-image slideshow-component slideshow-slide.product-media-container[aria-hidden='false'] {
+    opacity: 1;
   }
 
   .card-gallery__placeholder svg {
@@ -356,13 +402,13 @@
     }
   }
 
-  [product-grid-view='zoom-out'] .card-gallery .product-card-gallery__title-placeholder {
+  .product-grid--rows .card-gallery .product-card-gallery__title-placeholder {
     /* stylelint-disable-next-line declaration-no-important */
     padding: var(--padding-xs) !important;
     font-size: var(--font-size--xs);
   }
 
-  [product-grid-view='zoom-out'] .card-gallery .slideshow-control {
+  .product-grid--rows .card-gallery .slideshow-control {
     min-width: auto;
   }
 {% endstylesheet %}

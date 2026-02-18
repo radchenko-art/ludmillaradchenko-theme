@@ -42,6 +42,12 @@
     assign accent_font_italic_face_id = '[accent_font_italic_family]-[accent_font_italic_weight]-[accent_font_italic_style]|' | replace: '[accent_font_italic_family]', accent_font_italic.family | replace: '[accent_font_italic_weight]', accent_font_italic.weight | replace: '[accent_font_italic_style]', accent_font_italic.style
     assign accent_font_bold_italic_face_id = '[accent_font_bold_italic_family]-[accent_font_bold_italic_weight]-[accent_font_bold_italic_style]|' | replace: '[accent_font_bold_italic_family]', accent_font_bold_italic.family | replace: '[accent_font_bold_italic_weight]', accent_font_bold_italic.weight | replace: '[accent_font_bold_italic_style]', accent_font_bold_italic.style
 
+    assign accent_second_font = settings.type_accent_second_font
+    assign accent_second_font_face_id = '[accent_second_font_family]-[accent_second_font_weight]-[accent_second_font_style]|' | replace: '[accent_second_font_family]', accent_second_font.family | replace: '[accent_second_font_weight]', accent_second_font.weight | replace: '[accent_second_font_style]', accent_second_font.style
+
+    assign accent_third_font = settings.type_accent_third_font
+    assign accent_third_font_face_id = '[accent_third_font_family]-[accent_third_font_weight]-[accent_third_font_style]|' | replace: '[accent_third_font_family]', accent_third_font.family | replace: '[accent_third_font_weight]', accent_third_font.weight | replace: '[accent_third_font_style]', accent_third_font.style
+
     unless rendered_fonts contains primary_font_face_id
       echo primary_font | font_face: font_display: 'swap'
       assign rendered_fonts = rendered_fonts | append: primary_font_face_id
@@ -121,13 +127,23 @@
       echo accent_font_bold_italic | font_face: font_display: 'swap'
       assign rendered_fonts = rendered_fonts | append: accent_font_bold_italic_face_id
     endunless
+
+    unless rendered_fonts contains accent_second_font_face_id
+      echo accent_second_font | font_face: font_display: 'swap'
+      assign rendered_fonts = rendered_fonts | append: accent_second_font_face_id
+    endunless
+
+    unless rendered_fonts contains accent_third_font_face_id
+      echo accent_third_font | font_face: font_display: 'swap'
+      assign rendered_fonts = rendered_fonts | append: accent_third_font_face_id
+    endunless
   %}
 
   :root {
     /* Page Layout */
     --sidebar-width: 25rem;
     --narrow-content-width: 36rem;
-    --normal-content-width: 42rem;
+    --normal-content-width: 1140px;
     --wide-content-width: 46rem;
     --narrow-page-width: 90rem;
     --normal-page-width: 120rem;
@@ -167,6 +183,12 @@
     --font-accent--family: {{ settings.type_accent_font.family }}, {{ settings.type_accent_font.fallback_families }};
     --font-accent--style: {{ settings.type_accent_font.style }};
     --font-accent--weight: {{ settings.type_accent_font.weight }};
+    --font-accent-second--family: {{ settings.type_accent_second_font.family }}, {{ settings.type_accent_second_font.fallback_families }};
+    --font-accent-second--style: {{ settings.type_accent_second_font.style }};
+    --font-accent-second--weight: {{ settings.type_accent_second_font.weight }};
+    --font-accent-third--family: {{ settings.type_accent_third_font.family }}, {{ settings.type_accent_third_font.fallback_families }};
+    --font-accent-third--style: {{ settings.type_accent_third_font.style }};
+    --font-accent-third--weight: {{ settings.type_accent_third_font.weight }};
 
     /* Margin sizes */
     --font-h1--spacing: 0.25em;

@@ -74,28 +74,17 @@
 
 {% if block_settings.enable_filtering or block_settings.enable_sorting or block_settings.enable_grid_density %}
   {% if block_settings.filter_style == 'vertical' %}
-    {% # These elements are always rendered in the horizontal bar that's why we apply the .facets--horizontal class %}
+    {% # Bar: view buttons (left), then filters title (if enabled), then Sort by (right) %}
     <div
       class="facets facets--horizontal facets-controls-wrapper spacing-style"
       style="{% render 'spacing-style', settings: block_settings %}{% if block_settings.text_label_case == 'uppercase' %} --facet-label-transform: uppercase;{% endif %}"
     >
+      {% if block_settings.enable_grid_density %}
+        {% render 'grid-density-controls', viewport: 'desktop' %}
+      {% endif %}
       {% if block_settings.enable_filtering %}
         <h4 class="facets--filters-title">{{ 'content.filters' | t }}</h4>
       {% endif %}
-
-      <div
-        class="products-count-wrapper"
-        data-testid="products-count"
-      >
-        <span title="{{ 'content.product_count' | t }}">
-          {% if products_count > 25000 %}
-            {{- 'content.item_count_cutoff' | t: count: 25000 -}}
-          {% else %}
-            {{- 'content.item_count' | t: count: products_count -}}
-          {% endif %}
-        </span>
-      </div>
-
       {% if block_settings.enable_sorting %}
         {% render 'sorting',
           results: results,
@@ -106,10 +95,6 @@
           should_use_select_on_mobile: false,
           section_id: section.id
         %}
-      {% endif %}
-
-      {% if block_settings.enable_grid_density %}
-        {% render 'grid-density-controls', viewport: 'desktop' %}
       {% endif %}
     </div>
   {% endif %}
@@ -153,6 +138,9 @@
           class="facets__form"
           ref="facetsForm"
         >
+          {% if block_settings.filter_style == 'horizontal' and block_settings.enable_grid_density %}
+            {% render 'grid-density-controls', viewport: 'desktop' %}
+          {% endif %}
           {% if should_show_pane %}
             {% render 'filter-remove-buttons',
               filters: filters,
@@ -240,19 +228,6 @@
               {% endif %}
             {% endif %}
             {% if block_settings.filter_style == 'horizontal' %}
-              <div
-                class="products-count-wrapper"
-                data-testid="products-count"
-              >
-                <span title="{{ 'content.product_count' | t }}">
-                  {% if products_count > 25000 %}
-                    {{- 'content.item_count_cutoff' | t: count: 25000 -}}
-                  {% else %}
-                    {{- 'content.item_count' | t: count: products_count -}}
-                  {% endif %}
-                </span>
-              </div>
-
               {% if block_settings.enable_sorting %}
                 {% render 'sorting',
                   results: results,
@@ -263,10 +238,6 @@
                   should_use_select_on_mobile: false,
                   section_id: section.id
                 %}
-              {% endif %}
-
-              {% if block_settings.enable_grid_density %}
-                {% render 'grid-density-controls', viewport: 'desktop' %}
               {% endif %}
             {% endif %}
           {% endif %}
@@ -675,6 +646,7 @@
       max-height: none;
       width: auto;
       overflow: visible;
+      border-bottom: 1px solid #eee
     }
   }
 
@@ -1141,19 +1113,23 @@
     }
   }
 
-  /* Products count */
+  /* Product count removed from bar */
   .products-count-wrapper {
     display: none;
   }
 
-  .facets--horizontal .products-count-wrapper {
-    @media screen and (min-width: 750px) {
-      display: flex;
-      margin-left: auto;
-      flex-shrink: 0;
-      align-items: center;
-      height: var(--minimum-touch-target);
-    }
+  /* View buttons first (left), Sort by last (right) */
+  .facets--horizontal .facets__form .column-options-wrapper:first-child,
+  .facets-controls-wrapper .column-options-wrapper:first-child {
+    margin-left: 0;
+  }
+
+  .facets--horizontal .facets__form .sorting-filter,
+  .facets-controls-wrapper .sorting-filter {
+    flex: 1 1 0;
+    min-width: min-content;
+    max-width: 375px;
+    margin-left: auto;
   }
 
   /* Mobile specific components */

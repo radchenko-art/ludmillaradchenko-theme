@@ -335,7 +335,8 @@
       "quantity_maximum": "Maximum {{ maximum }}",
       "in_cart": "i varukorg",
       "default_title": "Standardtitel",
-      "sticky_add_to_cart": "Fält för att lägga till snabbt i varukorgen"
+      "sticky_add_to_cart": "Fält för att lägga till snabbt i varukorgen",
+      "brand": "Varumärke"
     }
   }
 }

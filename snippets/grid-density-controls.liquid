@@ -66,14 +66,14 @@
         <input
           type="radio"
           name="grid"
-          value="zoom-out"
+          value="rows"
           class="column-options__option-input"
-          aria-label="{{ 'content.grid_view.zoom_out' | t }}"
+          aria-label="{{ 'content.grid_view.rows' | t }}"
           on:change="results-list/updateLayout"
           data-skip-node-update
         >
-        <span class="column-picker column-picker--zoom-out">
-          {{- 'icon-grid-dense.svg' | inline_asset_content -}}
+        <span class="column-picker column-picker--rows">
+          {{- 'icon-list.svg' | inline_asset_content -}}
         </span>
       </label>
     {% endif %}
@@ -135,7 +135,7 @@
   }
 
   .column-options__option:has(.column-picker--default),
-  .column-options__option:has(.column-picker--zoom-out) {
+  .column-options__option:has(.column-picker--rows) {
     @media screen and (min-width: 750px) {
       display: flex;
     }
@@ -150,7 +150,7 @@
   }
 
   .column-options-wrapper .column-options__option:has(input[type="radio"]):has(.column-picker--default),
-  .column-options-wrapper .column-options__option:has(input[type="radio"]):has(.column-picker--zoom-out) {
+  .column-options-wrapper .column-options__option:has(input[type="radio"]):has(.column-picker--rows) {
     @media screen and (min-width: 750px) {
       display: flex;
     }

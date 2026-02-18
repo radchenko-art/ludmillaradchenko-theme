@@ -376,6 +376,18 @@
         "label": "t:options.accent"
       },
       {
+        "type": "font_picker",
+        "id": "type_accent_second_font",
+        "default": "anonymous_pro_n4",
+        "label": "t:options.accent_second"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_accent_third_font",
+        "default": "anonymous_pro_n4",
+        "label": "t:options.accent_third"
+      },
+      {
         "type": "header",
         "content": "t:content.text_presets"
       },
@@ -487,6 +499,10 @@
           {
             "value": "24",
             "label": "24px"
+          },
+          {
+            "value": "26",
+            "label": "26px"
           },
           {
             "value": "32",
@@ -635,6 +651,10 @@
           {
             "value": "24",
             "label": "24px"
+          },
+          {
+            "value": "26",
+            "label": "26px"
           },
           {
             "value": "32",
@@ -793,6 +813,10 @@
             "label": "24px"
           },
           {
+            "value": "26",
+            "label": "26px"
+          },
+          {
             "value": "32",
             "label": "32px"
           },
@@ -947,6 +971,10 @@
           {
             "value": "24",
             "label": "24px"
+          },
+          {
+            "value": "26",
+            "label": "26px"
           },
           {
             "value": "32",
@@ -1105,6 +1133,10 @@
             "label": "24px"
           },
           {
+            "value": "26",
+            "label": "26px"
+          },
+          {
             "value": "32",
             "label": "32px"
           },
@@ -1259,6 +1291,10 @@
           {
             "value": "24",
             "label": "24px"
+          },
+          {
+            "value": "26",
+            "label": "26px"
           },
           {
             "value": "32",

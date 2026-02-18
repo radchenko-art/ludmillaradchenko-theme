@@ -2,6 +2,14 @@
 
 {% assign block_settings = block.settings %}
 
+{%- liquid
+  assign col = block_settings.collection
+  if col == blank and template.name == 'collection'
+    assign col = collection
+  endif
+  assign col_image = col.image | default: col.featured_image
+-%}
+
 {% if block_settings.image_ratio == 'custom' %}
   {% assign image_width = block_settings.collection_image_width | at_most: 100 %}
   {% assign image_height = block_settings.collection_image_height %}
@@ -11,10 +19,10 @@
   assign ratio = 1
   assign block_ratio = block_settings.image_ratio
 
-  if block_settings.collection.image and block_ratio == 'portrait'
+  if col_image and block_ratio == 'portrait'
     assign ratio = 0.8
-  elsif block_settings.collection.image and block_ratio == 'adapt'
-    assign ratio = block_settings.collection.image.aspect_ratio
+  elsif col_image and block_ratio == 'adapt'
+    assign ratio = col_image.aspect_ratio
   endif
 
   if ratio == 0 or ratio == null
@@ -26,7 +34,7 @@
   endif
 %}
 
-{% if block_settings.collection.featured_image %}
+{% if col_image %}
   <div
     class="collection-image spacing-style collection-image-{{ block.id }}"
     style="--ratio: {{ ratio }}; --image-width: {{ image_width }}%; {% render 'spacing-style', settings: block_settings %}"
@@ -39,7 +47,7 @@
     %}
 
     {{
-      block_settings.collection.featured_image
+      col_image
       | image_url: width: 3840
       | image_tag: preload: true, class: 'collection-image__featured-image', widths: widths, sizes: sizes
     }}

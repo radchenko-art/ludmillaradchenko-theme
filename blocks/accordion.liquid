@@ -24,8 +24,9 @@
     width: 100%;
   }
 
-  .accordion--dividers accordion-custom:not(:first-child) .details {
-    border-block-start: var(--style-border-width) solid var(--color-border);
+  /* Remove all borders from accordion items */
+  .accordion accordion-custom .details {
+    border: none;
   }
 
   /* When accordion borders are not set, show fallback borders */
@@ -39,12 +40,11 @@
     --show-fallback-borders: 1;
   }
 
-  .accordion--dividers accordion-custom:first-child .details {
-    border-block-start: calc(var(--style-border-width) * var(--show-fallback-borders)) solid var(--color-border);
-  }
-
+  /* Dividers are handled by summary underline now */
+  .accordion--dividers accordion-custom:not(:first-child) .details,
+  .accordion--dividers accordion-custom:first-child .details,
   .accordion--dividers accordion-custom:last-child .details {
-    border-block-end: calc(var(--style-border-width) * var(--show-fallback-borders)) solid var(--color-border);
+    border: none;
   }
 
   .accordion--dividers .details-content {
@@ -56,15 +56,33 @@
     display: none;
   }
 
+  .accordion .svg-wrapper.icon-plus,
+  .accordion .svg-wrapper.icon-caret.icon-animated {
+    width: 22px;
+    height: 22px;
+  }
+
+  .accordion .svg-wrapper.icon-plus svg,
+  .accordion .svg-wrapper.icon-caret.icon-animated svg {
+    width: 22px;
+    height: 22px;
+  }
+
   /* because we can't pass apply a specific class on a block based on its parent block setting */
   .accordion .details__header {
+    padding: 15px 0;
     font-family: var(--summary-font-family);
     font-style: var(--summary-font-style);
     font-weight: var(--summary-font-weight);
-    font-size: var(--summary-font-size);
+    font-size: 15.6px;
     line-height: var(--summary-font-line-height);
     text-transform: var(--summary-font-case);
     min-height: var(--minimum-touch-target);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .accordion .details-content {
+    padding: 20px 0;
   }
 {% endstylesheet %}
 

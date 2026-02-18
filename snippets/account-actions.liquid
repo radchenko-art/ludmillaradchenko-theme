@@ -154,7 +154,7 @@
     --buttons-radius: var(--style-border-radius-buttons-primary);
   }
 
-  /* Своя кнопка поверх, оригинал Shop Pay скрыт — клик делегируется в JS */
+  /* Custom button on top, original Shop Pay hidden — click delegated in JS */
   .account-actions__sign-in-shop-wrap {
     position: relative;
   }
@@ -173,7 +173,7 @@
     z-index: 1;
     width: 100%;
   }
-  /* Если Shop Pay нет, скрыть обёртку с кастомной кнопкой (покажет только «Other sign in options») */
+  /* If no Shop Pay, hide wrapper with custom button (will only show «Other sign in options») */
   .account-actions__sign-ins:not(:has(shop-login-button)) .account-actions__sign-in-shop-wrap {
     display: none;
   }

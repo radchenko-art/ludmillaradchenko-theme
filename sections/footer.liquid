@@ -37,6 +37,8 @@
     style="
       {%  render 'spacing-style', settings: section.settings %}
       --footer-gap: {{ section.settings.gap }}px;
+      --footer-vertical-alignment: {{ section.settings.vertical_alignment }};
+      --footer-horizontal-alignment: {{ section.settings.horizontal_alignment }};
       --grid-columns: {{ grid_columns }};
       --last-row-count: {{ last_row_count }};
       --tablet-last-row-count: {{ tablet_last_row_count }};
@@ -53,6 +55,73 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--footer-gap);
+  }
+
+  .footer-content > * {
+    display: flex;
+    flex-direction: column;
+    align-items: var(--footer-horizontal-alignment, center);
+    justify-content: var(--footer-vertical-alignment, center);
+    text-align: center;
+  }
+
+  /* Block roots that use row flex: vertical = align-items, horizontal = justify-content */
+  .footer-content > .social-icons__wrapper,
+  .footer-content > .image-block,
+  .footer-content > .divider {
+    flex-direction: row;
+    justify-content: var(--footer-horizontal-alignment, center);
+    align-items: var(--footer-vertical-alignment, center);
+  }
+
+  /* Logo: position the block in the grid cell (block has intrinsic width) */
+  .footer-content .logo-block {
+    align-self: var(--footer-vertical-alignment, center);
+    justify-self: var(--footer-horizontal-alignment, center);
+    flex-direction: row !important;
+    justify-content: var(--footer-horizontal-alignment, center) !important;
+    align-items: var(--footer-vertical-alignment, center) !important;
+  }
+
+  /* Column flex blocks: ensure section alignment wins over block styles */
+  .footer-content > .text-block,
+  .footer-content > .group-block,
+  .footer-content > .email-signup-block,
+  .footer-content > .payment-icons {
+    flex-direction: column;
+    align-items: var(--footer-horizontal-alignment, center);
+    justify-content: var(--footer-vertical-alignment, center);
+  }
+
+  .footer-content > jumbo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: var(--footer-horizontal-alignment, center);
+    justify-content: var(--footer-vertical-alignment, center);
+  }
+
+  /* Menu and Social links: default gray, hover = foreground (override global link color) */
+  .footer-content .menu .menu__item a {
+    color: rgb(102, 102, 102) !important;
+  }
+
+  .footer-content .menu .menu__item a:hover {
+    color: var(--color-foreground) !important;
+  }
+
+  .footer-content .social-icons__wrapper a {
+    color: rgb(102, 102, 102) !important;
+  }
+
+  .footer-content .social-icons__wrapper a:hover {
+    color: var(--color-foreground) !important;
+  }
+
+  @media screen and (min-width: 750px) {
+    .footer-content > .social-icons__wrapper {
+      justify-content: var(--footer-horizontal-alignment, center);
+      align-items: var(--footer-vertical-alignment, center);
+    }
   }
 
   @media screen and (min-width: 750px) and (max-width: 989px) {
@@ -164,6 +233,28 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "select",
+      "id": "vertical_alignment",
+      "label": "Vertical alignment",
+      "options": [
+        { "value": "flex-start", "label": "Top" },
+        { "value": "center", "label": "Middle" },
+        { "value": "flex-end", "label": "Bottom" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "horizontal_alignment",
+      "label": "Horizontal alignment",
+      "options": [
+        { "value": "flex-start", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "flex-end", "label": "Right" }
+      ],
+      "default": "center"
     },
     {
       "type": "color_scheme",

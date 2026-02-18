@@ -349,7 +349,8 @@
       "quantity_maximum": "Maksimum {{ maximum }}",
       "in_cart": "w koszyku",
       "default_title": "Tytuł domyślny",
-      "sticky_add_to_cart": "Pasek szybkiego dodawania do koszyka"
+      "sticky_add_to_cart": "Pasek szybkiego dodawania do koszyka",
+      "brand": "Marka"
     }
   }
 }

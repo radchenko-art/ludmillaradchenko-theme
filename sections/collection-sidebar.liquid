@@ -1,0 +1,47 @@
+{%- liquid
+  assign show_sidebar = section.settings.show_sidebar
+  assign has_sidebar_content = false
+  if show_sidebar
+    capture sidebar_content
+      render 'collection-sidebar', collection: collection
+    endcapture
+    if sidebar_content contains 'collection-hierarchy-sidebar__list'
+      assign has_sidebar_content = true
+    endif
+  endif
+-%}
+
+{%- if show_sidebar and has_sidebar_content -%}
+  <div class="collection-sidebar-section collection-sidebar-section--visible" {{ section.shopify_attributes }}>
+    {{ sidebar_content }}
+  </div>
+{%- else -%}
+  <div class="collection-sidebar-section collection-sidebar-section--hidden" {{ section.shopify_attributes }} aria-hidden="true"></div>
+{%- endif -%}
+
+{% stylesheet %}
+  .collection-sidebar-section--hidden {
+    display: none;
+  }
+
+  .collection-sidebar-section.collection-sidebar-section--visible {
+    padding: 0 15px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Collection sidebar",
+  "enabled_on": {
+    "templates": ["collection"]
+  },
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_sidebar",
+      "label": "Show sidebar",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
