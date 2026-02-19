@@ -12,6 +12,13 @@
   assign plain_text = block_settings.text | strip_newlines | strip_html | strip
   assign text_width = width | default: block_settings.width
 
+  assign alignment_flex = 'flex-start'
+  if block_settings.alignment == 'center'
+    assign alignment_flex = 'center'
+  elsif block_settings.alignment == 'right'
+    assign alignment_flex = 'flex-end'
+  endif
+
   if block_settings.font_size contains 'heading-lg' or block_settings.font_size contains 'heading-xl'
     assign type = 'display'
   elsif block_settings.font_size contains 'heading'
@@ -58,7 +65,9 @@
     {% render 'typography-style', settings: block_settings %}
     --width: {{ text_width }};
     --max-width: var(--max-width--{{ type }}-{{ block_settings.max_width }});
-    {% if text_width == "100%" %}
+    {% if block_settings.alignment != blank %}
+      align-self: {{ alignment_flex }};
+      --horizontal-alignment: {{ alignment_flex }};
       --text-align: {{ block_settings.alignment }};
     {% endif %}
     {% if block_settings.background %}

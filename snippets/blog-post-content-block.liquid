@@ -1,0 +1,79 @@
+{%- comment -%} Renders article body. For use in main-blog-post section. Params: block, article. Two columns when content contains <hr>. {%- endcomment -%}
+{% assign content_raw = article.content %}
+{% assign content_lower = content_raw | downcase %}
+{% assign has_hr = false %}
+{% if content_lower contains "<hr" %}
+  {% assign has_hr = true %}
+{% endif %}
+{% assign normalized_content = content_raw | replace: "<HR", "<hr" | replace: "<Hr", "<hr" | replace: "<hR", "<hr" %}
+{% assign parts = normalized_content | split: "<hr" %}
+{% assign has_columns = false %}
+{% assign content_before = "" %}
+{% assign content_after = "" %}
+{% if has_hr and parts.size >= 2 %}
+  {% assign has_columns = true %}
+  {% assign content_before = parts[0] %}
+  {% assign rest = parts[1] %}
+  {% assign rest_split = rest | split: ">" %}
+  {% assign hr_tail = rest_split[0] | append: ">" %}
+  {% assign content_after = rest | remove_first: hr_tail %}
+{% endif %}
+
+<div class="blog-post-content-block blog-post-content-block--{{ block.id }} blog-post-content rte{% if has_hr %} blog-post-content-block--two-cols{% endif %}" {{ block.shopify_attributes }}>
+  {% if has_columns %}
+    <div class="blog-post-content-block__columns">
+      <div class="blog-post-content-block__column">
+        <rte-formatter class="snippet">
+          {{ content_before }}
+        </rte-formatter>
+      </div>
+      <div class="blog-post-content-block__column">
+        <rte-formatter class="snippet">
+          {{ content_after }}
+        </rte-formatter>
+      </div>
+    </div>
+  {% else %}
+    <rte-formatter class="snippet">
+      {{ content_raw }}
+    </rte-formatter>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .blog-post-content-block.blog-post-content {
+    max-width: var(--normal-content-width);
+    width: 100%;
+    margin: 0 auto;
+    font-size: 13px;
+    line-height: 20.15px;
+    text-align: left;
+  }
+
+  .blog-post-content-block.blog-post-content p {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
+  .blog-post-content-block__columns {
+    display: grid;
+    gap: var(--gap-lg, 1rem);
+    width: 100%;
+  }
+
+  .blog-post-content-block__column rte-formatter {
+    display: block;
+  }
+
+  @media screen and (min-width: 750px) {
+    .blog-post-content-block__columns {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media screen and (max-width: 750px) {
+    .blog-post-content-block__columns {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}

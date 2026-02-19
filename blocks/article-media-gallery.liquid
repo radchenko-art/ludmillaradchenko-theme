@@ -1,0 +1,270 @@
+{%- comment -%}
+  Gallery block for article: images from metafield custom.image_gallery (list of Image/File).
+  Works in Blog post section and in Custom section (same snippet used for both).
+  Params: block (has settings.title). Article from context.
+{%- endcomment -%}
+
+{% assign gallery_images = article.metafields.custom.image_gallery.value %}
+{% assign padding_top = block.settings.padding_top | default: 0 %}
+{% assign padding_bottom = block.settings.padding_bottom | default: 0 %}
+{% if gallery_images != blank %}
+  <div class="article-media-gallery blog-gallery" {{ block.shopify_attributes }} data-blog-gallery style="--gallery-padding-top: {{ padding_top }}px; --gallery-padding-bottom: {{ padding_bottom }}px;">
+    {% if block.settings.title != blank %}
+      <h3 class="article-media-gallery__title">{{ block.settings.title }}</h3>
+    {% endif %}
+    <div class="article-media-gallery__inner">
+      {% for img in gallery_images %}
+        {% assign image = img | default: img.value %}
+        {% if image != blank %}
+          {% assign full_url = image | image_url: width: 1600 %}
+          <figure class="article-media-gallery__figure">
+            <a class="article-media-gallery__link" href="{{ full_url }}" data-index="{{ forloop.index0 }}" aria-label="{{ 'accessibility.open_image_in_full_screen' | t | default: 'View full size' }}">
+              {{
+                image
+                | image_url: width: 1200
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '240, 352, 550, 832, 1200, 1600',
+                  sizes: '(min-width: 990px) 33vw, (min-width: 750px) 50vw, 100vw',
+                  class: 'article-media-gallery__img'
+              }}
+            </a>
+          </figure>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <dialog-component id="blog-gallery-lightbox-{{ block.id }}" class="blog-gallery-lightbox">
+      <dialog ref="dialog" class="blog-gallery-lightbox__dialog dialog-modal" scroll-lock aria-label="{{ 'accessibility.lightbox' | t | default: 'Image gallery' }}">
+        <button type="button" class="button button-unstyled blog-gallery-lightbox__close" aria-label="{{ 'actions.close_dialog' | t }}" on:click="/closeDialog">
+          <span class="svg-wrapper" aria-hidden="true">{{ 'icon-close.svg' | inline_asset_content }}</span>
+        </button>
+        <div class="blog-gallery-lightbox__content">
+          <img class="blog-gallery-lightbox__img" src="" alt="" decoding="async" />
+        </div>
+        <button type="button" class="button button-unstyled blog-gallery-lightbox__prev" aria-label="{{ 'accessibility.previous' | t | default: 'Previous' }}"><span class="svg-wrapper">{{ 'icon-chevron-left.svg' | inline_asset_content }}</span></button>
+        <button type="button" class="button button-unstyled blog-gallery-lightbox__next" aria-label="{{ 'accessibility.next' | t | default: 'Next' }}"><span class="svg-wrapper">{{ 'icon-chevron-right.svg' | inline_asset_content }}</span></button>
+      </dialog>
+    </dialog-component>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .blog-gallery {
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: var(--gallery-padding-top, 0);
+    padding-bottom: var(--gallery-padding-bottom, 0);
+  }
+  .blog-gallery .article-media-gallery__title {
+    text-align: center;
+    color: #ff0000;
+    font-size: 22px;
+  }
+  .blog-gallery .article-media-gallery__inner {
+    column-count: 5;
+    column-gap: 10px;
+  }
+  .blog-gallery figure {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin: 0 0 10px 0;
+    padding: 0;
+  }
+  .blog-gallery figcaption {
+    display: none;
+  }
+  .blog-gallery .article-media-gallery__img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    vertical-align: middle;
+  }
+  @media (max-width: 1024px) {
+    .blog-gallery .article-media-gallery__inner {
+      column-count: 4;
+    }
+  }
+  @media (max-width: 768px) {
+    .blog-gallery .article-media-gallery__inner {
+      column-count: 3;
+    }
+  }
+  @media (max-width: 480px) {
+    .blog-gallery .article-media-gallery__inner {
+      column-count: 2;
+    }
+    .blog-gallery figure {
+      margin-bottom: 8px;
+    }
+  }
+  .blog-gallery .article-media-gallery__link {
+    display: block;
+    cursor: pointer;
+  }
+  .blog-gallery .article-media-gallery__link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+  /* Lightbox */
+  .blog-gallery-lightbox__dialog {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    padding: 0;
+    border: none;
+    background: transparent;
+  }
+  .blog-gallery-lightbox__dialog::backdrop {
+    background: rgba(0, 0, 0, 0.75);
+  }
+  .blog-gallery-lightbox__close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    color: #fff;
+    padding: 0.5rem;
+  }
+  .blog-gallery-lightbox__close .svg-wrapper {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  .blog-gallery-lightbox__content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50vw;
+    min-height: 50vh;
+    padding: 3rem 4rem 3rem 3rem;
+  }
+  .blog-gallery-lightbox__img {
+    max-width: 100%;
+    max-height: 85vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  .blog-gallery-lightbox__prev,
+  .blog-gallery-lightbox__next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    color: #fff;
+    padding: 1rem;
+  }
+  .blog-gallery-lightbox__prev .svg-wrapper,
+  .blog-gallery-lightbox__next .svg-wrapper {
+    display: block;
+    width: 2rem;
+    height: 2rem;
+  }
+  .blog-gallery-lightbox__prev {
+    left: 0.5rem;
+  }
+  .blog-gallery-lightbox__next {
+    right: 0.5rem;
+  }
+{% endstylesheet %}
+
+<script>
+  (function() {
+    function initBlogGalleryLightbox() {
+      document.querySelectorAll('.blog-gallery[data-blog-gallery]').forEach(function(gallery) {
+        if (gallery.dataset.lightboxBound) return;
+        gallery.dataset.lightboxBound = '1';
+        var links = gallery.querySelectorAll('.article-media-gallery__link');
+        var dialogComponent = gallery.querySelector('dialog-component');
+        if (!dialogComponent || !links.length) return;
+        var dialog = dialogComponent.querySelector('dialog');
+        var img = dialogComponent.querySelector('.blog-gallery-lightbox__img');
+        var prevBtn = dialogComponent.querySelector('.blog-gallery-lightbox__prev');
+        var nextBtn = dialogComponent.querySelector('.blog-gallery-lightbox__next');
+        if (!dialog || !img) return;
+        var urls = Array.from(links).map(function(a) { return a.href; });
+        links.forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            e.preventDefault();
+            var index = parseInt(link.dataset.index, 10);
+            dialogComponent.dataset.currentIndex = index;
+            img.src = urls[index];
+            img.alt = link.querySelector('img') ? link.querySelector('img').alt || '' : '';
+            if (typeof dialogComponent.showDialog === 'function') dialogComponent.showDialog();
+          });
+        });
+        function showIndex(index) {
+          if (index < 0) index = urls.length - 1;
+          if (index >= urls.length) index = 0;
+          dialogComponent.dataset.currentIndex = index;
+          img.src = urls[index];
+        }
+        if (prevBtn) {
+          prevBtn.addEventListener('click', function() {
+            var current = parseInt(dialogComponent.dataset.currentIndex, 10) || 0;
+            showIndex(current - 1);
+          });
+        }
+        if (nextBtn) {
+          nextBtn.addEventListener('click', function() {
+            var current = parseInt(dialogComponent.dataset.currentIndex, 10) || 0;
+            showIndex(current + 1);
+          });
+        }
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBlogGalleryLightbox);
+    } else {
+      initBlogGalleryLightbox();
+    }
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Article media gallery",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0,
+      "unit": "px",
+      "label": "Padding top"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "default": 0,
+      "unit": "px",
+      "label": "Padding bottom"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Article media gallery",
+      "category": "Blog"
+    }
+  ]
+}
+{% endschema %}

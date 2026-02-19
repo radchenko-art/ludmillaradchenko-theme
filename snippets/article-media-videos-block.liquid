@@ -1,0 +1,164 @@
+{%- comment -%} Videos from article_videos (list.metaobject_reference). Params: block, article {%- endcomment -%}
+{% assign article_videos = article.metafields.custom.article_videos.value %}
+{% assign video_index_setting = block.settings.video_index | default: 0 %}
+{% assign video_hosting_only = block.settings.video_hosting_only | default: false %}
+{% assign width_mode = block.settings.width_mode | default: 'full' %}
+{% assign custom_width_px = block.settings.custom_width_px | default: 640 %}
+
+{% if article_videos != blank %}
+{% assign has_videos = false %}
+{% for item in article_videos %}
+  {% if video_hosting_only %}
+    {% if item.remote_video != blank %}
+      {% assign has_videos = true %}
+      {% break %}
+    {% endif %}
+  {% elsif item.remote_video != blank or item.inner_video != blank %}
+    {% assign has_videos = true %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% if has_videos %}
+  {% assign player_width_style = '--player-width: 100%;' %}
+  {% if width_mode == 'fit_content' %}
+    {% assign player_width_style = '--player-width: 640px; --player-max-width: 100%;' %}
+  {% elsif width_mode == 'normal' %}
+    {% assign player_width_style = '--player-width: ' | append: custom_width_px | append: 'px; --player-max-width: 100%;' %}
+  {% endif %}
+  <div class="article-media-videos {% if width_mode == 'full' %}article-media-videos--width-full{% endif %}" {{ block.shopify_attributes }} style="{{ player_width_style }}">
+    {% for item in article_videos %}
+      {% if video_index_setting == 0 or forloop.index == video_index_setting %}
+      {% assign remote_url = item.remote_video | default: item.remote_video.value %}
+      {% assign inner_video_raw = item.inner_video %}
+      {% assign inner_video = inner_video_raw.value | default: inner_video_raw %}
+      {% assign cover = item.video_cover.value | default: item.video_cover %}
+
+      {% if remote_url != blank %}
+        {% assign url_str = remote_url | strip %}
+        {% if url_str contains 'youtu.be' %}
+          {% assign yt_id = url_str | split: '/' | last | split: '?' | first %}
+        {% elsif url_str contains 'embed/' %}
+          {% assign yt_id = url_str | split: 'embed/' | last | split: '?' | first %}
+        {% else %}
+          {% assign yt_id = url_str | split: 'v=' | last | split: '&' | first %}
+        {% endif %}
+        {% if yt_id != blank %}
+          {% assign item_ratio = 1.777778 %}
+          {% assign item_id = 'article-media-yt-' | append: block.id | append: '-' | append: forloop.index %}
+          {% if url_str contains 'embed/' %}
+            {% assign embed_src = url_str %}
+          {% else %}
+            {% assign embed_src = 'https://www.youtube.com/embed/' | append: yt_id %}
+          {% endif %}
+          <div class="article-media-videos__item article-media-videos__item--external" id="{{ item_id }}">
+            <div class="article-media-videos__wrapper article-media-videos__wrapper--embed" style="--item-aspect-ratio: {{ item_ratio }};">
+              <iframe class="article-media-videos__iframe" src="{{ embed_src }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="Video"></iframe>
+            </div>
+          </div>
+        {% endif %}
+      {% elsif inner_video != blank and video_hosting_only == false %}
+        {% assign video_src = inner_video.sources[0].url | default: inner_video.url %}
+        {% if video_src != blank %}
+          {% assign poster_url = '' %}
+          {% if cover != blank %}
+            {% assign poster_url = cover | image_url: width: 1920 %}
+          {% endif %}
+          {% assign item_ratio = inner_video.aspect_ratio | default: 1.777778 %}
+          <div class="article-media-videos__item article-media-videos__item--native">
+            <div class="article-media-videos__wrapper article-media-videos__wrapper--with-overlay" style="--item-aspect-ratio: {{ item_ratio }};">
+              <div class="article-media-videos__play-overlay article-media-videos__play-overlay--native" role="button" tabindex="0" aria-label="Play video">
+                {% if poster_url != blank %}
+                  <img class="article-media-videos__poster-img" src="{{ poster_url }}" alt="" width="1920" height="1080" loading="lazy">
+                {% else %}
+                  <div class="article-media-videos__poster-placeholder"></div>
+                {% endif %}
+                <span class="article-media-videos__play-btn">
+                  <img src="{{ 'play-button-icon.png' | asset_url }}" alt="" class="article-media-videos__play-icon-img" width="85" height="85" loading="lazy">
+                </span>
+              </div>
+              <video
+                class="article-media-videos__video article-media-videos__video--no-controls"
+                {% if poster_url != blank %}poster="{{ poster_url }}"{% endif %}
+                preload="metadata"
+                playsinline
+                data-article-media-native
+              >
+                {% if inner_video.sources != blank %}
+                  {% for source in inner_video.sources %}
+                    <source src="{{ source.url }}" type="{{ source.mime_type | default: 'video/mp4' }}">
+                  {% endfor %}
+                {% else %}
+                  <source src="{{ video_src }}" type="video/mp4">
+                {% endif %}
+              </video>
+            </div>
+          </div>
+        {% endif %}
+      {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endif %}
+{% endif %}
+
+{% stylesheet %}
+  .article-media-videos { width: 100%; max-width: var(--normal-content-width, 42rem); display: flex; flex-direction: column; gap: 1.5rem; }
+  .article-media-videos--width-full { max-width: none; }
+  .article-media-videos__item { width: var(--player-width, 100%); max-width: var(--player-max-width, none); }
+  .article-media-videos__wrapper { position: relative; width: 100%; aspect-ratio: var(--item-aspect-ratio, 16 / 9); overflow: hidden; border-radius: 4px; background: #000; }
+  .article-media-videos__play-overlay { position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center; cursor: pointer; background: #000; }
+  .article-media-videos__play-overlay.is-hidden { pointer-events: none; opacity: 0; transition: opacity 0.2s ease; }
+  .article-media-videos__poster-img, .article-media-videos__poster-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .article-media-videos__poster-placeholder { background: #1a1a1a; }
+  .article-media-videos__play-btn { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; width: 85px; height: 85px; border-radius: 50%; color: #000; transition: transform 0.15s ease; }
+  .article-media-videos__play-overlay:hover .article-media-videos__play-btn { transform: scale(1.05); }
+  .article-media-videos__play-icon-img { width: 100%; height: 100%; object-fit: contain; }
+  .article-media-videos__iframe, .article-media-videos__video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  .article-media-videos__video--no-controls { z-index: 0; }
+  .article-media-videos__video--no-controls.article-media-videos__video--playing, .article-media-videos__video.article-media-videos__video--playing { z-index: 1; }
+  .article-media-videos__iframe-container { position: absolute; inset: 0; z-index: 1; }
+  .article-media-videos__iframe-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  .article-media-videos__video { object-fit: contain; }
+{% endstylesheet %}
+
+<script>
+  (function() {
+    document.querySelectorAll('.article-media-videos').forEach(function(block) {
+      block.addEventListener('click', function(e) {
+        var overlay = e.target.closest('.article-media-videos__play-overlay');
+        if (!overlay || overlay.classList.contains('is-hidden')) return;
+        var wrapper = overlay.closest('.article-media-videos__wrapper');
+        var item = overlay.closest('.article-media-videos__item');
+        if (item.classList.contains('article-media-videos__item--external')) {
+          var ytId = overlay.getAttribute('data-yt-id');
+          var container = wrapper.querySelector('.article-media-videos__iframe-container');
+          if (ytId && container && !container.querySelector('iframe')) {
+            var iframe = document.createElement('iframe');
+            iframe.setAttribute('src', 'https://www.youtube.com/embed/' + ytId + '?autoplay=1');
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('title', 'Video');
+            iframe.className = 'article-media-videos__iframe';
+            container.appendChild(iframe);
+            container.hidden = false;
+            overlay.classList.add('is-hidden');
+          }
+        } else if (item.classList.contains('article-media-videos__item--native')) {
+          var video = wrapper.querySelector('video[data-article-media-native]');
+          if (video) {
+            video.play();
+            video.setAttribute('controls', '');
+            video.classList.add('article-media-videos__video--playing');
+            overlay.classList.add('is-hidden');
+          }
+        }
+      });
+      block.querySelectorAll('.article-media-videos__play-overlay').forEach(function(overlay) {
+        overlay.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); overlay.click(); }
+        });
+      });
+    });
+  })();
+</script>

@@ -15,38 +15,44 @@
       {% render 'spacing-style', settings: section.settings %}
     "
   >
-    <div class="article-page__blocks">
-      {% liquid
-        assign article_videos_list = article.metafields.custom.article_videos.value
-        assign first_has_native_video = false
-        if article_videos_list != blank
-          assign first_item = article_videos_list.first
-          assign first_inner_raw = first_item.inner_video
-          assign first_inner = first_inner_raw.value | default: first_inner_raw
-          if first_inner_raw != blank or first_inner != blank
-            assign first_has_native_video = true
-          endif
-        endif
-        assign hero_video_block = ''
-        assign hero_title_block = ''
-        assign hero_content_block = ''
-        for bl in section.blocks
-          if bl.type == 'article-media-videos' and bl.settings.video_index == 1
-            assign hero_video_block = bl
-          endif
-          if bl.type == 'text' and hero_title_block == blank
-            assign hero_title_block = bl
-          endif
-          if bl.type == 'blog-post-content'
-            assign hero_content_block = bl
-          endif
-        endfor
-        assign use_hero_layout = false
-        if hero_video_block != blank and hero_title_block != blank and hero_content_block != blank and hero_video_block.settings.video_index == 1
-          assign use_hero_layout = true
-        endif
-      %}
+    {% comment %} first_has_native_video: проверка вне {% liquid %}, т.к. Drop (file_reference) в Liquid может давать blank в условии; используем capture вывода первого элемента (как в for) {% endcomment %}
+    {% assign article_videos_list = article.metafields.custom.article_videos.value %}
+    {% assign first_has_native_video = false %}
+    {% assign article_has_exactly_one_video = false %}
+    {% if article_videos_list != blank %}
+      {% if article_videos_list.size == 1 %}
+        {% assign article_has_exactly_one_video = true %}
+      {% endif %}
+      {% for media_item in article_videos_list limit: 1 %}
+        {% capture first_inner_video_output %}{{ media_item.inner_video }}{% endcapture %}
+        {% if first_inner_video_output != blank %}
+          {% assign first_has_native_video = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
 
+    {% liquid
+      assign hero_video_block = ''
+      assign hero_title_block = ''
+      assign hero_content_block = ''
+      for bl in section.blocks
+        if bl.type == 'article-media-videos' and bl.settings.video_index == 1
+          assign hero_video_block = bl
+        endif
+        if bl.type == 'text' and hero_title_block == blank
+          assign hero_title_block = bl
+        endif
+        if bl.type == 'blog-post-content'
+          assign hero_content_block = bl
+        endif
+      endfor
+      assign use_hero_layout = false
+      if hero_video_block != blank and hero_title_block != blank and hero_content_block != blank and hero_video_block.settings.video_index == 1 and first_has_native_video
+        assign use_hero_layout = true
+      endif
+    %}
+
+    <div class="article-page__blocks{% unless use_hero_layout %} article-page__blocks--single-column{% endunless %}">
       {% assign hero_row_output = false %}
       {% for block in section.blocks %}
         {% if use_hero_layout and hero_row_output == false %}
@@ -78,7 +84,10 @@
           {% when 'blog-post-content' %}
             {% render 'blog-post-content-block', block: block, article: article %}
           {% when 'article-media-videos' %}
-            {% render 'article-media-videos-block', block: block, article: article %}
+            {% comment %} В секции Blog post: не показывать блок, если колонки не сработали и у поста ровно одно видео {% endcomment %}
+            {% unless use_hero_layout == false and article_has_exactly_one_video %}
+              {% render 'article-media-videos-block', block: block, article: article %}
+            {% endunless %}
           {% when 'article-media-gallery' %}
             {% render 'article-media-gallery-block', block: block, article: article %}
           {% when 'image' %}
@@ -195,15 +204,38 @@
     padding: 5px;
   }
 
+  .article-page__blocks--single-column {
+    max-width: 630px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .article-page__blocks > .text-block {
     margin-bottom: 20px;
   }
 
-  .article-page__hero-col-text > .text-block {
+  body .section .article-page__blocks .text-block:first-of-type,
+  body .section .article-page__blocks .text-block:first-of-type *,
+  body .section .article-page__hero-col-text .text-block:first-of-type,
+  body .section .article-page__hero-col-text .text-block:first-of-type *,
+  body .section .article-page__blocks .text-block--blog-post-title,
+  body .section .article-page__blocks .text-block--blog-post-title *,
+  body .section .article-page__hero-col-text .text-block--blog-post-title,
+  body .section .article-page__hero-col-text .text-block--blog-post-title * {
     color: #ff0000;
     font-size: 22px;
     line-height: 1;
+    text-transform: none !important;
+  }
+
+  .article-page__hero-col-text > .text-block:first-of-type {
     margin-bottom: 40px;
+  }
+
+  .article-page__blocks h2.elementor-heading-title {
+    color: #000;
+    font-size: 15px;
+    font-weight: bold;
   }
 
   .article-page__hero-col-video .article-media-videos {
@@ -291,6 +323,7 @@
       "name": "Article media videos",
       "settings": [
         { "type": "range", "id": "video_index", "min": 0, "max": 20, "step": 1, "default": 0, "label": "Video number", "info": "0 = all, 1 = first, 2 = second..." },
+        { "type": "checkbox", "id": "video_hosting_only", "label": "Video hosting only", "default": false },
         { "type": "header", "content": "Width" },
         { "type": "select", "id": "width_mode", "label": "Width", "options": [{ "value": "full", "label": "Full" }, { "value": "fit_content", "label": "Fit content" }, { "value": "normal", "label": "Normal" }], "default": "full" },
         { "type": "range", "id": "custom_width_px", "min": 320, "max": 1200, "step": 20, "default": 640, "unit": "px", "label": "Player width (px)" }
@@ -300,7 +333,10 @@
       "type": "article-media-gallery",
       "name": "Article media gallery",
       "settings": [
-        { "type": "text", "id": "title", "label": "Title" }
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "header", "content": "Padding" },
+        { "type": "range", "id": "padding_top", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "px", "label": "Padding top" },
+        { "type": "range", "id": "padding_bottom", "min": 0, "max": 100, "step": 1, "default": 0, "unit": "px", "label": "Padding bottom" }
       ]
     },
     {

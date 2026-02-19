@@ -38,7 +38,8 @@
   {% endif %}
 ></script>
 
-{% if settings.show_second_image_on_hover and template.name == 'collection' %}
+{% if settings.show_second_image_on_hover %}
+  {% if template.name == 'collection' or template.name == 'product' %}
 <script>
   (function() {
     function hasMultipleSlides(slideshow) {
@@ -64,6 +65,7 @@
     }, true);
   })();
 </script>
+  {% endif %}
 {% endif %}
 
 <link

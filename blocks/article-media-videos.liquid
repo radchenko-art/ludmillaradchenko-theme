@@ -1,0 +1,72 @@
+{%- comment -%}
+  Videos block for article. Delegates to snippet.
+{%- endcomment -%}
+{% render 'article-media-videos-block', block: block, article: article %}
+
+{% schema %}
+{
+  "name": "Article media videos",
+  "tag": null,
+  "settings": [
+    {
+      "type": "range",
+      "id": "video_index",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 0,
+      "label": "Video number",
+      "info": "0 = show all videos in one block; 1 = first video, 2 = second, etc. Use one block per place and set the number to show that video here."
+    },
+    {
+      "type": "checkbox",
+      "id": "video_hosting_only",
+      "label": "Video hosting only",
+      "default": false,
+      "info": "When enabled, only videos by URL (YouTube, etc.) are shown; uploaded videos are hidden."
+    },
+    {
+      "type": "header",
+      "content": "Width"
+    },
+    {
+      "type": "select",
+      "id": "width_mode",
+      "label": "Width",
+      "options": [
+        {
+          "value": "full",
+          "label": "Full"
+        },
+        {
+          "value": "fit_content",
+          "label": "Fit content"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        }
+      ],
+      "default": "full"
+    },
+    {
+      "type": "range",
+      "id": "custom_width_px",
+      "min": 320,
+      "max": 1200,
+      "step": 20,
+      "default": 640,
+      "unit": "px",
+      "label": "Player width (px)",
+      "info": "Used when Width is set to Normal.",
+      "visible_if": "{{ block.settings.width_mode == 'normal' }}"
+    },
+  ],
+  "presets": [
+    {
+      "name": "Article media videos",
+      "category": "Blog"
+    }
+  ]
+}
+{% endschema %}

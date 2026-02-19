@@ -102,6 +102,11 @@ class ProductRecommendations extends Component {
         if (recommendations?.innerHTML && recommendations.innerHTML.trim().length) {
           this.dataset.recommendationsPerformed = 'true';
           this.innerHTML = recommendations.innerHTML;
+          this.dispatchEvent(new CustomEvent('product-recommendations:loaded', { bubbles: true }));
+          const section = this.closest?.('.shopify-section');
+          if (section) {
+            section.dispatchEvent(new CustomEvent('shopify:section:load', { bubbles: true }));
+          }
         } else {
           this.#handleError(new Error('No recommendations available'));
         }

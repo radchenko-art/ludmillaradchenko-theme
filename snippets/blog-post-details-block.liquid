@@ -1,0 +1,48 @@
+{%- comment -%} Renders blog post details (date, author). For use in main-blog-post section. Params: block, article {%- endcomment -%}
+{% assign block_settings = block.settings %}
+{% assign alignment = alignment | default: block_settings.alignment %}
+{% assign display_author = author | default: article.author %}
+{% assign display_date = date | default: article.published_at %}
+{% if article != blank and article.metafields.custom.event_date != blank %}
+  {% assign display_date = article.metafields.custom.event_date %}
+{% endif %}
+
+{%- if block_settings.show_date or block_settings.show_author -%}
+  <div
+    class="
+      blog-post-details
+      spacing-style
+      justify-{{ alignment }}
+      {% if block_settings.type_preset != '' %}{{ block_settings.type_preset }}{% endif%}
+    "
+    style="{% render 'spacing-style', settings: block_settings %}"
+    {{ block.shopify_attributes }}
+  >
+    {%- if block_settings.show_date -%}
+      <span>{%- if block_settings.date_format == 'dd_mm_yyyy' -%}{{- display_date | date: '%d/%m/%Y' -}}{%- else -%}{{- display_date | time_tag: format: 'date' -}}{%- endif -%}</span>
+    {%- endif -%}
+
+    {%- if block_settings.show_date and block_settings.show_author -%}
+      <span>{{ 'content.blog_details_separator' | t }}</span>
+    {%- endif -%}
+
+    {%- if block_settings.show_author -%}
+      <span>{{ display_author }}</span>
+    {%- endif -%}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .blog-post-details {
+    display: flex;
+    gap: var(--gap-sm);
+    font-size: var(--font-paragraph-size);
+    color: rgb(var(--color-foreground-rgb) / var(--opacity-subdued-text));
+    white-space: nowrap;
+    flex-wrap: wrap;
+  }
+  .blog-post-details > span {
+    text-overflow: clip;
+    overflow: hidden;
+  }
+{% endstylesheet %}

@@ -45,22 +45,16 @@
           "name": "Article media videos",
           "settings": {
             "video_index": 1,
+            "video_hosting_only": false,
             "width_mode": "full",
             "custom_width_px": 640
-          }
-        },
-        "article_media_gallery_9NqFpC": {
-          "type": "article-media-gallery",
-          "settings": {
-            "title": "SPECIAL PICS"
           }
         }
       },
       "block_order": [
         "blog-post-title",
         "blog-post-content",
-        "article-media-video-hero",
-        "article_media_gallery_9NqFpC"
+        "article-media-video-hero"
       ],
       "settings": {
         "content_direction": "column",
@@ -69,9 +63,68 @@
         "padding-block-start": 40,
         "padding-block-end": 80
       }
+    },
+    "section_U7YHyK": {
+      "type": "section",
+      "blocks": {
+        "article_media_videos_GUmQFP": {
+          "type": "article-media-videos",
+          "name": "Article media videos",
+          "settings": {
+            "video_index": 1,
+            "video_hosting_only": true,
+            "width_mode": "full",
+            "custom_width_px": 640
+          },
+          "blocks": {}
+        },
+        "article_media_gallery_eAcwtf": {
+          "type": "article-media-gallery",
+          "name": "Article media gallery",
+          "settings": {
+            "title": "SPECIAL PICS",
+            "padding_top": 80,
+            "padding_bottom": 100
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "article_media_videos_GUmQFP",
+        "article_media_gallery_eAcwtf"
+      ],
+      "name": "t:names.custom_section",
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "full-width",
+        "section_height": "small",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
-    "section"
+    "section",
+    "section_U7YHyK"
   ]
 }

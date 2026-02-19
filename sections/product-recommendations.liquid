@@ -25,6 +25,36 @@
   endcapture
 %}
 
+{% stylesheet %}
+  .product-recommendations .product-card__content .text-block,
+  .product-recommendations .product-card__content .text-block p {
+    font-family: var(--font-accent--family);
+    font-size: 14px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0;
+    text-align: center;
+  }
+  .product-recommendations .product-card__content .text-block p {
+    font-family: var(--font-h5--family);
+  }
+  .product-recommendations .product-card__content {
+    align-items: center;
+    --product-card-alignment: center;
+  }
+  /* Prevent gallery from collapsing when align-items: center */
+  .product-recommendations .product-card__content .card-gallery {
+    width: 100%;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+  .product-recommendations product-price {
+    text-align: center;
+  }
+{% endstylesheet %}
+
 <product-recommendations
   id="product-recommendations-{{ section.id }}"
   class="product-recommendations"
@@ -50,9 +80,18 @@
       {%  render 'spacing-style', settings: section.settings %}
       {%  render 'gap-style', value: section.settings.gap %}
       {{ styles }}
+      --padding-inline-start: 0;
+      --padding-inline-end: 0;
     "
   >
-    <div class="section-resource-list__content">
+    <div
+      class="section-resource-list__inner spacing-style"
+      style="--padding-inline-start: {{ section.settings.padding-inline-start | default: 15 }}px; --padding-inline-end: {{ section.settings.padding-inline-end | default: 15 }}px;"
+    >
+    <div
+      class="section-resource-list__content"
+      style="--horizontal-alignment: flex-start;"
+    >
       {% content_for 'blocks' %}
     </div>
 
@@ -90,7 +129,6 @@
       {% endcapture %}
 
       {% liquid
-        # Create an array from the list items to be used in the carousel
         assign slide_content = list_items | strip
         assign slides = slide_content | split: '<!--@list/split-->'
 
@@ -130,7 +168,7 @@
         {% endcase %}
       </div>
 
-      {% if section.settings.carousel_on_mobile and section.settings.layout_type != 'carousel' %}
+      {% if section.settings.carousel_on_mobile and section.settings.layout_type == 'grid' %}
         {% liquid
           assign mobile_carousel_gap = section.settings.columns_gap
         %}
@@ -165,6 +203,7 @@
         {% endfor %}
       </div>
     {%- endif -%}
+    </div>
   </div>
 </product-recommendations>
 
@@ -430,6 +469,26 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 15
     }
   ],
   "presets": [
@@ -452,14 +511,17 @@
         "gap": 28,
         "color_scheme": "scheme-1",
         "padding-block-start": 48,
-        "padding-block-end": 48
+        "padding-block-end": 48,
+        "padding-inline-start": 15,
+        "padding-inline-end": 15
       },
       "blocks": {
         "header": {
           "type": "text",
           "name": "t:names.header",
           "settings": {
-            "text": "t:html_defaults.related_product"
+            "text": "t:html_defaults.related_product",
+            "alignment": "left"
           }
         },
         "static-product-card": {
@@ -467,12 +529,21 @@
           "name": "t:names.product_card",
           "static": true,
           "settings": {
-            "product_card_gap": 4
+            "product_card_gap": 8,
+            "inherit_color_scheme": true,
+            "color_scheme": "",
+            "border": "none",
+            "border_width": 1,
+            "border_opacity": 100,
+            "border_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 0,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
           },
           "blocks": {
-            "product-card-gallery": {
+            "card-gallery": {
               "type": "_product-card-gallery",
-              "name": "t:names.product_card_media",
               "settings": {
                 "image_ratio": "adapt",
                 "border": "none",
@@ -489,9 +560,10 @@
               "type": "product-title",
               "name": "t:names.product_title",
               "settings": {
-                "width": "fit-content",
+                "truncate_30": true,
+                "width": "100%",
                 "max_width": "normal",
-                "alignment": "left",
+                "alignment": "center",
                 "type_preset": "rte",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
@@ -511,14 +583,13 @@
             },
             "price": {
               "type": "price",
-              "name": "t:names.product_price",
               "settings": {
                 "show_sale_price_first": true,
                 "show_installments": false,
                 "show_tax_info": false,
                 "type_preset": "h6",
                 "width": "100%",
-                "alignment": "left",
+                "alignment": "center",
                 "font": "var(--font-body--family)",
                 "font_size": "1rem",
                 "line_height": "normal",
@@ -530,9 +601,23 @@
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               }
+            },
+            "wishlist_button": {
+              "type": "wishlist-button",
+              "name": "Wishlist Button",
+              "settings": {
+                "custom_liquid": "<button title=\"Add to wishlist\" aria-label=\"Add to wishlist\" class=\"st-wishlist-button\" type=\"button\" data-type=\"details\" data-handle=\"{{closest.product.handle}}\" aria-label=\"Add product to wishlist\"></button>"
+              }
+            },
+            "compare_button": {
+              "type": "compare-button",
+              "name": "Compare Button",
+              "settings": {
+                "custom_liquid": "<button type=\"button\" class=\"button add-to-comparable\" data-product=\"{{ closest.product.handle }}\" aria-label=\"Compare\">\n  <span class=\"add-to-comparison-label\">\n    <span class=\"svg-wrapper\" aria-hidden=\"true\" style=\"display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;\">{{ 'icon-compare.svg' | inline_asset_content }}</span>\n  Add to compare\n  </span>\n  <span class=\"in-comparison-label\">In comparison</span>\n</button>"
+              }
             }
           },
-          "block_order": ["product-card-gallery", "product_title", "price"]
+          "block_order": ["card-gallery", "product_title", "price", "wishlist_button", "compare_button"]
         }
       },
       "block_order": ["header"]

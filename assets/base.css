@@ -4355,6 +4355,13 @@ slideshow-arrows .slideshow-control.slideshow-control--style-none {
   row-gap: var(--gap);
 }
 
+.section-resource-list__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  width: 100%;
+}
+
 .section-resource-list__content {
   display: flex;
   flex-direction: column;
