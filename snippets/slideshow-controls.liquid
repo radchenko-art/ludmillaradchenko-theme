@@ -291,6 +291,17 @@
     display: none;
   }
 
+  scroll-hint {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  scroll-hint::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
   slideshow-controls button {
     --color: rgb(var(--color-foreground-rgb) / var(--opacity-30));
     --color-active: var(--color-foreground);
@@ -328,8 +339,14 @@
       min-height: 100%;
 
       .slideshow-controls__thumbnails-container {
-        overflow: hidden auto;
+        /* Keep theme setting thumbnail_visible_count working in Safari */
+        overflow-x: hidden;
+        overflow-y: auto;
         max-height: calc(var(--thumbnail-visible-count, 5) * (var(--thumbnail-width) + var(--gap-xs, 4px)));
+        height: min(100%, calc(var(--thumbnail-visible-count, 5) * (var(--thumbnail-width) + var(--gap-xs, 4px))));
+        min-height: 0;
+        block-size: min(100%, calc(var(--thumbnail-visible-count, 5) * (var(--thumbnail-width) + var(--gap-xs, 4px))));
+        -webkit-overflow-scrolling: touch;
       }
 
       &:not([controls-on-media]) {
@@ -629,7 +646,8 @@
   }
 
   .slideshow-controls__thumbnails-strip .slideshow-controls__thumbnails-container {
-    flex: 1;
+    /* Safari may ignore max-height on flex:1 + overflow:auto */
+    flex: 0 1 auto;
     min-height: 0;
   }
 

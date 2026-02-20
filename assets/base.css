@@ -4093,6 +4093,7 @@ slideshow-slide {
   position: relative;
   scroll-snap-align: center;
   width: var(--slide-width, 100%);
+  max-width: 100%;
   max-height: 100%;
   flex-shrink: 0;
   view-timeline-name: var(--slideshow-timeline);
@@ -4201,12 +4202,15 @@ slideshow-container {
 
 @media screen and (min-width: 750px) {
   .media-gallery--carousel slideshow-component:has(slideshow-controls[thumbnails]) {
+    /* Explicit controls column width so Safari cannot stretch it to 100% (auto track sizing bug) */
+    --slideshow-controls-column-width: calc(var(--thumbnail-width) + 2 * var(--slideshow-thumbnails-padding-inline, var(--padding-sm)));
+
     &:has(slideshow-controls[pagination-position='right']) {
       display: grid;
       grid-template:
         'container controls' auto
         'arrows controls' min-content
-        / 1fr auto;
+        / minmax(0, 1fr) var(--slideshow-controls-column-width);
     }
 
     &:has(slideshow-controls[pagination-position='left']) {
@@ -4214,11 +4218,17 @@ slideshow-container {
       grid-template:
         'controls container' auto
         'controls arrows' min-content
-        / auto 1fr;
+        / var(--slideshow-controls-column-width) minmax(0, 1fr);
     }
 
     slideshow-controls[pagination-position='left'] {
       order: -1;
+    }
+
+    /* Allow container and scroller to shrink (grid blowout prevention) */
+    slideshow-container,
+    slideshow-container slideshow-slides {
+      min-width: 0;
     }
   }
 }

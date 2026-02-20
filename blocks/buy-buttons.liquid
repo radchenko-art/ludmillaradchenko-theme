@@ -382,6 +382,7 @@
     display: flex;
     flex-wrap: wrap;
     width: 100%;
+    gap: var(--gap-sm);
   }
 
   .product-form-buttons__main-row:not(:has(.quantity-rules)) {
@@ -421,21 +422,47 @@
     padding-block: var(--padding-lg);
   }
 
-  /* Quantity selector: 100px × 64px, 2px border #ddd, no radius */
+  /* Quantity selector: max 100px, buttons 30px, input 36px, 2px border, vertically centered */
+  .buy-buttons-block .quantity-selector-wrapper {
+    align-self: center;
+  }
+
   .buy-buttons-block .quantity-selector,
   .buy-buttons-block quantity-selector-component.quantity-selector {
-    flex-grow: 0;
-    flex-shrink: 0;
-    width: 100px;
+    --quantity-selector-width: 100px;
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100px;
+    min-width: 100px;
     height: 64px;
     min-height: 64px;
+    box-sizing: border-box;
+    padding: 0;
     border: 2px solid #ddd;
     border-radius: 0;
+    gap: 0;
   }
 
   .buy-buttons-block .quantity-selector .quantity-minus,
   .buy-buttons-block .quantity-selector .quantity-plus {
+    width: 30px;
+    min-width: 30px;
+    padding: 0;
+    margin: 0;
     border-radius: 0;
+  }
+
+  .buy-buttons-block .quantity-selector input[type='number'] {
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .buy-buttons-block .quantity-selector input[type='number']:focus,
+  .buy-buttons-block .quantity-selector input[type='number']:focus-visible {
+    outline: none;
   }
 
   /* Add to cart / Sold out: 200px × 64px, no radius, uppercase */
