@@ -176,6 +176,7 @@
                 "show_sale_price_first": true,
                 "show_installments": false,
                 "show_tax_info": false,
+                "tax_info": "",
                 "type_preset": "h6",
                 "width": "100%",
                 "alignment": "center",
@@ -199,22 +200,13 @@
                 "custom_liquid": "<button title=\"Add to wishlist\" aria-label=\"Add to wishlist\" class=\"st-wishlist-button\" type=\"button\" data-type=\"details\" data-handle=\"{{closest.product.handle}}\" aria-label=\"Add product to wishlist\"></button>"
               },
               "blocks": {}
-            },
-            "compare_button_nHpLVG": {
-              "type": "compare-button",
-              "name": "Compare Button",
-              "settings": {
-                "custom_liquid": "<button type=\"button\" class=\"button add-to-comparable\" data-product=\"{{ closest.product.handle }}\" aria-label=\"Compare\">\n  <span class=\"add-to-comparison-label\">\n    <span class=\"svg-wrapper\" aria-hidden=\"true\" style=\"display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;\">{{ 'icon-compare.svg' | inline_asset_content }}</span>\n    Add to compare\n  </span>\n  <span class=\"in-comparison-label\">In comparison</span>\n</button>"
-              },
-              "blocks": {}
             }
           },
           "block_order": [
             "card-gallery",
             "product_title_4nY4eT",
             "price_EzJzMm",
-            "wishlist_button_H49WFJ",
-            "compare_button_nHpLVG"
+            "wishlist_button_H49WFJ"
           ]
         }
       },
