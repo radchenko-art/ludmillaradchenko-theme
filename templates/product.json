@@ -229,14 +229,6 @@
                   },
                   "blocks": {}
                 },
-                "compare_button_wXbh9U": {
-                  "type": "compare-button",
-                  "name": "Compare Button",
-                  "settings": {
-                    "custom_liquid": "<button type=\"button\" class=\"button add-to-comparable\" data-product=\"{{product.handle}}\" aria-label=\"Compare\">\n  <span class=\"add-to-comparison-icon\">\n    <span class=\"svg-wrapper\" aria-hidden=\"true\" style=\"display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;\">{{ 'icon-compare.svg' | inline_asset_content }}</span>\n  </span>\n  <span class=\"in-comparison-label\"></span>\n</button>"
-                  },
-                  "blocks": {}
-                },
                 "quantity": {
                   "type": "quantity",
                   "static": true,
@@ -260,8 +252,7 @@
                 }
               },
               "block_order": [
-                "wishlist_button_V8qwTe",
-                "compare_button_wXbh9U"
+                "wishlist_button_V8qwTe"
               ]
             },
             "divider_4anHj3": {
