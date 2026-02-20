@@ -4090,6 +4090,7 @@ slideshow-component[mobile-disabled] slideshow-slides {
 }
 
 slideshow-slide {
+  display: block;
   position: relative;
   scroll-snap-align: center;
   width: var(--slide-width, 100%);
