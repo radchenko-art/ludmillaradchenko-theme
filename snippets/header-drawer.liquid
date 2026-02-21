@@ -55,16 +55,11 @@
     scroll-lock
   >
     <summary
-      class="header__icon header__icon--menu header__icon--summary"
+      class="visually-hidden"
       aria-label="{{ 'accessibility.menu' | t }}"
       on:click="/toggle"
     >
-      <span class="svg-wrapper header-drawer-icon header-drawer-icon--open">
-        {{- 'icon-menu.svg' | inline_asset_content -}}
-      </span>
-      <span class="svg-wrapper header-drawer-icon header-drawer-icon--close">
-        {{- 'icon-close.svg' | inline_asset_content -}}
-      </span>
+      {{ 'accessibility.menu' | t }}
     </summary>
     <div
       ref="menuDrawer"
@@ -791,6 +786,26 @@
 
   .header--compact .header__drawer {
     min-height: var(--minimum-touch-target);
+  }
+
+  @media screen and (max-width: 991px) {
+    /* Header row is empty on mobile: keep drawer functional but remove reserved height */
+    #header-component[data-menu-style='drawer'] .header__drawer {
+      --header-drawer-min-height: 0px;
+      min-height: 0;
+    }
+
+    #header-component[data-menu-style='drawer'] .header__row--top:not(.divider--page-width),
+    #header-component[data-menu-style='drawer'] .header__row--top.divider--page-width .header__columns {
+      border-bottom-width: 0;
+    }
+
+    #header-component[data-menu-style='drawer'] .header__row--top .header__columns {
+      --padding-block-start: 0px;
+      --padding-block-end: 0px;
+      min-height: 0;
+      padding-block: 0;
+    }
   }
 
   .menu-drawer__navigation {

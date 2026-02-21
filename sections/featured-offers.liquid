@@ -120,6 +120,45 @@
   </div>
 </div>
 
+<script>
+  (function () {
+    const MOBILE_QUERY = '(max-width: 600px)';
+
+    const syncFeaturedOffersDescriptionHeight = () => {
+      const isMobile = window.matchMedia(MOBILE_QUERY).matches;
+      const cards = document.querySelectorAll('.featured-offers .box-banner1 .ApImage');
+
+      cards.forEach((card) => {
+        const media = card.querySelector(':scope > a');
+        const description = card.querySelector(':scope > .image_description');
+
+        if (!description) return;
+
+        if (!isMobile) {
+          card.style.removeProperty('--featured-offers-mobile-pair-height');
+          return;
+        }
+
+        const mediaHeight = media ? Math.ceil(media.getBoundingClientRect().height) : 0;
+        if (mediaHeight > 0) {
+          card.style.setProperty('--featured-offers-mobile-pair-height', `${mediaHeight}px`);
+        }
+      });
+    };
+
+    const scheduleSync = () => requestAnimationFrame(syncFeaturedOffersDescriptionHeight);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', scheduleSync, { once: true });
+    } else {
+      scheduleSync();
+    }
+
+    window.addEventListener('load', scheduleSync);
+    window.addEventListener('resize', scheduleSync);
+  })();
+</script>
+
 {% stylesheet %}
   /* Layout: section + wrapper + container (from donor) */
   .featured-offers__background {
@@ -246,6 +285,25 @@
       width: 50%;
       height: 100%;
       z-index: 1;
+    }
+  }
+
+  @media (min-width: 601px) and (max-width: 991px) {
+    .featured-offers .box-banner1 .ApImage.img-top > a {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .featured-offers .box-banner1 .ApImage.img-top .image_description {
+      top: 0;
+      right: 0;
+      left: auto;
+      width: 50%;
+      height: 100%;
     }
   }
 
@@ -444,6 +502,12 @@
       padding-bottom: 0;
     }
 
+    .featured-offers .box-banner1 .ApImage > a {
+      display: block;
+      width: 100%;
+      position: static;
+    }
+
     .featured-offers .box-banner1 .ApImage img {
       width: 100% !important;
       height: auto !important;
@@ -453,7 +517,8 @@
     .featured-offers .box-banner1 .ApImage .image_description {
       position: static;
       width: 100%;
-      height: auto;
+      height: var(--featured-offers-mobile-pair-height, auto);
+      min-height: var(--featured-offers-mobile-pair-height, auto);
       padding: 20px 0 40px;
     }
   }

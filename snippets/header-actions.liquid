@@ -27,12 +27,13 @@
   {% if block %}{{ block.shopify_attributes }}{% endif %}
 >
   {% if shop.customer_accounts_enabled %}
-    <script
-      src="{{ 'dialog.js' | asset_url }}"
-      type="module"
-    ></script>
+    <div class="header-actions__account">
+      <script
+        src="{{ 'dialog.js' | asset_url }}"
+        type="module"
+      ></script>
 
-    <anchored-popover-component
+      <anchored-popover-component
       data-close-on-resize="true"
       class="account-popover mobile:hidden"
       {% if account_menu_behavior == 'hover' %}data-hover-triggered{% endif %}
@@ -80,8 +81,10 @@
         {% render 'account-actions' %}
       </dialog>
     </dialog-component>
+    </div>
   {% endif %}
 
+  <div class="header-actions__cart">
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
     <script
       src="{{ 'cart-drawer.js' | asset_url }}"
@@ -216,6 +219,7 @@
       {{ cart_icon }}
     </a>
   {% endif %}
+  </div>
 </header-actions>
 
 {% stylesheet %}

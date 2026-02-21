@@ -714,9 +714,8 @@ export function setHeaderMenuStyle() {
   const headerComponent = /** @type {HTMLElement} | null */ (document.querySelector('#header-component'));
   if (headerComponent) {
     window.requestAnimationFrame(() => {
-      const overflowList = headerComponent?.querySelector('overflow-list');
-      const hasReachedMinimum = overflowList && overflowList.hasAttribute('minimum-reached');
-      headerComponent.dataset.menuStyle = isTouchDevice() || hasReachedMinimum ? 'drawer' : 'menu';
+      const isMobileHeader = window.matchMedia('(max-width: 991px)').matches;
+      headerComponent.dataset.menuStyle = isMobileHeader ? 'drawer' : 'menu';
     });
   }
 }

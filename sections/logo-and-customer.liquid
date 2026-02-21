@@ -4,6 +4,15 @@
   style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;"
 >
   <div class="logo-and-customer__row">
+    <button
+      type="button"
+      class="button button-unstyled logo-and-customer__menu-trigger"
+      aria-label="{{ 'accessibility.menu' | t }}"
+      data-logo-customer-menu-trigger
+    >
+      <span class="svg-wrapper" aria-hidden="true">{{ 'icon-menu.svg' | inline_asset_content }}</span>
+    </button>
+
     {% for block in section.blocks %}
       {% case block.type %}
         {% when 'logo_block' %}
@@ -73,15 +82,9 @@
 
   .logo-and-customer__logo-image {
     object-fit: contain;
-    height: var(--logo-image-height-mobile);
-    width: var(--logo-image-width-mobile);
-  }
-
-  @media screen and (min-width: 750px) {
-    .logo-and-customer__logo-image {
-      height: var(--logo-image-height);
-      width: var(--logo-image-width);
-    }
+    /* Keep logo size constant on mobile and desktop */
+    height: var(--logo-image-height);
+    width: var(--logo-image-width);
   }
 
   .logo-and-customer__logo-text {
@@ -95,10 +98,97 @@
   }
 
   /* Equal spacing between all icons (search, localization, account, cart) */
+  .logo-and-customer__menu-trigger {
+    display: none;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    justify-self: start;
+    align-self: center;
+  }
+
+  .logo-and-customer__menu-trigger .svg-wrapper {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-and-customer__menu-trigger .svg-wrapper svg {
+    width: calc(var(--icon-size-xs) * 2);
+    height: calc(var(--icon-size-xs) * 2);
+  }
+
+  .logo-and-customer__menu-trigger .svg-wrapper svg path {
+    stroke-width: 1.5px;
+  }
+
   .logo-and-customer__actions header-actions {
     display: flex;
     align-items: center;
     gap: var(--logo-and-customer-actions-gap, var(--gap-xl));
+  }
+
+  @media screen and (max-width: 991px) {
+    .logo-and-customer.spacing-style {
+      --padding-block-start: 0px !important;
+    }
+
+    .logo-and-customer__menu-trigger {
+      display: inline-flex;
+      grid-column: 1;
+      justify-self: start;
+    }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center) {
+      position: relative;
+      padding-top: calc(40px + var(--padding-2xs));
+    }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center)::after {
+      content: '';
+      position: absolute;
+      inset-inline-start: 50%;
+      transform: translateX(-50%);
+      top: 40px;
+      width: 100vw;
+      border-bottom: 1px solid #e6e6e6;
+      pointer-events: none;
+    }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions .header-actions__account {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      z-index: 2;
+    }
+
+    /* Mobile account menu should behave like desktop popover (no drawer overlay) */
+    .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions .header-actions__account .account-popover.mobile\:hidden {
+      display: block !important;
+    }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions .header-actions__account .account-drawer {
+      display: none !important;
+    }
+
+    /* Future hook: language/currency on the left in top 40px row */
+    .logo-and-customer__row:has(.logo-and-customer__logo--center) .header-mobile-localization {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      z-index: 2;
+    }
   }
 {% endstylesheet %}
 

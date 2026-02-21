@@ -99,6 +99,12 @@
     align-items: center;
   }
 
+  @media screen and (max-width: 991px) {
+    .account-button--with-label .account-button__icon {
+      margin-right: 5px;
+    }
+  }
+
   /* The shop avatar doesn't bubble the click event up to our button, so we need to prevent that or the button doesn't work */
   .account-button shop-user-avatar {
     pointer-events: none;

@@ -18,12 +18,14 @@ class HeaderDrawer extends Component {
     super.connectedCallback();
 
     this.addEventListener('keyup', this.#onKeyUp);
+    document.addEventListener('click', this.#onExternalTriggerClick);
     this.#setupAnimatedElementListeners();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('keyup', this.#onKeyUp);
+    document.removeEventListener('click', this.#onExternalTriggerClick);
   }
 
   /**
@@ -34,6 +36,13 @@ class HeaderDrawer extends Component {
     if (event.key !== 'Escape') return;
 
     this.#close(this.#getDetailsElement(event));
+  };
+
+  #onExternalTriggerClick = (event) => {
+    const trigger = event.target instanceof Element && event.target.closest('[data-logo-customer-menu-trigger]');
+    if (!trigger) return;
+
+    this.toggle();
   };
 
   /**
@@ -70,9 +79,8 @@ class HeaderDrawer extends Component {
     const details = this.#getDetailsElement(event);
     const summary = details.querySelector('summary');
 
-    if (!summary) return;
-
-    summary.setAttribute('aria-expanded', 'true');
+    details.setAttribute('open', '');
+    summary?.setAttribute('aria-expanded', 'true');
 
     this.preventInitialAccordionAnimations(details);
     requestAnimationFrame(() => {
@@ -111,9 +119,7 @@ class HeaderDrawer extends Component {
   #close(details) {
     const summary = details.querySelector('summary');
 
-    if (!summary) return;
-
-    summary.setAttribute('aria-expanded', 'false');
+    summary?.setAttribute('aria-expanded', 'false');
     details.classList.remove('menu-open');
     this.refs.menuDrawer.classList.remove('menu-drawer--has-submenu-opened');
 
