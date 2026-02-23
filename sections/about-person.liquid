@@ -25,11 +25,15 @@
 
   assign show_header_row = false
   assign show_single_row_image_text = false
+  assign show_about_person_special_layout = false
   if main_image != blank and subheading != blank and has_columns
     assign show_header_row = true
   endif
   if main_image != blank and subheading == blank and has_columns == false
     assign show_single_row_image_text = true
+  endif
+  if main_image != blank and subheading != blank and bg_image != blank and subheading_image == blank
+    assign show_about_person_special_layout = true
   endif
 -%}
 
@@ -56,13 +60,13 @@
         {% endif %}
       "
     >
-    {%- unless show_header_row -%}
+    {%- unless show_header_row or show_about_person_special_layout -%}
       <div class="page-content__title-wrapper">
         <h1 class="page-content__title">{{ page.title }}</h1>
       </div>
     {%- endunless -%}
 
-    {%- if show_header_row -%}
+    {%- if show_header_row and show_about_person_special_layout == false -%}
       <div class="page-content__two-columns page-content__header-row">
         <div class="page-content__column">
           {%- if main_image != blank -%}
@@ -97,7 +101,88 @@
       </div>
     {%- endif -%}
 
-    {%- if show_single_row_image_text -%}
+    {%- if show_about_person_special_layout -%}
+      <div class="page-content__two-columns page-content__about-special">
+        <div class="page-content__column">
+          <div class="page-content__main-image">
+            <img
+              src="{{ main_image | image_url: width: 800 }}"
+              alt=""
+              width="{{ main_image.width }}"
+              height="{{ main_image.height }}"
+              loading="lazy"
+            >
+          </div>
+        </div>
+        <div class="page-content__column page-content__column--subheading page-content__column--text">
+          <h2 class="page-content__subheading">{{ subheading }}</h2>
+          <rte-formatter>{{ content_raw }}</rte-formatter>
+
+          {% assign about_contact_form_id = 'AboutPersonContactForm' %}
+          {%- form 'contact', id: about_contact_form_id, class: 'about-person-contact-form' -%}
+            <input type="hidden" name="contact[tags]" value="about-person">
+
+            {%- if form.posted_successfully? and form.id == about_contact_form_id -%}
+              <p class="about-person-contact-form__success">{{ 'blocks.contact_form.post_success' | t }}</p>
+            {%- endif -%}
+
+            {%- if form.errors and form.id == about_contact_form_id -%}
+              <p class="about-person-contact-form__error">
+                {{ form.errors.translated_fields.email | capitalize }} {{ form.errors.messages.email }}
+              </p>
+            {%- endif -%}
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-subject" class="about-person-contact-form__label">
+                {{ 'content.about_person_contact.select_request' | t }}
+              </label>
+              <select
+                id="{{ about_contact_form_id }}-subject"
+                class="about-person-contact-form__input"
+                name="contact[subject]"
+              >
+                <option value="Customer service">{{ 'content.about_person_contact.customer_service' | t }}</option>
+                <option value="Technical support">{{ 'content.about_person_contact.technical_support' | t }}</option>
+              </select>
+            </div>
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-email" class="about-person-contact-form__label">
+                {{ 'content.about_person_contact.address_email' | t }}
+              </label>
+              <input
+                type="email"
+                id="{{ about_contact_form_id }}-email"
+                class="about-person-contact-form__input"
+                autocomplete="email"
+                name="contact[email]"
+                spellcheck="false"
+                autocapitalize="off"
+                value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+                aria-required="true"
+              >
+            </div>
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-body" class="about-person-contact-form__label">
+                {{ 'content.about_person_contact.request_information' | t }}
+              </label>
+              <textarea
+                rows="6"
+                id="{{ about_contact_form_id }}-body"
+                class="about-person-contact-form__input about-person-contact-form__input--textarea"
+                name="contact[body]"
+                placeholder="{{ 'content.about_person_contact.message_placeholder' | t }}"
+              >{{- form.body -}}</textarea>
+            </div>
+
+            <button type="submit" class="button page-content__download-link about-person-contact-form__submit">
+              {{ 'content.about_person_contact.send_request' | t }}
+            </button>
+          {%- endform -%}
+        </div>
+      </div>
+    {%- elsif show_single_row_image_text -%}
       <div class="page-content__two-columns">
         <div class="page-content__column">
           <div class="page-content__main-image">
@@ -190,6 +275,12 @@
 
   .about-person--has-bg .rte a:not(.page-content__download-link) {
     border-bottom-color: rgba(255, 255, 255, 0.6);
+  }
+
+  @media screen and (max-width: 499px) {
+    .about-person__inner-wrap.spacing-style {
+      padding-inline: 0 !important;
+    }
   }
 
   @media screen and (min-width: 750px) {
@@ -289,6 +380,73 @@
 
   .page-content__download-link + .page-content__download-link {
     margin-left: 1rem;
+  }
+
+  .page-content__about-special .page-content__column--subheading {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  .page-content__about-special .page-content__subheading {
+    margin-bottom: 16px;
+    text-align: center;
+  }
+
+  .about-person-contact-form {
+    width: 100%;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: transparent;
+  }
+
+  .about-person-contact-form__field {
+    margin-bottom: 24px;
+  }
+
+  .about-person-contact-form__label {
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .section-about-person .about-person-contact-form :is(input, textarea, select).about-person-contact-form__input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    border-radius: 3px;
+    background-color: #fff;
+    color: #000;
+    opacity: 1;
+  }
+
+  .section-about-person .about-person-contact-form :is(input, textarea, select).about-person-contact-form__input:focus,
+  .section-about-person .about-person-contact-form :is(input, textarea, select).about-person-contact-form__input:focus-visible {
+    outline: 0;
+    box-shadow: none;
+  }
+
+  .about-person-contact-form__input::placeholder {
+    color: #777;
+  }
+
+  .about-person-contact-form__input--textarea {
+    resize: vertical;
+    height: 100px;
+    min-height: 100px;
+  }
+
+  .about-person-contact-form__submit {
+    align-self: center;
+    margin-top: 0;
+  }
+
+  .about-person-contact-form__success,
+  .about-person-contact-form__error {
+    margin: 0 0 24px;
   }
 
   @media screen and (min-width: 750px) {

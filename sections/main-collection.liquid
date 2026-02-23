@@ -105,6 +105,17 @@
     gap: 0;
   }
 
+  @media screen and (max-width: 767px) {
+    .collection-layout-wrapper.section--page-width {
+      grid-template-columns: 1fr;
+    }
+
+    .collection-layout-wrapper.section--page-width > .collection-layout-wrapper__center {
+      grid-column: 1;
+      padding-inline: var(--page-margin);
+    }
+  }
+
   .collection-layout-wrapper.section--full-width > .collection-layout-wrapper__center {
     grid-column: 1 / -1;
     min-width: 0;
@@ -121,9 +132,9 @@
     display: none;
   }
 
-  @media screen and (min-width: 750px) {
+  @media screen and (min-width: 768px) {
     .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) {
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 247px minmax(0, 1fr);
       grid-template-rows: auto 1fr;
     }
 
@@ -137,35 +148,46 @@
     .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) > .shopify-section:nth-child(2) {
       grid-column: 2;
       grid-row: 1;
+      min-width: 0;
     }
 
     .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) > .shopify-section:nth-child(3) {
       grid-column: 2;
       grid-row: 2;
+      min-width: 0;
+    }
+  }
+
+  @media screen and (min-width: 992px) {
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) {
+      grid-template-columns: 360px minmax(0, 1fr);
     }
   }
 
   .main-collection-grid {
     grid-column: var(--grid-column--mobile);
 
-    @media screen and (min-width: 750px) {
+    @media screen and (min-width: 768px) {
       grid-column: var(--grid-column--desktop);
     }
   }
 
-  /* With sidebar: remove .section grid from content and set padding 0 15px (no JS, no layout shift) */
-  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container,
-  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width {
-    display: block;
-    padding: 0 15px;
-    grid-template-columns: unset;
-    grid-template-rows: unset;
+  @media screen and (min-width: 768px) {
+    /* With sidebar: remove .section grid from content and set padding 0 15px (no JS, no layout shift) */
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container,
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width {
+      display: block;
+      padding: 0 15px;
+      grid-template-columns: unset;
+      grid-template-rows: unset;
+    }
+
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width > *,
+    .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container > * {
+      grid-column: unset;
+    }
   }
 
-  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width > *,
-  .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container > * {
-    grid-column: unset;
-  }
 {% endstylesheet %}
 
 {% schema %}

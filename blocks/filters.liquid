@@ -586,6 +586,45 @@
     justify-content: space-between;
   }
 
+  @media screen and (max-width: 749px) {
+    .facets-mobile-wrapper .column-options-wrapper {
+      display: none !important;
+    }
+
+    .facets-toggle .facets-mobile-wrapper .sorting-filter {
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100% !important;
+      margin-left: 0 !important;
+    }
+
+    .facets-mobile-wrapper facets-form-component,
+    .facets-mobile-wrapper facets-form-component form,
+    .facets-mobile-wrapper sorting-filter-component {
+      width: 100%;
+      max-width: 100%;
+      margin-inline: 0;
+    }
+
+    .facets-mobile-wrapper sorting-filter-component .sorting-filter__container {
+      width: 100%;
+      padding-inline: 0;
+      margin-inline: 0;
+    }
+
+    .facets-mobile-wrapper sorting-filter-component .sorting-filter__summary,
+    .facets-mobile-wrapper sorting-filter-component .sorting-filter__trigger-wrapper,
+    .facets-mobile-wrapper sorting-filter-component .sorting-filter__trigger-box {
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100% !important;
+    }
+
+    .facets-mobile-wrapper sorting-filter-component .facets__label {
+      display: none;
+    }
+  }
+
   @media screen and (min-width: 750px) {
     dialog-component.facets-block-wrapper {
       position: absolute;

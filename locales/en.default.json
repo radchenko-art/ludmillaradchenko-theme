@@ -320,7 +320,16 @@
     "recipient_form_fields_visible": "Recipient form fields are now visible",
     "recipient_form_fields_hidden": "Recipient form fields are now hidden",
     "recipient_form_error": "There was an error with the form submission",
-    "product_custom_property_character_count": "{{ used_chars }}/{{ max_chars }} characters used"
+    "product_custom_property_character_count": "{{ used_chars }}/{{ max_chars }} characters used",
+    "about_person_contact": {
+      "select_request": "Select request",
+      "customer_service": "Customer service",
+      "technical_support": "Technical support",
+      "address_email": "Address Email",
+      "request_information": "Request information",
+      "message_placeholder": "Message",
+      "send_request": "Send Request"
+    }
   },
   "fields": {
     // Separates min and max values in price range filter

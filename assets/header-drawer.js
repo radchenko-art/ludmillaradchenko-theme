@@ -45,6 +45,36 @@ class HeaderDrawer extends Component {
     this.toggle();
   };
 
+
+  /**
+   * In drawer accordions: text click navigates, chevron click toggles details.
+   * @param {MouseEvent} event
+   */
+  handleAccordionSummaryClick(event) {
+    if (!(event.target instanceof Element)) return;
+
+    const summary = event.currentTarget;
+    if (!(summary instanceof HTMLElement)) return;
+
+    const chevron = event.target.closest('.menu-drawer__accordion-chevron');
+    if (chevron) {
+      // Allow native summary/details toggle only when clicking chevron.
+      return;
+    }
+
+    const link = event.target.closest('.menu-drawer__menu-link');
+    if (link instanceof HTMLAnchorElement) {
+      // Prevent summary toggle and keep link navigation behavior.
+      event.preventDefault();
+      event.stopPropagation();
+      window.location.href = link.href;
+      return;
+    }
+
+    // Clicking other summary areas should not toggle accordion.
+    event.preventDefault();
+  }
+
   /**
    * @returns {boolean} Whether the main menu drawer is open
    */

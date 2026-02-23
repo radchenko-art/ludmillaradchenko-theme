@@ -27,11 +27,18 @@
   .collection-sidebar-section.collection-sidebar-section--visible {
     padding: 0 15px;
   }
+
+  @media screen and (max-width: 767px) {
+    .shopify-section__sidebar {
+      display: none;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "Collection sidebar",
+  "class": "shopify-section__sidebar",
   "enabled_on": {
     "templates": ["collection"]
   },

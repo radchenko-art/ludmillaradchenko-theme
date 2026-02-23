@@ -4,10 +4,17 @@
 
 {% render 'section', section: section, children: children %}
 
+
+{% stylesheet %}
+  .collection-heading-section .spacing-style.layout-panel-flex.layout-panel-flex--column.section-content-wrapper.mobile-column {
+    padding-inline: 0 !important;
+  }
+{% endstylesheet %}
+
 {% schema %}
 {
   "name": "Collection heading",
-  "class": "section-wrapper",
+  "class": "section-wrapper collection-heading-section",
   "enabled_on": {
     "templates": ["collection"]
   },
