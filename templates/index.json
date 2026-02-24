@@ -78,12 +78,13 @@
         "featured_offers_qCjapq": {
           "type": "featured_offers",
           "settings": {
-            "link_1": "",
+            "image_1": "shopify://shop_images/4-awalibable-works.jpg",
+            "link_1": "shopify://collections/multiple-art-limited-edition",
             "notation_1": "",
-            "title_1": "Title 1",
-            "subtitle_1": "Subtitle 1",
-            "paragraph_1": "First block text.",
-            "cta_text_1": "Learn more",
+            "title_1": "MULTIPLE ART",
+            "subtitle_1": "Limited edition",
+            "paragraph_1": "Design reproductions of works of art on specific supports",
+            "cta_text_1": "CHOOSE YOURS",
             "link_2": "",
             "notation_2": "",
             "title_2": "Title 2",
