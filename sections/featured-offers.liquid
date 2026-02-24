@@ -36,6 +36,9 @@
                       </a>
                     {% endif %}
                     <div class="image_description">
+                      {% if block.settings.notation_1 != blank %}
+                        <div class="featured-offers__notation">{{ block.settings.notation_1 }}</div>
+                      {% endif %}
                       {% if block.settings.title_1 != blank %}
                         <h3>{{ block.settings.title_1 }}</h3>
                       {% endif %}
@@ -65,6 +68,9 @@
                       </a>
                     {% endif %}
                     <div class="image_description">
+                      {% if block.settings.notation_2 != blank %}
+                        <div class="featured-offers__notation">{{ block.settings.notation_2 }}</div>
+                      {% endif %}
                       {% if block.settings.title_2 != blank %}
                         <h3>{{ block.settings.title_2 }}</h3>
                       {% endif %}
@@ -96,6 +102,9 @@
                       </a>
                     {% endif %}
                     <div class="image_description">
+                      {% if block.settings.notation_3 != blank %}
+                        <div class="featured-offers__notation">{{ block.settings.notation_3 }}</div>
+                      {% endif %}
                       {% if block.settings.title_3 != blank %}
                         <h3>{{ block.settings.title_3 }}</h3>
                       {% endif %}
@@ -362,8 +371,24 @@
 
   .featured-offers .box-banner1 .ApImage .image_description h3,
   .featured-offers .box-banner1 .ApImage .image_description h4,
-  .featured-offers .box-banner1 .ApImage .image_description p {
+  .featured-offers .box-banner1 .ApImage .image_description p,
+  .featured-offers .box-banner1 .ApImage .image_description .featured-offers__notation {
     width: 100%;
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description .featured-offers__notation {
+    font-family: var(--font-subheading--family);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 3px;
+    line-height: 12.1px;
+    text-transform: uppercase;
+    color: #000;
+    margin-bottom: 8px;
+  }
+
+  .featured-offers .box-banner1 .ApImage .image_description .featured-offers__notation p {
+    margin: 0;
   }
 
   .featured-offers .box-banner1 .ApImage .image_description h3 {
@@ -372,6 +397,7 @@
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+    margin: 0 0 8px;
   }
 
   @media (max-width: 1600px) {
@@ -616,6 +642,11 @@
           "label": "Link"
         },
         {
+          "type": "html",
+          "id": "notation_1",
+          "label": "Notation"
+        },
+        {
           "type": "text",
           "id": "title_1",
           "label": "Title"
@@ -651,6 +682,11 @@
           "label": "Link"
         },
         {
+          "type": "html",
+          "id": "notation_2",
+          "label": "Notation"
+        },
+        {
           "type": "text",
           "id": "title_2",
           "label": "Title"
@@ -684,6 +720,11 @@
           "type": "url",
           "id": "link_3",
           "label": "Link"
+        },
+        {
+          "type": "html",
+          "id": "notation_3",
+          "label": "Notation"
         },
         {
           "type": "text",

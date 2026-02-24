@@ -88,11 +88,6 @@
         "settings": {
           "custom_css": ""
         }
-      },
-      "3228365661995190140": {
-        "type": "shopify://apps/comparable-products/blocks/compare_products/a0463732-e49b-4c6e-b22b-3158b9b069a8",
-        "disabled": false,
-        "settings": {}
       }
     },
     "color_schemes": {
