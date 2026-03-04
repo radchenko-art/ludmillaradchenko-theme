@@ -79,13 +79,13 @@
         "featured_offers_qCjapq": {
           "type": "featured_offers",
           "settings": {
-            "image_1": "shopify://shop_images/4-awalibable-works.jpg",
+            "image_1": "shopify://shop_images/about-2026.jpg",
             "link_1": "shopify://collections/multiple-art-limited-edition",
             "notation_1": "",
-            "title_1": "MULTIPLE ART",
-            "subtitle_1": "Limited edition",
-            "paragraph_1": "Design reproductions of works of art on specific supports",
-            "cta_text_1": "CHOOSE YOURS",
+            "title_1": "About Artist",
+            "subtitle_1": "bio",
+            "paragraph_1": "Self potrait",
+            "cta_text_1": "discover more",
             "image_2": "shopify://shop_images/compleanno-45.jpg",
             "link_2": "shopify://blogs/special-exhibition",
             "notation_2": "",
