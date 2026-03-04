@@ -67,13 +67,13 @@
             "subtitle_2": "bio",
             "paragraph_2": "Self potrait",
             "cta_text_2": "discover more",
-            "image_3": "shopify://shop_images/act-dubai-25.jpg",
-            "link_3": "https://cdn.shopify.com/s/files/1/0959/0633/2999/files/the-wings-of-power.pdf?v=1770633639",
-            "notation_3": "OBLONG GALLERY DUBAI<br><br>11-25 February 2026",
-            "title_3": "THE WINGS OF POWER",
-            "subtitle_3": "by Ludmilla Radchenko",
-            "paragraph_3": "Art Digital Catalogue",
-            "cta_text_3": "Download now"
+            "image_3": "shopify://shop_images/4-awalibable-works.jpg",
+            "link_3": "shopify://collections/multiple-art-limited-edition",
+            "notation_3": "",
+            "title_3": "MULTIPLE ART",
+            "subtitle_3": "Limited edition",
+            "paragraph_3": "Design reproductions of works of art on specific supports",
+            "cta_text_3": "CHOOSE YOURS"
           }
         },
         "featured_offers_qCjapq": {
@@ -93,12 +93,13 @@
             "subtitle_2": "Exhibitions and events",
             "paragraph_2": "The best of",
             "cta_text_2": "VIEW NOW",
-            "link_3": "",
-            "notation_3": "",
-            "title_3": "Title 3",
-            "subtitle_3": "Subtitle 3",
-            "paragraph_3": "Third block text.",
-            "cta_text_3": "Learn more"
+            "image_3": "shopify://shop_images/act-dubai-25.jpg",
+            "link_3": "https://cdn.shopify.com/s/files/1/0959/0633/2999/files/the-wings-of-power.pdf?v=1770633639",
+            "notation_3": "OBLONG GALLERY DUBAI<br><br>11-25 February 2026",
+            "title_3": "THE WINGS OF POWER",
+            "subtitle_3": "by Ludmilla Radchenko",
+            "paragraph_3": "Art Digital Catalogue",
+            "cta_text_3": "Download now"
           }
         }
       },
