@@ -72,7 +72,7 @@
           "name": "Article media videos",
           "settings": {
             "video_index": 1,
-            "video_hosting_only": false,
+            "video_hosting_only": true,
             "width_mode": "normal",
             "custom_width_px": 960
           },
