@@ -11,6 +11,7 @@
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
+      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
@@ -59,13 +60,39 @@
             "subtitle_1": "collection",
             "paragraph_1": "Art multiples to wear",
             "cta_text_1": "Shop now",
-            "image_2": "shopify://shop_images/about-2026.jpg",
-            "link_2": "#",
+            "image_2": "shopify://shop_images/Foto-123_copy.png",
+            "link_2": "shopify://blogs/special-exhibition/wings-of-power-11-02-25-02-oblong-gallery-dubai-uae",
             "notation_2": "",
-            "title_2": "About Artist",
-            "subtitle_2": "bio",
-            "paragraph_2": "Self potrait",
-            "cta_text_2": "discover more",
+            "title_2": "New Exhibition",
+            "subtitle_2": "BY LUDMILLA RADCHENKO",
+            "paragraph_2": "WINGS OF POWER, 11.02 – 25.02 Oblong Gallery, Dubai, UAE",
+            "cta_text_2": "immerse",
+            "image_3": "shopify://shop_images/4-awalibable-works.jpg",
+            "link_3": "shopify://collections/multiple-art-limited-edition",
+            "notation_3": "",
+            "title_3": "MULTIPLE ART",
+            "subtitle_3": "Limited edition",
+            "paragraph_3": "Design reproductions of works of art on specific supports",
+            "cta_text_3": "CHOOSE YOURS"
+          }
+        },
+        "featured_offers_qCjapq": {
+          "type": "featured_offers",
+          "settings": {
+            "image_1": "shopify://shop_images/about-2026.jpg",
+            "link_1": "shopify://collections/multiple-art-limited-edition",
+            "notation_1": "",
+            "title_1": "About Artist",
+            "subtitle_1": "bio",
+            "paragraph_1": "Self potrait",
+            "cta_text_1": "discover more",
+            "image_2": "shopify://shop_images/compleanno-45.jpg",
+            "link_2": "shopify://blogs/special-exhibition",
+            "notation_2": "",
+            "title_2": "EXHIBITIONS",
+            "subtitle_2": "Exhibitions and events",
+            "paragraph_2": "The best of",
+            "cta_text_2": "VIEW NOW",
             "image_3": "shopify://shop_images/act-dubai-25.jpg",
             "link_3": "https://cdn.shopify.com/s/files/1/0959/0633/2999/files/the-wings-of-power.pdf?v=1770633639",
             "notation_3": "OBLONG GALLERY DUBAI<br><br>11-25 February 2026",
@@ -73,29 +100,6 @@
             "subtitle_3": "by Ludmilla Radchenko",
             "paragraph_3": "Art Digital Catalogue",
             "cta_text_3": "Download now"
-          }
-        },
-        "featured_offers_qCjapq": {
-          "type": "featured_offers",
-          "settings": {
-            "link_1": "",
-            "notation_1": "",
-            "title_1": "Title 1",
-            "subtitle_1": "Subtitle 1",
-            "paragraph_1": "First block text.",
-            "cta_text_1": "Learn more",
-            "link_2": "",
-            "notation_2": "",
-            "title_2": "Title 2",
-            "subtitle_2": "Subtitle 2",
-            "paragraph_2": "Second block text.",
-            "cta_text_2": "Learn more",
-            "link_3": "",
-            "notation_3": "",
-            "title_3": "Title 3",
-            "subtitle_3": "Subtitle 3",
-            "paragraph_3": "Third block text.",
-            "cta_text_3": "Learn more"
           }
         }
       },

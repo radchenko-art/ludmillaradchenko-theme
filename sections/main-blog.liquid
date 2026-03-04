@@ -28,31 +28,59 @@
       class="blog-posts-container"
     >
       {% liquid
-        assign sorted_articles = blog.articles | sort: 'metafields.custom.event_date' | reverse
-        assign items_on_page = sorted_articles.size
-      %}
-      {% for article in sorted_articles %}
-        {% assign is_even = forloop.index | modulo: 2 %}
-        {% style %}
-          [data-blog-index="{{ section.id }}-{{ forloop.index }}"] {
-            --col-span: 6;
-            --blog-post-card-scale: 1;
-          }
+        capture article_sort_rows
+          for article in blog.articles
+            assign event_date = article.metafields.custom.event_date.value | default: article.metafields.custom.event_date
+            assign sort_date = event_date | default: article.published_at
+            assign sort_timestamp = sort_date | date: '%s'
 
-          @media screen and (max-width: 749px) {
-            [data-blog-index="{{ section.id }}-{{ forloop.index }}"] {
+            echo sort_timestamp
+            echo '::'
+            echo forloop.index0
+            echo '||'
+          endfor
+        endcapture
+
+        assign sorted_article_rows = article_sort_rows | split: '||' | sort | reverse
+        assign items_on_page = blog.articles.size
+      %}
+      {% for sorted_row in sorted_article_rows %}
+        {% if sorted_row == blank %}
+          {% continue %}
+        {% endif %}
+
+        {% assign sorted_row_parts = sorted_row | split: '::' %}
+        {% assign article_index = sorted_row_parts[1] | plus: 0 %}
+
+        {% for article in blog.articles %}
+          {% if forloop.index0 != article_index %}
+            {% continue %}
+          {% endif %}
+
+          {% assign is_even = forloop.parentloop.index | modulo: 2 %}
+          {% style %}
+            [data-blog-index="{{ section.id }}-{{ forloop.parentloop.index }}"] {
               --col-span: 6;
               --blog-post-card-scale: 1;
             }
-          }
-        {% endstyle %}
-        <div
-          class="blog-post-item blog-post-item--donor{% if is_even == 0 %} blog-post-item--even{% endif %}"
-          data-testid="blog-post-item"
-          data-blog-index="{{ section.id }}-{{ forloop.index }}"
-        >
-          {% content_for 'block', id: 'static-blog-post-card', type: '_blog-post-card', article: article %}
-        </div>
+
+            @media screen and (max-width: 749px) {
+              [data-blog-index="{{ section.id }}-{{ forloop.parentloop.index }}"] {
+                --col-span: 6;
+                --blog-post-card-scale: 1;
+              }
+            }
+          {% endstyle %}
+          <div
+            class="blog-post-item blog-post-item--donor{% if is_even == 0 %} blog-post-item--even{% endif %}"
+            data-testid="blog-post-item"
+            data-blog-index="{{ section.id }}-{{ forloop.parentloop.index }}"
+          >
+            {% content_for 'block', id: 'static-blog-post-card', type: '_blog-post-card', article: article %}
+          </div>
+
+          {% break %}
+        {% endfor %}
       {% endfor %}
     </div>
   </div>

@@ -11,10 +11,11 @@
 {% assign block_settings = block.settings %}
 {% assign alignment = alignment | default: block_settings.alignment %}
 {% assign display_author = author | default: article.author %}
-{% assign display_date = date | default: article.published_at %}
-{% if article != blank and article.metafields.custom.event_date != blank %}
-  {% assign display_date = article.metafields.custom.event_date %}
+{% assign event_date = blank %}
+{% if article != blank %}
+  {% assign event_date = article.metafields.custom.event_date.value | default: article.metafields.custom.event_date %}
 {% endif %}
+{% assign display_date = date | default: event_date | default: article.published_at %}
 
 {%- if block_settings.show_date or block_settings.show_author -%}
   <div
