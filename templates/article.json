@@ -71,10 +71,10 @@
           "type": "article-media-videos",
           "name": "Article media videos",
           "settings": {
-            "video_index": 1,
+            "video_index": 0,
             "video_hosting_only": true,
             "width_mode": "normal",
-            "custom_width_px": 960
+            "custom_width_px": 1200
           },
           "blocks": {}
         },
@@ -100,7 +100,7 @@
         "horizontal_alignment": "flex-start",
         "vertical_alignment": "center",
         "align_baseline": false,
-        "horizontal_alignment_flex_direction_column": "flex-start",
+        "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "center",
         "gap": 12,
         "section_width": "full-width",
