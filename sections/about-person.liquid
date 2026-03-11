@@ -17,6 +17,7 @@
   assign main_image = page.metafields.custom.main_image.value
   assign subheading = page.metafields.custom.subtitle.value | default: page.metafields.custom.subheading.value
   assign subheading_image = page.metafields.custom.subheading_image.value
+  assign right_text = page.metafields.custom.right_text
   assign bg_image = page.metafields.custom.background_image.value
   assign bg_image_url = ''
   if bg_image != blank
@@ -83,7 +84,11 @@
         </div>
         <div class="page-content__column page-content__column--subheading">
           <h2 class="page-content__subheading">{{ subheading }}</h2>
-          {%- if subheading_image != blank -%}
+          {%- if right_text != blank -%}
+            <div class="page-content__right-text rte">
+              {{ right_text | metafield_tag }}
+            </div>
+          {%- elsif subheading_image != blank -%}
             <div class="page-content__subheading-image">
               <img
                 src="{{ subheading_image | image_url: width: 600 }}"
@@ -459,6 +464,12 @@
     .page-content__title-wrapper {
       max-width: 1140px;
       margin-inline: auto;
+    }
+
+    .page-content__right-text {
+      padding-inline: 40px;
+      margin-top: 20px;
+      text-align: center;
     }
   }
 {% endstylesheet %}
