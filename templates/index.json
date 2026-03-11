@@ -80,7 +80,7 @@
           "type": "featured_offers",
           "settings": {
             "image_1": "shopify://shop_images/about-2026.jpg",
-            "link_1": "shopify://collections/multiple-art-limited-edition",
+            "link_1": "shopify://pages/about-the-brand",
             "notation_1": "",
             "title_1": "About Artist",
             "subtitle_1": "bio",
