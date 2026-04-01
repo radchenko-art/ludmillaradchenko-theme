@@ -12,6 +12,7 @@
     "logo": "shopify://shop_images/logo.jpg",
     "logo_height": 70,
     "logo_height_mobile": 28,
+    "favicon": "shopify://shop_images/favicon.png",
     "type_body_font": "poppins_n4",
     "type_subheading_font": "montserrat_n4",
     "type_heading_font": "montserrat_n7",
@@ -81,15 +82,6 @@
     "variant_button_radius": 14,
     "variant_button_width": "equal-width-buttons",
     "content_for_index": [],
-    "blocks": {
-      "6933373160360723723": {
-        "type": "shopify://apps/swishlist-simple-wishlist/blocks/wishlist_settings/bfcb80f2-f00d-42ae-909a-9f00c726327b",
-        "disabled": false,
-        "settings": {
-          "custom_css": ""
-        }
-      }
-    },
     "color_schemes": {
       "scheme-1": {
         "settings": {
