@@ -23,7 +23,7 @@
         "customer_menu": {
           "type": "customer_menu",
           "settings": {
-            "icons_gap": "0",
+            "icons_gap": "0.5rem",
             "account_label": "MY ACCOUNT",
             "account_menu_behavior": "modal",
             "show_search": true,
