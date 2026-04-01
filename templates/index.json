@@ -11,7 +11,6 @@
   "sections": {
     "hero_jVaWmY": {
       "type": "hero",
-      "disabled": true,
       "name": "t:names.hero",
       "settings": {
         "media_type_1": "image",
