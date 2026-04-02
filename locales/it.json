@@ -78,6 +78,7 @@
     "slideshow": "Presentazione"
   },
   "actions": {
+    "sort_by": "Ordina per",
     "add_to_cart": "Aggiungi al carrello",
     "clear_all": "Cancella tutto",
     "remove": "Rimuovi",
