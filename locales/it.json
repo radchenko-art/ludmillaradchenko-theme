@@ -126,6 +126,7 @@
       "select_request":"Seleziona una richiesta",
       "customer_service": "Servizio clienti",
       "technical_support": "Supporto tecnico",
+      "send_request": "Invia la richiesta",
     },
     "reviews": "recensioni",
     "no_results_found": "Nessun risultato trovato",
