@@ -24,7 +24,7 @@
           "type": "customer_menu",
           "settings": {
             "icons_gap": "0",
-            "account_label": "MY ACCOUNT",
+            "account_label": "IL MIO ACCOUNT",
             "account_menu_behavior": "modal",
             "show_search": true,
             "show_country": true,
