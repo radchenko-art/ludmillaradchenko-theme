@@ -302,6 +302,7 @@
     }
   },
   "blogs": {
+    "view_now":"Guarda ora",
     "article": {
       "comment_author_separator": "•",
       "comments_heading": {
