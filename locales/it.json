@@ -123,6 +123,7 @@
       "message_placeholder": "Messaggio",
       "request_information": "Richiedi informazioni",
       "address_email": "Indirizzo e-mail",
+      "select_request":"Seleziona una richiesta",
     },
     "reviews": "recensioni",
     "no_results_found": "Nessun risultato trovato",
