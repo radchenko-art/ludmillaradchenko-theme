@@ -8,6 +8,18 @@
  * ------------------------------------------------------------
  */
 {
+  "collections":{
+    "sorting": {
+      "manual": "Seleziona",
+      "best_selling": "Più venduti",
+      "title_ascending": "Titolo: dalla A alla Z",
+      "title_descending": "Titolo: dalla Z alla A",
+      "price_ascending": "Prezzo: crescente",
+      "price_descending": "Prezzo: decrescente",
+      "created_ascending": "Data di creazione: crescente",
+      "created_descending": "Data di creazione: decrescente"
+    }
+  },
   "blocks": {
     "load_video": "Carica il video: {{ description }}",
     "sold_out": "Esaurito",
