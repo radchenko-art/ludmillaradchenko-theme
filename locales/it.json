@@ -119,6 +119,9 @@
     "open": "Apri"
   },
   "content": {
+    "about_person_contact":{
+      "message_placeholder": "Messaggio",
+    },
     "reviews": "recensioni",
     "no_results_found": "Nessun risultato trovato",
     "language": "Lingua",
