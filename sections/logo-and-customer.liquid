@@ -15,12 +15,12 @@
 
     {% for block in section.blocks %}
       {% case block.type %}
+        {% when 'region_selector' %}
+          {% render 'logo-and-customer-region-selector', block: block %}
         {% when 'logo_block' %}
           {% render 'logo-and-customer-logo-markup', block: block %}
         {% when 'customer_menu' %}
           {% render 'logo-and-customer-actions-markup', block: block %}
-        {% when 'region_selector' %}
-          {% render 'logo-and-customer-region-selector', block: block %}
       {% endcase %}
     {% endfor %}
   </div>
@@ -46,45 +46,50 @@
 
   .logo-and-customer__row {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: var(--gap-xl);
   }
 
-  /* Center logo: align to middle of container via grid */
+  /* One row: region + logo left group, customer actions pinned to the end */
+  .logo-and-customer__row .logo-and-customer__actions {
+    margin-inline-start: auto;
+    flex-shrink: 0;
+  }
+
+  .logo-and-customer__row .logo-and-customer__region {
+    flex-shrink: 0;
+  }
+
+  .logo-and-customer__row .logo-and-customer__logo {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  /* Center logo: region (left) | logo (center) | actions (right) — one row */
   .logo-and-customer__row:has(.logo-and-customer__logo--center) {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    justify-items: start;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: var(--gap-xl);
   }
 
   .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__logo--center {
-    justify-self: center;
     grid-column: 2;
+    justify-self: center;
   }
 
   .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions {
     grid-column: 3;
     justify-self: end;
+    margin-inline-start: 0;
   }
 
-  /* Center logo + region selector: four columns */
-  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) {
-    grid-template-columns: 1fr auto auto 1fr;
-  }
-
-  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__logo--center {
-    grid-column: 2;
-  }
-
-  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__region {
-    grid-column: 3;
-    justify-self: end;
-    margin-inline-end: var(--gap-md);
-  }
-
-  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__actions {
-    grid-column: 4;
+  .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__region {
+    grid-column: 1;
+    justify-self: start;
   }
 
   .logo-and-customer__region {
@@ -267,6 +272,8 @@
       min-height: 40px;
       z-index: 2;
       margin-inline-end: 0;
+      /* Do not reserve a grid track; burger stays in column 1 */
+      grid-column: unset;
     }
   }
 {% endstylesheet %}
@@ -280,26 +287,6 @@
     "groups": ["header"]
   },
   "blocks": [
-    {
-      "type": "logo_block",
-      "name": "Logo",
-      "settings": [
-        {
-          "type": "paragraph",
-          "content": "t:content.edit_logo_in_theme_settings"
-        },
-        {
-          "type": "select",
-          "id": "position",
-          "label": "Position",
-          "options": [
-            { "value": "left", "label": "t:options.left" },
-            { "value": "center", "label": "t:options.center" }
-          ],
-          "default": "left"
-        }
-      ]
-    },
     {
       "type": "region_selector",
       "name": "Store region",
@@ -377,6 +364,26 @@
             { "value": "1.125rem", "label": "18px" }
           ],
           "default": "0.875rem"
+        }
+      ]
+    },
+    {
+      "type": "logo_block",
+      "name": "Logo",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:content.edit_logo_in_theme_settings"
+        },
+        {
+          "type": "select",
+          "id": "position",
+          "label": "Position",
+          "options": [
+            { "value": "left", "label": "t:options.left" },
+            { "value": "center", "label": "t:options.center" }
+          ],
+          "default": "left"
         }
       ]
     },
@@ -562,12 +569,6 @@
     {
       "name": "Logo and customer",
       "blocks": {
-        "logo": {
-          "type": "logo_block",
-          "settings": {
-            "position": "left"
-          }
-        },
         "region_selector": {
           "type": "region_selector",
           "settings": {
@@ -579,6 +580,12 @@
             "accessibility_label": "Store region",
             "font": "heading",
             "font_size": "0.875rem"
+          }
+        },
+        "logo": {
+          "type": "logo_block",
+          "settings": {
+            "position": "left"
           }
         },
         "customer_menu": {
@@ -596,7 +603,7 @@
           }
         }
       },
-      "block_order": ["logo", "region_selector", "customer_menu"]
+      "block_order": ["region_selector", "logo", "customer_menu"]
     }
   ]
 }
