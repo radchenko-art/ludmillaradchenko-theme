@@ -14,12 +14,6 @@
     "logo_and_customer": {
       "type": "logo-and-customer",
       "blocks": {
-        "logo": {
-          "type": "logo_block",
-          "settings": {
-            "position": "center"
-          }
-        },
         "region_selector": {
           "type": "region_selector",
           "settings": {
@@ -31,6 +25,12 @@
             "accessibility_label": "Store region",
             "font": "heading",
             "font_size": "0.875rem"
+          }
+        },
+        "logo": {
+          "type": "logo_block",
+          "settings": {
+            "position": "center"
           }
         },
         "customer_menu": {
@@ -51,8 +51,8 @@
         }
       },
       "block_order": [
-        "logo",
         "region_selector",
+        "logo",
         "customer_menu"
       ],
       "name": "Logo and customer",
