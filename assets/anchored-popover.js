@@ -111,6 +111,15 @@ export class AnchoredPopoverComponent extends Component {
       popover.style.setProperty('top', `${topFromParent}px`);
       popover.style.setProperty('right', `${rightFromParent}px`);
       popover.style.removeProperty('left');
+    } else if (this.classList.contains('region-selector-popover')) {
+      const leftViewport = rect.left;
+      popover.style.setProperty('position', 'fixed', 'important');
+      popover.style.setProperty('inset', 'auto', 'important');
+      popover.style.setProperty('top', `${rect.bottom + gap}px`, 'important');
+      popover.style.setProperty('left', `${leftViewport}px`, 'important');
+      popover.style.setProperty('right', 'auto', 'important');
+      popover.style.setProperty('bottom', 'auto', 'important');
+      popover.style.setProperty('margin', '0', 'important');
     } else if (this.classList.contains('account-popover')) {
       const rightViewport = window.innerWidth - rect.right;
       popover.style.setProperty('position', 'fixed', 'important');
@@ -172,8 +181,8 @@ export class AnchoredPopoverComponent extends Component {
           this.#updatePosition();
         });
       }
-      // account-popover in modal: top layer → fixed + viewport coords; on scroll we update position
-      if (this.classList.contains('account-popover')) {
+      // Top-layer popovers: fixed + viewport coords; on scroll we follow the trigger
+      if (this.classList.contains('account-popover') || this.classList.contains('region-selector-popover')) {
         popover.addEventListener('beforetoggle', (event) => {
           const evt = /** @type {ToggleEvent} */ (event);
           if (evt.newState === 'open') {

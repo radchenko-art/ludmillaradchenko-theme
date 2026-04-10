@@ -15,6 +15,22 @@
 
     {% for block in section.blocks %}
       {% case block.type %}
+        {% when 'region_selector' %}
+          {% liquid
+            assign region_loc_font = 'heading'
+            assign region_loc_font_size = '0.875rem'
+            for cm in section.blocks
+              if cm.type == 'customer_menu'
+                assign region_loc_font = cm.settings.localization_font
+                assign region_loc_font_size = cm.settings.localization_font_size
+              endif
+            endfor
+          %}
+          {% render 'logo-and-customer-region-selector',
+            block: block,
+            localization_font: region_loc_font,
+            localization_font_size: region_loc_font_size
+          %}
         {% when 'logo_block' %}
           {% render 'logo-and-customer-logo-markup', block: block %}
         {% when 'customer_menu' %}
@@ -24,6 +40,18 @@
   </div>
 </div>
 
+{% liquid
+  assign load_region_selector_js = false
+  for b in section.blocks
+    if b.type == 'region_selector'
+      assign load_region_selector_js = true
+    endif
+  endfor
+%}
+{% if load_region_selector_js %}
+  <script src="{{ 'logo-and-customer-region-selector.js' | asset_url }}" defer></script>
+{% endif %}
+
 {% stylesheet %}
   .logo-and-customer {
     border-block-end: var(--border-bottom-width) solid var(--color-border);
@@ -32,26 +60,162 @@
 
   .logo-and-customer__row {
     display: flex;
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: var(--gap-xl);
   }
 
-  /* Center logo: align to middle of container via grid */
+  /* One row: region + logo left group, customer actions pinned to the end */
+  .logo-and-customer__row .logo-and-customer__actions {
+    margin-inline-start: auto;
+    flex-shrink: 0;
+  }
+
+  .logo-and-customer__row .logo-and-customer__region {
+    flex-shrink: 0;
+  }
+
+  .logo-and-customer__row .logo-and-customer__logo {
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  /* Center logo: region (left) | logo (center) | actions (right) — one row */
   .logo-and-customer__row:has(.logo-and-customer__logo--center) {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    justify-items: start;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    justify-items: stretch;
+    gap: var(--gap-xl);
   }
 
   .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__logo--center {
-    justify-self: center;
     grid-column: 2;
+    justify-self: center;
   }
 
   .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions {
     grid-column: 3;
     justify-self: end;
+    margin-inline-start: 0;
+  }
+
+  .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__region {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .logo-and-customer__region {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 992px) {
+    .logo-and-customer__region {
+      margin-left: 15px;
+    }
+  }
+
+  /* Anchored popover (same panel + carets as #account-popover in snippets/header-actions.liquid) */
+  .region-selector-popover {
+    position: relative;
+    --account-popover-min-width: 200px;
+  }
+
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button {
+    display: flex;
+    position: relative;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--menu-localization-font);
+    font-size: var(--menu-localization-font-size);
+    font-weight: var(--menu-top-level-font-weight);
+    padding-inline: var(--padding-2xs);
+    margin-inline: calc(-1 * var(--padding-2xs));
+    max-width: min(100%, 14rem);
+    box-shadow: none;
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+    text-align: start;
+  }
+
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button,
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button:hover {
+    box-shadow: none;
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-foreground);
+  }
+
+  .region-selector-popover .region-selector-popover__value {
+    white-space: nowrap;
+  }
+
+  .region-selector-popover .region-selector-popover__trigger .icon-caret {
+    height: var(--icon-size-xs);
+    width: var(--icon-size-xs);
+    flex-shrink: 0;
+    transition: transform var(--animation-speed) var(--animation-easing);
+    pointer-events: none;
+  }
+
+  .region-selector-popover:has([popover]:popover-open) .region-selector-popover__trigger .icon-caret svg {
+    transform: rotate(180deg);
+  }
+
+  .region-selector-popover .region-selector-popover__trigger:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground-rgb) / 0.35);
+    outline-offset: 2px;
+  }
+
+  /* Popover arrow under left edge (trigger is in the header start); account uses right: 1.25rem */
+  .region-selector-popover .account-popover__panel::before,
+  .region-selector-popover .account-popover__panel::after {
+    right: auto;
+    left: 1.25rem;
+  }
+
+  .region-selector-popover .region-selector-popover__nav {
+    padding: 0;
+  }
+
+  /* Mirror account-actions list rows (snippets/account-actions.liquid) if that stylesheet is absent */
+  .region-selector-popover .account-actions__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .region-selector-popover .account-actions__link.account-actions__row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    width: 100%;
+    padding: 0.313rem 1.125rem;
+    text-align: start;
+    text-decoration: none;
+    color: inherit;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    font-size: 9.75pt;
+  }
+
+  .region-selector-popover .account-actions__link.account-actions__row:hover {
+    color: var(--color-foreground);
+  }
+
+  .region-selector-popover .account-actions__link[aria-current='true'] {
+    font-weight: 600;
   }
 
   .logo-and-customer__logo {
@@ -189,6 +353,19 @@
       min-height: 40px;
       z-index: 2;
     }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__region {
+      position: absolute;
+      top: 0;
+      inset-inline-start: 48px;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      z-index: 2;
+      margin-inline-end: 0;
+      /* Do not reserve a grid track; burger stays in column 1 */
+      grid-column: unset;
+    }
   }
 {% endstylesheet %}
 
@@ -201,6 +378,61 @@
     "groups": ["header"]
   },
   "blocks": [
+    {
+      "type": "region_selector",
+      "name": "Store region",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Italy and UAE appear in a dropdown with flags. Choosing a region opens the same path on that domain. In the theme editor, changing the selection does not redirect."
+        },
+        {
+          "type": "text",
+          "id": "italy_store_url",
+          "label": "Italy store URL",
+          "default": "https://ludmillaradchenko.art"
+        },
+        {
+          "type": "text",
+          "id": "uae_store_url",
+          "label": "UAE store URL",
+          "default": "https://uae.ludmillaradchenko.art"
+        },
+        {
+          "type": "select",
+          "id": "fallback_region",
+          "label": "Default selection (preview / unknown host)",
+          "options": [
+            { "value": "italy", "label": "Italy" },
+            { "value": "uae", "label": "UAE" }
+          ],
+          "default": "uae"
+        },
+        {
+          "type": "text",
+          "id": "label_italy",
+          "label": "Italy label",
+          "default": "Italy"
+        },
+        {
+          "type": "text",
+          "id": "label_uae",
+          "label": "UAE label",
+          "default": "UAE"
+        },
+        {
+          "type": "text",
+          "id": "accessibility_label",
+          "label": "Accessibility label",
+          "default": "Store region"
+        },
+        {
+          "type": "paragraph",
+          "content": "Typography matches the Customer menu block → Localization (font and size)."
+        }
+      ]
+    },
     {
       "type": "logo_block",
       "name": "Logo",
@@ -403,6 +635,17 @@
     {
       "name": "Logo and customer",
       "blocks": {
+        "region_selector": {
+          "type": "region_selector",
+          "settings": {
+            "italy_store_url": "https://ludmillaradchenko.art",
+            "uae_store_url": "https://uae.ludmillaradchenko.art",
+            "fallback_region": "uae",
+            "label_italy": "Italy",
+            "label_uae": "UAE",
+            "accessibility_label": "Store region"
+          }
+        },
         "logo": {
           "type": "logo_block",
           "settings": {
@@ -424,7 +667,7 @@
           }
         }
       },
-      "block_order": ["logo", "customer_menu"]
+      "block_order": ["region_selector", "logo", "customer_menu"]
     }
   ]
 }

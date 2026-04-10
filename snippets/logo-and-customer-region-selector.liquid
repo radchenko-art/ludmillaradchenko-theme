@@ -1,0 +1,117 @@
+{% comment %}
+  Store region (Italy / UAE) as anchored popover — same panel pattern as #account-popover.
+  @param {object} block
+  @param {string} localization_font
+  @param {string} localization_font_size
+{% endcomment %}
+{% liquid
+  assign host_down = request.host | downcase
+  assign italy_origin = block.settings.italy_store_url | strip
+  assign uae_origin = block.settings.uae_store_url | strip
+  if italy_origin == blank
+    assign italy_origin = 'https://ludmillaradchenko.art'
+  endif
+  if uae_origin == blank
+    assign uae_origin = 'https://uae.ludmillaradchenko.art'
+  endif
+
+  assign italy_host = italy_origin | replace: 'https://', '' | replace: 'http://', '' | split: '/' | first | downcase
+  assign uae_host = uae_origin | replace: 'https://', '' | replace: 'http://', '' | split: '/' | first | downcase
+
+  assign uae_www = 'www.' | append: uae_host
+  assign italy_www = 'www.' | append: italy_host
+
+  assign current_region = block.settings.fallback_region
+  if host_down == uae_host or host_down == uae_www
+    assign current_region = 'uae'
+  elsif host_down == italy_host or host_down == italy_www
+    assign current_region = 'italy'
+  endif
+
+  assign loc_font = localization_font | default: 'heading'
+  assign loc_font_size = localization_font_size | default: '0.875rem'
+
+  assign localization_font_style = '--menu-localization-font: var(--font-[loc_font]--family); ' | replace: '[loc_font]', loc_font
+  assign localization_font_size_style = '--menu-localization-font-size: [loc_font_size]; ' | replace: '[loc_font_size]', loc_font_size
+
+  assign italy_label = block.settings.label_italy
+  if italy_label == blank
+    assign italy_label = 'Italy'
+  endif
+  assign uae_label = block.settings.label_uae
+  if uae_label == blank
+    assign uae_label = 'UAE'
+  endif
+
+  assign path_req = request.path | default: '/'
+
+  assign italy_href = italy_origin | append: path_req
+  assign uae_href = uae_origin | append: path_req
+
+  assign popover_id = 'StoreRegionPopover-' | append: block.id
+%}
+
+<div class="logo-and-customer__region" {{ block.shopify_attributes }}>
+  <anchored-popover-component
+    data-close-on-resize="true"
+    class="region-selector-popover"
+    data-region-selector-root
+    data-design-mode="{% if request.design_mode %}true{% else %}false{% endif %}"
+  >
+    <button
+      type="button"
+      class="region-selector-popover__trigger dropdown-localization__button localization-selector link button-unstyled"
+      style="{{ localization_font_style }} {{ localization_font_size_style }}"
+      ref="trigger"
+      popovertarget="{{ popover_id }}"
+      popovertargetaction="toggle"
+      aria-haspopup="dialog"
+      aria-label="{{ block.settings.accessibility_label | default: 'Store region' | escape }}"
+    >
+      <span class="region-selector-popover__value" aria-hidden="true">
+        {%- if current_region == 'uae' -%}
+          🇦🇪 {{ uae_label }}
+        {%- else -%}
+          🇮🇹 {{ italy_label }}
+        {%- endif -%}
+      </span>
+      <span class="svg-wrapper icon-caret" aria-hidden="true">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+    </button>
+
+    <div
+      id="{{ popover_id }}"
+      class="account-popover__panel details-content color-{{ settings.popover_color_scheme }}"
+      popover="auto"
+      ref="popover"
+    >
+      <nav class="region-selector-popover__nav" aria-label="{{ block.settings.accessibility_label | default: 'Store region' | escape }}">
+        <ul class="account-actions__list">
+          <li class="account-actions__list-item">
+            <a
+              href="{{ italy_href | escape }}"
+              class="account-actions__link account-actions__row region-selector-popover__link"
+              data-store-origin="{{ italy_origin | escape }}"
+              {% if current_region == 'italy' %}
+                aria-current="true"
+              {% endif %}
+            >
+              🇮🇹 {{ italy_label }}
+            </a>
+          </li>
+          <li class="account-actions__list-item">
+            <a
+              href="{{ uae_href | escape }}"
+              class="account-actions__link account-actions__row region-selector-popover__link"
+              data-store-origin="{{ uae_origin | escape }}"
+              {% if current_region == 'uae' %}
+                aria-current="true"
+              {% endif %}
+            >
+              🇦🇪 {{ uae_label }}
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </anchored-popover-component>
+</div>
