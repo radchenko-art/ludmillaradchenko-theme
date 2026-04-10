@@ -20,6 +20,19 @@
             "position": "center"
           }
         },
+        "region_selector": {
+          "type": "region_selector",
+          "settings": {
+            "italy_store_url": "https://ludmillaradchenko.art",
+            "uae_store_url": "https://uae.ludmillaradchenko.art",
+            "fallback_region": "italy",
+            "label_italy": "Italy",
+            "label_uae": "UAE",
+            "accessibility_label": "Store region",
+            "font": "heading",
+            "font_size": "0.875rem"
+          }
+        },
         "customer_menu": {
           "type": "customer_menu",
           "settings": {
@@ -39,6 +52,7 @@
       },
       "block_order": [
         "logo",
+        "region_selector",
         "customer_menu"
       ],
       "name": "Logo and customer",

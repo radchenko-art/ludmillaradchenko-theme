@@ -19,10 +19,24 @@
           {% render 'logo-and-customer-logo-markup', block: block %}
         {% when 'customer_menu' %}
           {% render 'logo-and-customer-actions-markup', block: block %}
+        {% when 'region_selector' %}
+          {% render 'logo-and-customer-region-selector', block: block %}
       {% endcase %}
     {% endfor %}
   </div>
 </div>
+
+{% liquid
+  assign load_region_selector_js = false
+  for b in section.blocks
+    if b.type == 'region_selector'
+      assign load_region_selector_js = true
+    endif
+  endfor
+%}
+{% if load_region_selector_js %}
+  <script src="{{ 'logo-and-customer-region-selector.js' | asset_url }}" defer></script>
+{% endif %}
 
 {% stylesheet %}
   .logo-and-customer {
@@ -52,6 +66,60 @@
   .logo-and-customer__row:has(.logo-and-customer__logo--center) .logo-and-customer__actions {
     grid-column: 3;
     justify-self: end;
+  }
+
+  /* Center logo + region selector: four columns */
+  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) {
+    grid-template-columns: 1fr auto auto 1fr;
+  }
+
+  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__logo--center {
+    grid-column: 2;
+  }
+
+  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__region {
+    grid-column: 3;
+    justify-self: end;
+    margin-inline-end: var(--gap-md);
+  }
+
+  .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__actions {
+    grid-column: 4;
+  }
+
+  .logo-and-customer__region {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-and-customer-region__select {
+    font-family: var(--logo-customer-region-font-family, var(--font-heading--family));
+    font-size: var(--logo-customer-region-font-size, 0.875rem);
+    font-weight: 500;
+    line-height: 1.2;
+    padding-block: 0.25rem;
+    padding-inline: 0.35rem 1.75rem;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    background-color: transparent;
+    color: var(--color-foreground);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='currentColor' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.15rem center;
+    background-size: 10px 6px;
+    max-width: min(100%, 14rem);
+    text-overflow: ellipsis;
+  }
+
+  .logo-and-customer-region__select:hover {
+    color: var(--color-foreground);
+  }
+
+  .logo-and-customer-region__select:focus {
+    outline: 2px solid rgb(var(--color-foreground-rgb) / 0.35);
+    outline-offset: 2px;
   }
 
   .logo-and-customer__logo {
@@ -189,6 +257,17 @@
       min-height: 40px;
       z-index: 2;
     }
+
+    .logo-and-customer__row:has(.logo-and-customer__logo--center):has(.logo-and-customer__region) .logo-and-customer__region {
+      position: absolute;
+      top: 0;
+      inset-inline-start: 48px;
+      display: flex;
+      align-items: center;
+      min-height: 40px;
+      z-index: 2;
+      margin-inline-end: 0;
+    }
   }
 {% endstylesheet %}
 
@@ -218,6 +297,86 @@
             { "value": "center", "label": "t:options.center" }
           ],
           "default": "left"
+        }
+      ]
+    },
+    {
+      "type": "region_selector",
+      "name": "Store region",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Italy and UAE appear in a dropdown with flags. Choosing a region opens the same path on that domain. In the theme editor, changing the selection does not redirect."
+        },
+        {
+          "type": "text",
+          "id": "italy_store_url",
+          "label": "Italy store URL",
+          "default": "https://ludmillaradchenko.art"
+        },
+        {
+          "type": "text",
+          "id": "uae_store_url",
+          "label": "UAE store URL",
+          "default": "https://uae.ludmillaradchenko.art"
+        },
+        {
+          "type": "select",
+          "id": "fallback_region",
+          "label": "Default selection (preview / unknown host)",
+          "options": [
+            { "value": "italy", "label": "Italy" },
+            { "value": "uae", "label": "UAE" }
+          ],
+          "default": "italy"
+        },
+        {
+          "type": "text",
+          "id": "label_italy",
+          "label": "Italy label",
+          "default": "Italy"
+        },
+        {
+          "type": "text",
+          "id": "label_uae",
+          "label": "UAE label",
+          "default": "UAE"
+        },
+        {
+          "type": "text",
+          "id": "accessibility_label",
+          "label": "Accessibility label",
+          "default": "Store region"
+        },
+        {
+          "type": "header",
+          "content": "Typography"
+        },
+        {
+          "type": "select",
+          "id": "font",
+          "label": "t:settings.font",
+          "options": [
+            { "value": "heading", "label": "t:options.heading" },
+            { "value": "subheading", "label": "t:options.subheading" },
+            { "value": "body", "label": "t:options.body" },
+            { "value": "accent", "label": "t:options.accent" }
+          ],
+          "default": "heading"
+        },
+        {
+          "type": "select",
+          "id": "font_size",
+          "label": "t:settings.size",
+          "options": [
+            { "value": "0.625rem", "label": "10px" },
+            { "value": "0.75rem", "label": "12px" },
+            { "value": "0.875rem", "label": "14px" },
+            { "value": "1rem", "label": "16px" },
+            { "value": "1.125rem", "label": "18px" }
+          ],
+          "default": "0.875rem"
         }
       ]
     },
@@ -409,6 +568,19 @@
             "position": "left"
           }
         },
+        "region_selector": {
+          "type": "region_selector",
+          "settings": {
+            "italy_store_url": "https://ludmillaradchenko.art",
+            "uae_store_url": "https://uae.ludmillaradchenko.art",
+            "fallback_region": "italy",
+            "label_italy": "Italy",
+            "label_uae": "UAE",
+            "accessibility_label": "Store region",
+            "font": "heading",
+            "font_size": "0.875rem"
+          }
+        },
         "customer_menu": {
           "type": "customer_menu",
           "settings": {
@@ -424,7 +596,7 @@
           }
         }
       },
-      "block_order": ["logo", "customer_menu"]
+      "block_order": ["logo", "region_selector", "customer_menu"]
     }
   ]
 }
