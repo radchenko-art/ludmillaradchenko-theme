@@ -111,8 +111,13 @@
     align-items: center;
   }
 
-  /* Match header Customer menu → localization dropdown trigger (sections/header.liquid) */
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button {
+  /* Anchored popover (same panel + carets as #account-popover in snippets/header-actions.liquid) */
+  .region-selector-popover {
+    position: relative;
+    --account-popover-min-width: 200px;
+  }
+
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button {
     display: flex;
     position: relative;
     align-items: center;
@@ -131,15 +136,15 @@
     text-align: start;
   }
 
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button,
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button:hover {
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button,
+  .region-selector-popover .region-selector-popover__trigger.dropdown-localization__button:hover {
     box-shadow: none;
     background-color: transparent;
     border-color: transparent;
     color: var(--color-foreground);
   }
 
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger .icon-caret {
+  .region-selector-popover .region-selector-popover__trigger .icon-caret {
     height: var(--icon-size-xs);
     width: var(--icon-size-xs);
     flex-shrink: 0;
@@ -147,31 +152,59 @@
     pointer-events: none;
   }
 
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__select {
-    flex: 1;
-    min-width: 0;
-    margin: 0;
-    padding: 0;
-    border: none;
-    appearance: none;
-    background-color: transparent;
-    color: inherit;
-    font: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-    cursor: pointer;
-    text-overflow: ellipsis;
+  .region-selector-popover:has([popover]:popover-open) .region-selector-popover__trigger .icon-caret svg {
+    transform: rotate(180deg);
   }
 
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__select:focus {
-    outline: none;
-  }
-
-  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger:focus-within {
+  .region-selector-popover .region-selector-popover__trigger:focus-visible {
     outline: 2px solid rgb(var(--color-foreground-rgb) / 0.35);
     outline-offset: 2px;
+  }
+
+  /* Popover arrow under left edge (trigger is in the header start); account uses right: 1.25rem */
+  .region-selector-popover .account-popover__panel::before,
+  .region-selector-popover .account-popover__panel::after {
+    right: auto;
+    left: 1.25rem;
+  }
+
+  .region-selector-popover .region-selector-popover__nav {
+    padding: 0;
+  }
+
+  /* Mirror account-actions list rows (snippets/account-actions.liquid) if that stylesheet is absent */
+  .region-selector-popover .account-actions__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .region-selector-popover .account-actions__link.account-actions__row {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    width: 100%;
+    padding: 0.313rem 1.125rem;
+    text-align: start;
+    text-decoration: none;
+    color: inherit;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    font-size: 9.75pt;
+  }
+
+  .region-selector-popover .account-actions__link.account-actions__row:hover {
+    color: var(--color-foreground);
+  }
+
+  .region-selector-popover .account-actions__link[aria-current='true'] {
+    font-weight: 600;
   }
 
   .logo-and-customer__logo {

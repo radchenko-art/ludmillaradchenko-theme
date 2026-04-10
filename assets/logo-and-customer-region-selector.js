@@ -1,21 +1,23 @@
 /**
- * Cross-domain store region switcher (Italy / UAE).
- * Preserves path, query string, and hash on redirect.
+ * Cross-domain store region: same-path redirect with query + hash.
+ * Theme editor: block navigation; popover still toggles via native popover.
  */
 document.addEventListener(
-  'change',
+  'click',
   (event) => {
-    const select = event.target?.closest?.('[data-logo-customer-region-select]');
-    if (!select || !(select instanceof HTMLSelectElement)) return;
+    const link = event.target?.closest?.('.region-selector-popover__link');
+    if (!link || !(link instanceof HTMLAnchorElement)) return;
 
-    if (select.dataset.designMode === 'true') {
-      const keep = select.dataset.currentValue;
-      if (keep) select.value = keep;
+    const root = link.closest('[data-region-selector-root]');
+    if (root instanceof HTMLElement && root.dataset.designMode === 'true') {
+      event.preventDefault();
       return;
     }
 
-    const origin = select.value;
+    const origin = link.dataset.storeOrigin;
     if (!origin) return;
+
+    event.preventDefault();
 
     try {
       const url = new URL(origin);
@@ -24,7 +26,7 @@ document.addEventListener(
       url.hash = window.location.hash;
       window.location.assign(url.toString());
     } catch {
-      window.location.assign(origin);
+      window.location.assign(link.href);
     }
   },
   false
