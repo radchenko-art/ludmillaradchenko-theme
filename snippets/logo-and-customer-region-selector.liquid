@@ -1,6 +1,9 @@
 {% comment %}
   Renders Italy / UAE selector that redirects to the chosen storefront origin (same path).
+  Styling matches Customer menu localization trigger (dropdown-localization__button).
   @param {object} block - section block (region_selector)
+  @param {string} localization_font - same values as Customer menu → Localization → Font
+  @param {string} localization_font_size - same as Customer menu → Localization → Size
 {% endcomment %}
 {% liquid
   assign host_down = request.host | downcase
@@ -26,15 +29,11 @@
     assign current_region = 'italy'
   endif
 
-  assign font_family = '--font-heading--family'
-  case block.settings.font
-    when 'subheading'
-      assign font_family = '--font-subheading--family'
-    when 'body'
-      assign font_family = '--font-body--family'
-    when 'accent'
-      assign font_family = '--font-accent--family'
-  endcase
+  assign loc_font = localization_font | default: 'heading'
+  assign loc_font_size = localization_font_size | default: '0.875rem'
+
+  assign localization_font_style = '--menu-localization-font: var(--font-[loc_font]--family); ' | replace: '[loc_font]', loc_font
+  assign localization_font_size_style = '--menu-localization-font-size: [loc_font_size]; ' | replace: '[loc_font_size]', loc_font_size
 
   assign italy_label = block.settings.label_italy
   if italy_label == blank
@@ -47,35 +46,40 @@
 %}
 
 <div
-  class="logo-and-customer__region"
+  class="logo-and-customer__region dropdown-localization"
   {{ block.shopify_attributes }}
 >
   <label class="visually-hidden" for="LogoCustomerRegion-{{ block.id }}">
     {{- block.settings.accessibility_label | default: 'Store region' -}}
   </label>
-  <select
-    id="LogoCustomerRegion-{{ block.id }}"
-    class="logo-and-customer-region__select"
-    data-logo-customer-region-select
-    data-design-mode="{% if request.design_mode %}true{% else %}false{% endif %}"
-    data-current-value="{% if current_region == 'uae' %}{{ uae_origin }}{% else %}{{ italy_origin }}{% endif %}"
-    style="--logo-customer-region-font-family: var({{ font_family }}); --logo-customer-region-font-size: {{ block.settings.font_size }};"
+  <div
+    class="logo-and-customer-region__trigger dropdown-localization__button localization-selector link"
+    style="{{ localization_font_style }} {{ localization_font_size_style }}"
   >
-    <option
-      value="{{ italy_origin | escape }}"
-      {% if current_region == 'italy' %}
-        selected
-      {% endif %}
+    <select
+      id="LogoCustomerRegion-{{ block.id }}"
+      class="logo-and-customer-region__select"
+      data-logo-customer-region-select
+      data-design-mode="{% if request.design_mode %}true{% else %}false{% endif %}"
+      data-current-value="{% if current_region == 'uae' %}{{ uae_origin }}{% else %}{{ italy_origin }}{% endif %}"
     >
-      🇮🇹 {{ italy_label }}
-    </option>
-    <option
-      value="{{ uae_origin | escape }}"
-      {% if current_region == 'uae' %}
-        selected
-      {% endif %}
-    >
-      🇦🇪 {{ uae_label }}
-    </option>
-  </select>
+      <option
+        value="{{ italy_origin | escape }}"
+        {% if current_region == 'italy' %}
+          selected
+        {% endif %}
+      >
+        🇮🇹 {{ italy_label }}
+      </option>
+      <option
+        value="{{ uae_origin | escape }}"
+        {% if current_region == 'uae' %}
+          selected
+        {% endif %}
+      >
+        🇦🇪 {{ uae_label }}
+      </option>
+    </select>
+    <span class="svg-wrapper icon-caret" aria-hidden="true">{{ 'icon-caret.svg' | inline_asset_content }}</span>
+  </div>
 </div>

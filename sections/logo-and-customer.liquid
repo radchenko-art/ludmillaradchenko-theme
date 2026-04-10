@@ -16,7 +16,21 @@
     {% for block in section.blocks %}
       {% case block.type %}
         {% when 'region_selector' %}
-          {% render 'logo-and-customer-region-selector', block: block %}
+          {% liquid
+            assign region_loc_font = 'heading'
+            assign region_loc_font_size = '0.875rem'
+            for cm in section.blocks
+              if cm.type == 'customer_menu'
+                assign region_loc_font = cm.settings.localization_font
+                assign region_loc_font_size = cm.settings.localization_font_size
+              endif
+            endfor
+          %}
+          {% render 'logo-and-customer-region-selector',
+            block: block,
+            localization_font: region_loc_font,
+            localization_font_size: region_loc_font_size
+          %}
         {% when 'logo_block' %}
           {% render 'logo-and-customer-logo-markup', block: block %}
         {% when 'customer_menu' %}
@@ -97,32 +111,65 @@
     align-items: center;
   }
 
-  .logo-and-customer-region__select {
-    font-family: var(--logo-customer-region-font-family, var(--font-heading--family));
-    font-size: var(--logo-customer-region-font-size, 0.875rem);
-    font-weight: 500;
-    line-height: 1.2;
-    padding-block: 0.25rem;
-    padding-inline: 0.35rem 1.75rem;
-    margin: 0;
-    border: none;
+  /* Match header Customer menu → localization dropdown trigger (sections/header.liquid) */
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button {
+    display: flex;
+    position: relative;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--menu-localization-font);
+    font-size: var(--menu-localization-font-size);
+    font-weight: var(--menu-top-level-font-weight);
+    padding-inline: var(--padding-2xs);
+    margin-inline: calc(-1 * var(--padding-2xs));
+    max-width: min(100%, 14rem);
+    box-shadow: none;
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-foreground);
     cursor: pointer;
+    text-align: start;
+  }
+
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button,
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger.dropdown-localization__button:hover {
+    box-shadow: none;
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--color-foreground);
+  }
+
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger .icon-caret {
+    height: var(--icon-size-xs);
+    width: var(--icon-size-xs);
+    flex-shrink: 0;
+    transition: transform var(--animation-speed) var(--animation-easing);
+    pointer-events: none;
+  }
+
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__select {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
     appearance: none;
     background-color: transparent;
-    color: var(--color-foreground);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='currentColor' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.15rem center;
-    background-size: 10px 6px;
-    max-width: min(100%, 14rem);
+    color: inherit;
+    font: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    cursor: pointer;
     text-overflow: ellipsis;
   }
 
-  .logo-and-customer-region__select:hover {
-    color: var(--color-foreground);
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__select:focus {
+    outline: none;
   }
 
-  .logo-and-customer-region__select:focus {
+  .logo-and-customer__region.dropdown-localization .logo-and-customer-region__trigger:focus-within {
     outline: 2px solid rgb(var(--color-foreground-rgb) / 0.35);
     outline-offset: 2px;
   }
@@ -337,33 +384,8 @@
           "default": "Store region"
         },
         {
-          "type": "header",
-          "content": "Typography"
-        },
-        {
-          "type": "select",
-          "id": "font",
-          "label": "t:settings.font",
-          "options": [
-            { "value": "heading", "label": "t:options.heading" },
-            { "value": "subheading", "label": "t:options.subheading" },
-            { "value": "body", "label": "t:options.body" },
-            { "value": "accent", "label": "t:options.accent" }
-          ],
-          "default": "heading"
-        },
-        {
-          "type": "select",
-          "id": "font_size",
-          "label": "t:settings.size",
-          "options": [
-            { "value": "0.625rem", "label": "10px" },
-            { "value": "0.75rem", "label": "12px" },
-            { "value": "0.875rem", "label": "14px" },
-            { "value": "1rem", "label": "16px" },
-            { "value": "1.125rem", "label": "18px" }
-          ],
-          "default": "0.875rem"
+          "type": "paragraph",
+          "content": "Typography matches the Customer menu block → Localization (font and size)."
         }
       ]
     },
@@ -577,9 +599,7 @@
             "fallback_region": "italy",
             "label_italy": "Italy",
             "label_uae": "UAE",
-            "accessibility_label": "Store region",
-            "font": "heading",
-            "font_size": "0.875rem"
+            "accessibility_label": "Store region"
           }
         },
         "logo": {

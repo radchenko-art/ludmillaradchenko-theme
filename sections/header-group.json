@@ -22,9 +22,7 @@
             "fallback_region": "italy",
             "label_italy": "Italy",
             "label_uae": "UAE",
-            "accessibility_label": "Store region",
-            "font": "heading",
-            "font_size": "0.875rem"
+            "accessibility_label": "Store region"
           }
         },
         "logo": {
