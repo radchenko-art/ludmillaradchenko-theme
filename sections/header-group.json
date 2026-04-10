@@ -27,7 +27,7 @@
             "account_label": "IL MIO ACCOUNT",
             "account_menu_behavior": "modal",
             "show_search": true,
-            "show_country": true,
+            "show_country": false,
             "country_selector_style": false,
             "show_language": true,
             "localization_font": "heading",
