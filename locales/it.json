@@ -90,6 +90,7 @@
     "slideshow": "Presentazione"
   },
   "actions": {
+    "sign_in_with_shop": "Sign In with Shop",
     "sort_by": "Ordina per",
     "add_to_cart": "Aggiungi al carrello",
     "clear_all": "Cancella tutto",
