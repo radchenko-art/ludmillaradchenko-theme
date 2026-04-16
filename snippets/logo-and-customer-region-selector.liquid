@@ -90,6 +90,7 @@
             <a
               href="{{ italy_href | escape }}"
               class="account-actions__link account-actions__row region-selector-popover__link"
+              data-store-region="italy"
               data-store-origin="{{ italy_origin | escape }}"
               {% if current_region == 'italy' %}
                 aria-current="true"
@@ -102,6 +103,7 @@
             <a
               href="{{ uae_href | escape }}"
               class="account-actions__link account-actions__row region-selector-popover__link"
+              data-store-region="uae"
               data-store-origin="{{ uae_origin | escape }}"
               {% if current_region == 'uae' %}
                 aria-current="true"

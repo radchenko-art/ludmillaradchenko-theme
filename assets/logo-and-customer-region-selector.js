@@ -1,5 +1,6 @@
 /**
  * Cross-domain store region: same-path redirect with query + hash.
+ * Sets an override flag in localStorage for 2 hours to prevent geo-redirect loops.
  * Theme editor: block navigation; popover still toggles via native popover.
  */
 document.addEventListener(
@@ -18,6 +19,15 @@ document.addEventListener(
     if (!origin) return;
 
     event.preventDefault();
+
+    // Persist explicit choice for 2 hours.
+    try {
+      const region = link.dataset.storeRegion;
+      const expiresAt = Date.now() + 2 * 60 * 60 * 1000;
+      if (region === 'italy' || region === 'uae') {
+        window.localStorage.setItem('lr_preferred_store', JSON.stringify({ region, expiresAt }));
+      }
+    } catch (_) {}
 
     try {
       const url = new URL(origin);

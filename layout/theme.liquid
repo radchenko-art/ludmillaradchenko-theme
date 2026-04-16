@@ -25,13 +25,53 @@
     {% endif %}
 
     <script>
-      fetch('https://ipapi.co/json/')
-          .then(r => r.json())
-          .then(d => {
-              if (d.country_code === 'AE') {
-                  window.location.href = 'https://uae.ludmillaradchenko.art';
+      (function () {
+        var OVERRIDE_KEY = 'lr_preferred_store';
+        var UAE_ORIGIN = 'https://uae.ludmillaradchenko.art';
+
+        function getOverride() {
+          try {
+            var raw = window.localStorage.getItem(OVERRIDE_KEY);
+            if (!raw) return null;
+            var parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+              window.localStorage.removeItem(OVERRIDE_KEY);
+              return null;
+            }
+            return parsed; // { region: 'italy'|'uae', expiresAt: number }
+          } catch (e) {
+            return null;
+          }
+        }
+
+        // Respect explicit user choice for 2 hours (set by the region switcher).
+        var override = getOverride();
+        if (override && override.region) return;
+
+        // Avoid redirect loops / no-op redirects when already on UAE domain.
+        try {
+          var host = window.location.hostname.toLowerCase();
+          if (host === 'uae.ludmillaradchenko.art' || host === 'www.uae.ludmillaradchenko.art') return;
+        } catch (e) {}
+
+        fetch('https://ipapi.co/json/')
+          .then(function (r) { return r.json(); })
+          .then(function (d) {
+            if (d && d.country_code === 'AE') {
+              try {
+                var url = new URL(UAE_ORIGIN);
+                url.pathname = window.location.pathname;
+                url.search = window.location.search;
+                url.hash = window.location.hash;
+                window.location.assign(url.toString());
+              } catch (e) {
+                window.location.assign(UAE_ORIGIN);
               }
-          });
+            }
+          })
+          .catch(function () {});
+      })();
     </script>
 
     {%- render 'meta-tags' -%}
