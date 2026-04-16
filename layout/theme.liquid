@@ -24,6 +24,16 @@
       >
     {% endif %}
 
+    <script>
+      fetch('https://ipapi.co/json/')
+          .then(r => r.json())
+          .then(d => {
+              if (d.country_code === 'AE') {
+                  window.location.href = 'https://uae.ludmillaradchenko.art';
+              }
+          });
+    </script>
+
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
@@ -101,15 +111,6 @@
           headerComponent.dataset.menuStyle = isMobileHeader ? 'drawer' : 'menu';
         }
       })();
-    </script>
-        <script>
-        fetch('https://ipapi.co/json/')
-            .then(r => r.json())
-            .then(d => {
-                if (d.country_code === 'AE') {
-                    window.location.href = 'https://uae.ludmillaradchenko.art';
-                }
-            });
     </script>
 
     <main
