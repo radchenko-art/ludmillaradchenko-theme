@@ -239,7 +239,7 @@
             {%- assign ext = filename | split: '.' | last -%}
             {%- assign suffix = '.' | append: ext -%}
             {%- assign name_only = filename | remove: suffix -%}
-            {%- assign link_text = name_only | replace: '-', ' ' -%}
+            {%- assign link_text = name_only | replace: '-', ' ' | replace: '_', ' ' -%}
             <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
           {%- endif -%}
         {%- endfor -%}
