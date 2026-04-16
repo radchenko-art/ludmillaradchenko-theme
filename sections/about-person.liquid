@@ -219,28 +219,30 @@
 
     {%- assign download_files = page.metafields.custom.download_files.value -%}
     {%- if download_files != blank -%}
-      <div class="page-content__downloads">
+      {%- capture download_urls -%}
         {%- if download_files.url != blank -%}
-          {%- assign file_url = download_files.url -%}
-          {%- assign filename = file_url | split: '?' | first | split: '/' | last -%}
-          {%- assign ext = filename | split: '.' | last -%}
-          {%- assign suffix = '.' | append: ext -%}
-          {%- assign name_only = filename | remove: suffix -%}
-          {%- assign link_text = name_only | replace: '-', ' ' | prepend: 'Download ' -%}
-          <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
+          {{- download_files.url -}}|||
         {%- else -%}
           {%- for file in download_files -%}
             {%- assign file_url = file.url | default: file -%}
-            {%- if file_url != blank -%}
-              {%- assign filename = file_url | split: '?' | first | split: '/' | last -%}
-              {%- assign ext = filename | split: '.' | last -%}
-              {%- assign suffix = '.' | append: ext -%}
-              {%- assign name_only = filename | remove: suffix -%}
-              {%- assign link_text = name_only | replace: '-', ' ' | prepend: 'Download ' -%}
-              <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
-            {%- endif -%}
+            {%- if file_url != blank -%}{{- file_url -}}|||{%- endif -%}
           {%- endfor -%}
         {%- endif -%}
+      {%- endcapture -%}
+
+      {%- assign download_urls_array = download_urls | split: '|||' -%}
+      <div class="page-content__downloads">
+        {%- for file_url in download_urls_array -%}
+          {%- assign file_url = file_url | strip -%}
+          {%- if file_url != blank -%}
+            {%- assign filename = file_url | split: '?' | first | split: '/' | last -%}
+            {%- assign ext = filename | split: '.' | last -%}
+            {%- assign suffix = '.' | append: ext -%}
+            {%- assign name_only = filename | remove: suffix -%}
+            {%- assign link_text = name_only | replace: '-', ' ' -%}
+            <a href="{{ file_url }}" class="page-content__download-link" download>{{ link_text }}</a>
+          {%- endif -%}
+        {%- endfor -%}
       </div>
     {%- endif -%}
     </div>
@@ -355,7 +357,11 @@
 
   .page-content__downloads {
     margin-top: 2rem;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .page-content__download-link {
@@ -383,8 +389,8 @@
     font-weight: 500;
   }
 
-  .page-content__download-link + .page-content__download-link {
-    margin-left: 1rem;
+  .page-content__download-link {
+    white-space: nowrap;
   }
 
   .page-content__about-special .page-content__column--subheading {
