@@ -28,6 +28,7 @@
       (function () {
         var OVERRIDE_KEY = 'lr_preferred_store';
         var UAE_ORIGIN = 'https://uae.ludmillaradchenko.art';
+        var UAE_HOME = UAE_ORIGIN.replace(/\/$/, '') + '/';
 
         /** Shared across ludmillaradchenko.art and *.ludmillaradchenko.art (localStorage is per-host). */
         function getSharedCookieDomain() {
@@ -41,15 +42,19 @@
         }
 
         function readCookie(name) {
-          var parts = ('; ' + document.cookie).split('; ' + name + '=');
-          if (parts.length < 2) return null;
-          var value = parts.pop().split(';').shift();
-          if (value == null || value === '') return null;
-          try {
-            return decodeURIComponent(value);
-          } catch (e) {
-            return value;
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var part = cookies[i].replace(/^\s+/, '');
+            if (part.indexOf(name + '=') !== 0) continue;
+            var value = part.substring(name.length + 1);
+            if (value === '') return null;
+            try {
+              return decodeURIComponent(value);
+            } catch (e) {
+              return value;
+            }
           }
+          return null;
         }
 
         function clearOverride() {
@@ -99,21 +104,41 @@
           if (host === 'uae.ludmillaradchenko.art' || host === 'www.uae.ludmillaradchenko.art') return;
         } catch (e) {}
 
-        fetch('https://ipapi.co/json/')
-          .then(function (r) { return r.json(); })
-          .then(function (d) {
-            if (d && d.country_code === 'AE') {
-              try {
-                var url = new URL(UAE_ORIGIN);
-                url.pathname = window.location.pathname;
-                url.search = window.location.search;
-                url.hash = window.location.hash;
-                window.location.assign(url.toString());
-              } catch (e) {
-                window.location.assign(UAE_ORIGIN);
-              }
-            }
+        function redirectToUaeIfAe(countryCode) {
+          if (!countryCode || String(countryCode).toUpperCase() !== 'AE') return;
+          window.location.assign(UAE_HOME);
+        }
+
+        function fetchCountryCodePrimary() {
+          return fetch('https://ipapi.co/json/')
+            .then(function (r) {
+              if (!r.ok) throw new Error('ipapi_http');
+              return r.json();
+            })
+            .then(function (d) {
+              if (d && d.error) throw new Error('ipapi_error');
+              if (d && d.country_code) return String(d.country_code).toUpperCase();
+              throw new Error('ipapi_no_code');
+            });
+        }
+
+        function fetchCountryCodeFallback() {
+          return fetch('https://get.geojs.io/v1/ip/country.json')
+            .then(function (r) {
+              if (!r.ok) throw new Error('geojs_http');
+              return r.json();
+            })
+            .then(function (d) {
+              if (d && d.country) return String(d.country).toUpperCase();
+              throw new Error('geojs_no_code');
+            });
+        }
+
+        fetchCountryCodePrimary()
+          .catch(function () {
+            return fetchCountryCodeFallback();
           })
+          .then(redirectToUaeIfAe)
           .catch(function () {});
       })();
     </script>
