@@ -24,6 +24,125 @@
       >
     {% endif %}
 
+    <script>
+      (function () {
+        var OVERRIDE_KEY = 'lr_preferred_store';
+        var UAE_ORIGIN = 'https://uae.ludmillaradchenko.art';
+        var UAE_HOME = UAE_ORIGIN.replace(/\/$/, '') + '/';
+
+        /** Shared across ludmillaradchenko.art and *.ludmillaradchenko.art (localStorage is per-host). */
+        function getSharedCookieDomain() {
+          try {
+            var host = window.location.hostname.toLowerCase();
+            if (host === 'ludmillaradchenko.art' || host.endsWith('.ludmillaradchenko.art')) {
+              return '.ludmillaradchenko.art';
+            }
+          } catch (e) {}
+          return '';
+        }
+
+        function readCookie(name) {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var part = cookies[i].replace(/^\s+/, '');
+            if (part.indexOf(name + '=') !== 0) continue;
+            var value = part.substring(name.length + 1);
+            if (value === '') return null;
+            try {
+              return decodeURIComponent(value);
+            } catch (e) {
+              return value;
+            }
+          }
+          return null;
+        }
+
+        function clearOverride() {
+          try {
+            window.localStorage.removeItem(OVERRIDE_KEY);
+          } catch (e) {}
+          var base = OVERRIDE_KEY + '=; path=/; max-age=0';
+          document.cookie = base;
+          var shared = getSharedCookieDomain();
+          if (shared) document.cookie = base + '; domain=' + shared;
+        }
+
+        function getOverride() {
+          var parsed = null;
+          var rawCookie = readCookie(OVERRIDE_KEY);
+          if (rawCookie) {
+            try {
+              parsed = JSON.parse(rawCookie);
+            } catch (e) {
+              parsed = null;
+            }
+          }
+          if (!parsed || typeof parsed !== 'object') {
+            try {
+              var rawLs = window.localStorage.getItem(OVERRIDE_KEY);
+              if (rawLs) parsed = JSON.parse(rawLs);
+            } catch (e) {
+              parsed = null;
+            }
+          }
+          if (!parsed || typeof parsed !== 'object') return null;
+          if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+            clearOverride();
+            return null;
+          }
+          if (!parsed.region) return null;
+          return parsed; // { region: 'italy'|'uae', expiresAt: number }
+        }
+
+        // Respect explicit user choice for 2 hours (set by the region switcher: cookie + localStorage).
+        var override = getOverride();
+        if (override && override.region) return;
+
+        // Avoid redirect loops / no-op redirects when already on UAE domain.
+        try {
+          var host = window.location.hostname.toLowerCase();
+          if (host === 'uae.ludmillaradchenko.art' || host === 'www.uae.ludmillaradchenko.art') return;
+        } catch (e) {}
+
+        function redirectToUaeIfAe(countryCode) {
+          if (!countryCode || String(countryCode).toUpperCase() !== 'AE') return;
+          window.location.assign(UAE_HOME);
+        }
+
+        function fetchCountryCodePrimary() {
+          return fetch('https://ipapi.co/json/')
+            .then(function (r) {
+              if (!r.ok) throw new Error('ipapi_http');
+              return r.json();
+            })
+            .then(function (d) {
+              if (d && d.error) throw new Error('ipapi_error');
+              if (d && d.country_code) return String(d.country_code).toUpperCase();
+              throw new Error('ipapi_no_code');
+            });
+        }
+
+        function fetchCountryCodeFallback() {
+          return fetch('https://get.geojs.io/v1/ip/country.json')
+            .then(function (r) {
+              if (!r.ok) throw new Error('geojs_http');
+              return r.json();
+            })
+            .then(function (d) {
+              if (d && d.country) return String(d.country).toUpperCase();
+              throw new Error('geojs_no_code');
+            });
+        }
+
+        fetchCountryCodePrimary()
+          .catch(function () {
+            return fetchCountryCodeFallback();
+          })
+          .then(redirectToUaeIfAe)
+          .catch(function () {});
+      })();
+    </script>
+
     {%- render 'meta-tags' -%}
     {%- render 'stylesheets' -%}
     {%- render 'fonts' -%}
