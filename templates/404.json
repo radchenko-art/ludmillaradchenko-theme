@@ -6,7 +6,8 @@
  * or related systems. Please exercise caution as any changes
  * made to this file may be overwritten.
  * ------------------------------------------------------------
- */{
+ */
+{
   "sections": {
     "main": {
       "type": "main-404",
@@ -185,7 +186,7 @@
               "type": "_product-card-gallery",
               "name": "t:names.product_card_media",
               "settings": {
-                "image_ratio": "adapt",
+                "image_ratio": "square",
                 "border": "none",
                 "border_width": 1,
                 "border_opacity": 100,
@@ -201,6 +202,7 @@
               "type": "product-title",
               "name": "t:names.product_title",
               "settings": {
+                "truncate_30": false,
                 "width": "100%",
                 "max_width": "normal",
                 "alignment": "left",
@@ -229,6 +231,7 @@
                 "show_sale_price_first": true,
                 "show_installments": false,
                 "show_tax_info": false,
+                "tax_info": "",
                 "type_preset": "h6",
                 "width": "100%",
                 "alignment": "left",
