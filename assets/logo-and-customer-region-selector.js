@@ -1,8 +1,19 @@
 /**
  * Cross-domain store region: same-path redirect with query + hash.
- * Sets an override flag in localStorage for 2 hours to prevent geo-redirect loops.
+ * Sets an override for 2 hours (cookie + localStorage) to prevent geo-redirect loops.
+ * Cookie uses domain=.ludmillaradchenko.art so Italy and UAE subdomains share it (localStorage does not).
  * Theme editor: block navigation; popover still toggles via native popover.
  */
+function lrGetSharedCookieDomain() {
+  try {
+    const host = window.location.hostname.toLowerCase();
+    if (host === 'ludmillaradchenko.art' || host.endsWith('.ludmillaradchenko.art')) {
+      return '.ludmillaradchenko.art';
+    }
+  } catch (_) {}
+  return '';
+}
+
 document.addEventListener(
   'click',
   (event) => {
@@ -20,12 +31,21 @@ document.addEventListener(
 
     event.preventDefault();
 
-    // Persist explicit choice for 2 hours.
+    // Persist explicit choice for 2 hours (cookie is readable on both storefront hosts).
     try {
       const region = link.dataset.storeRegion;
       const expiresAt = Date.now() + 2 * 60 * 60 * 1000;
       if (region === 'italy' || region === 'uae') {
-        window.localStorage.setItem('lr_preferred_store', JSON.stringify({ region, expiresAt }));
+        const payload = JSON.stringify({ region, expiresAt });
+        try {
+          window.localStorage.setItem('lr_preferred_store', payload);
+        } catch (_) {}
+        const maxAge = 7200;
+        const sharedDomain = lrGetSharedCookieDomain();
+        let cookie = `lr_preferred_store=${encodeURIComponent(payload)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+        if (sharedDomain) cookie += `; domain=${sharedDomain}`;
+        if (window.location.protocol === 'https:') cookie += '; Secure';
+        document.cookie = cookie;
       }
     } catch (_) {}
 

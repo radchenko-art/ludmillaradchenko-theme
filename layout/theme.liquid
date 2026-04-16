@@ -29,23 +29,67 @@
         var OVERRIDE_KEY = 'lr_preferred_store';
         var UAE_ORIGIN = 'https://uae.ludmillaradchenko.art';
 
-        function getOverride() {
+        /** Shared across ludmillaradchenko.art and *.ludmillaradchenko.art (localStorage is per-host). */
+        function getSharedCookieDomain() {
           try {
-            var raw = window.localStorage.getItem(OVERRIDE_KEY);
-            if (!raw) return null;
-            var parsed = JSON.parse(raw);
-            if (!parsed || typeof parsed !== 'object') return null;
-            if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
-              window.localStorage.removeItem(OVERRIDE_KEY);
-              return null;
+            var host = window.location.hostname.toLowerCase();
+            if (host === 'ludmillaradchenko.art' || host.endsWith('.ludmillaradchenko.art')) {
+              return '.ludmillaradchenko.art';
             }
-            return parsed; // { region: 'italy'|'uae', expiresAt: number }
+          } catch (e) {}
+          return '';
+        }
+
+        function readCookie(name) {
+          var parts = ('; ' + document.cookie).split('; ' + name + '=');
+          if (parts.length < 2) return null;
+          var value = parts.pop().split(';').shift();
+          if (value == null || value === '') return null;
+          try {
+            return decodeURIComponent(value);
           } catch (e) {
-            return null;
+            return value;
           }
         }
 
-        // Respect explicit user choice for 2 hours (set by the region switcher).
+        function clearOverride() {
+          try {
+            window.localStorage.removeItem(OVERRIDE_KEY);
+          } catch (e) {}
+          var base = OVERRIDE_KEY + '=; path=/; max-age=0';
+          document.cookie = base;
+          var shared = getSharedCookieDomain();
+          if (shared) document.cookie = base + '; domain=' + shared;
+        }
+
+        function getOverride() {
+          var parsed = null;
+          var rawCookie = readCookie(OVERRIDE_KEY);
+          if (rawCookie) {
+            try {
+              parsed = JSON.parse(rawCookie);
+            } catch (e) {
+              parsed = null;
+            }
+          }
+          if (!parsed || typeof parsed !== 'object') {
+            try {
+              var rawLs = window.localStorage.getItem(OVERRIDE_KEY);
+              if (rawLs) parsed = JSON.parse(rawLs);
+            } catch (e) {
+              parsed = null;
+            }
+          }
+          if (!parsed || typeof parsed !== 'object') return null;
+          if (!parsed.expiresAt || Date.now() > parsed.expiresAt) {
+            clearOverride();
+            return null;
+          }
+          if (!parsed.region) return null;
+          return parsed; // { region: 'italy'|'uae', expiresAt: number }
+        }
+
+        // Respect explicit user choice for 2 hours (set by the region switcher: cookie + localStorage).
         var override = getOverride();
         if (override && override.region) return;
 
