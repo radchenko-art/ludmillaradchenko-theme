@@ -190,6 +190,7 @@ export default class ResultsList extends PaginatedList {
   #gridObserver = null;
 
   #showCollectionResortPreloader() {
+    this.classList.add('collection-resort--loading');
     const el = this.refs.collectionResortPreloader;
     if (!(el instanceof HTMLElement)) return;
     el.classList.remove('is-hidden');
@@ -197,6 +198,7 @@ export default class ResultsList extends PaginatedList {
   }
 
   #hideCollectionResortPreloader() {
+    this.classList.remove('collection-resort--loading');
     const el = this.refs.collectionResortPreloader;
     if (!(el instanceof HTMLElement)) return;
     el.classList.add('is-hidden');
