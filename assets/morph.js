@@ -5,7 +5,7 @@ import { Component } from '@theme/component';
  * @property {boolean} [childrenOnly] - Only update children
  * @property {(node: Node | undefined) => string|number|undefined} [getNodeKey] - Get node key for matching
  * @property {(oldNode: Node, newNode: Node) => void} [onBeforeUpdate] - Pre-update hook
- * @property {(node: Node) => void} [onAfterUpdate] - Post-update hook
+ * @property {(node: Node) => void} [onAfterUpdate] - Post-update hook; receives the **live** morphed node (target in the document), not the parsed template node
  * @property {(oldNode: Node, newNode: Node) => boolean} [reject] - Reject a node from being morphed
  * @property {boolean} [hydrationMode] - If true, only morph subtrees whose elements have `data-hydration-key="<non-empty>"`, matched by that value
  */
@@ -231,7 +231,8 @@ function walk(newNode, oldNode, options) {
     updateChildren(newNode, oldNode, options);
   }
 
-  options.onAfterUpdate?.(newNode);
+  // Use oldNode: newNode comes from DOMParser and is not upgraded (e.g. custom elements are not instanceof Component).
+  options.onAfterUpdate?.(oldNode);
 
   return oldNode;
 }
