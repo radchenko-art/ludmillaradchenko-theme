@@ -1,5 +1,6 @@
 import { mediaQueryLarge, requestIdleCallback, startViewTransition } from '@theme/utilities';
 import PaginatedList from '@theme/paginated-list';
+import { sectionRenderer } from '@theme/section-renderer';
 
 /**
  * A custom element that renders a pagniated results list
@@ -11,6 +12,7 @@ export default class ResultsList extends PaginatedList {
     mediaQueryLarge.addEventListener('change', this.#handleMediaQueryChange);
     this.setAttribute('initialized', '');
     this.#observeGridForNewCards();
+    this.#sortNewProductsAcrossCollection();
   }
 
   disconnectedCallback() {
@@ -33,6 +35,87 @@ export default class ResultsList extends PaginatedList {
   }
 
   #gridObserver = null;
+
+  async #sortNewProductsAcrossCollection() {
+    if (this.dataset.sortNewFirst !== 'true') return;
+
+    const { grid } = this.refs;
+    if (!grid) return;
+
+    const totalPages = Number(grid.dataset.lastPage || 1);
+    if (!Number.isFinite(totalPages) || totalPages < 1) return;
+
+    const currentPage = this.#getCurrentPage();
+    const cardsByPage = new Map();
+    cardsByPage.set(currentPage, Array.from(grid.querySelectorAll(':scope > [ref="cards[]"]')));
+
+    for (let page = 1; page <= totalPages; page++) {
+      if (page === currentPage) continue;
+
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', String(page));
+      url.hash = '';
+
+      const pageHTML = await sectionRenderer.getSectionHTML(this.sectionId, true, url);
+      const parsedPage = new DOMParser().parseFromString(pageHTML, 'text/html');
+      const pageGrid = parsedPage.querySelector('[ref="grid"]');
+      const pageCards = pageGrid ? Array.from(pageGrid.querySelectorAll(':scope > [ref="cards[]"]')) : [];
+      cardsByPage.set(page, pageCards);
+    }
+
+    const allCards = [];
+    const pageSizes = [];
+    for (let page = 1; page <= totalPages; page++) {
+      const pageCards = cardsByPage.get(page) || [];
+      pageSizes.push(pageCards.length);
+      allCards.push(...pageCards);
+    }
+
+    if (allCards.length === 0) return;
+
+    const newCards = [];
+    const regularCards = [];
+    for (const card of allCards) {
+      if (card.dataset.isNew === 'true') {
+        newCards.push(card);
+      } else {
+        regularCards.push(card);
+      }
+    }
+
+    const sortedCards = [...newCards, ...regularCards];
+    const isInfiniteScroll = this.getAttribute('infinite-scroll') !== 'false';
+
+    if (isInfiniteScroll) {
+      if (this.infinityScrollObserver) this.infinityScrollObserver.disconnect();
+      this.refs.viewMorePrevious?.remove();
+      this.refs.viewMoreNext?.remove();
+      grid.replaceChildren(...sortedCards);
+      return;
+    }
+
+    const pageSize = this.#getPageSize(pageSizes, sortedCards.length);
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    grid.replaceChildren(...sortedCards.slice(start, end));
+  }
+
+  #getCurrentPage() {
+    const urlPage = Number(new URL(window.location.href).searchParams.get('page') || '1');
+    if (Number.isFinite(urlPage) && urlPage > 0) return urlPage;
+
+    const firstCard = this.refs.cards?.[0];
+    const cardPage = Number(firstCard?.dataset.page || '1');
+    if (Number.isFinite(cardPage) && cardPage > 0) return cardPage;
+
+    return 1;
+  }
+
+  #getPageSize(pageSizes, totalCards) {
+    const validSizes = pageSizes.filter((size) => Number.isFinite(size) && size > 0);
+    if (validSizes.length > 0) return Math.max(...validSizes);
+    return totalCards;
+  }
 
   /**
    * Updates the layout.
