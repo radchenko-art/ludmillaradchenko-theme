@@ -45,6 +45,17 @@
   data-sort-new-first="{{ sort_new_first }}"
 >
   {% render 'skip-to-content-link', href: '#ResultsList', text: 'accessibility.skip_to_results_list' %}
+  {% if sort_new_first %}
+    <div
+      class="collection-resort-preloader"
+      ref="collectionResortPreloader"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <span class="collection-resort-preloader__spinner" aria-hidden="true"></span>
+    </div>
+  {% endif %}
 
   <div
     class="collection-wrapper grid gap-style{% if section.settings.product_grid_width == 'full-width' %} collection-wrapper--grid-full-width{% endif %}"
@@ -62,46 +73,32 @@
       {% assign products_per_page = section.settings.products_per_page %}
     {% endif %}
 
-    <div class="collection-resort-scope">
-      {% if sort_new_first %}
-        <div
-          class="collection-resort-preloader"
-          ref="collectionResortPreloader"
-          role="status"
-          aria-live="polite"
-          aria-busy="true"
-        >
-          <span class="collection-resort-preloader__spinner" aria-hidden="true"></span>
-        </div>
-      {% endif %}
+    {% paginate collection.products by products_per_page %}
+      {% capture children %}
+        {% for product in collection.products %}
+          <li
+            id="{{ section.id }}-{{ product.id }}"
+            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+            data-page="{{ paginate.current_page }}"
+            data-product-id="{{ product.id }}"
+            data-is-new="{% if product.metafields.custom.is_new.value == true %}true{% else %}false{% endif %}"
+            ref="cards[]"
+          >
+            {% # theme-check-disable %}
+            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+            {% # theme-check-enable %}
+          </li>
+        {% endfor %}
+      {% endcapture %}
 
-      {% paginate collection.products by products_per_page %}
-        {% capture children %}
-          {% for product in collection.products %}
-            <li
-              id="{{ section.id }}-{{ product.id }}"
-              class="product-grid__item product-grid__item--{{ forloop.index0 }}"
-              data-page="{{ paginate.current_page }}"
-              data-product-id="{{ product.id }}"
-              data-is-new="{% if product.metafields.custom.is_new.value == true %}true{% else %}false{% endif %}"
-              ref="cards[]"
-            >
-              {% # theme-check-disable %}
-              {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
-              {% # theme-check-enable %}
-            </li>
-          {% endfor %}
-        {% endcapture %}
-
-        {% render 'product-grid',
-          section: section,
-          children: children,
-          products: collection.products,
-          paginate: paginate,
-          enable_infinite_scroll: section.settings.enable_infinite_scroll
-        %}
-      {% endpaginate %}
-    </div>
+      {% render 'product-grid',
+        section: section,
+        children: children,
+        products: collection.products,
+        paginate: paginate,
+        enable_infinite_scroll: section.settings.enable_infinite_scroll
+      %}
+    {% endpaginate %}
   </div>
 </results-list>
 
@@ -212,7 +209,7 @@
   }
 
   /* Client-side new-first sort: cover product grid until JS finishes reordering */
-  .collection-resort-scope {
+  .product-grid-container {
     position: relative;
   }
 
