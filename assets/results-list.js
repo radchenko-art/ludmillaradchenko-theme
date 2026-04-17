@@ -1,6 +1,159 @@
 import { mediaQueryLarge, requestIdleCallback, startViewTransition } from '@theme/utilities';
 import PaginatedList from '@theme/paginated-list';
-import { sectionRenderer } from '@theme/section-renderer';
+import { buildSectionSelector } from '@theme/section-renderer';
+
+/**
+ * @param {string} text
+ * @param {number} startIdx
+ * @returns {string | null}
+ */
+function extractBalancedJsonObject(text, startIdx) {
+  if (text[startIdx] !== '{') return null;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = startIdx; i < text.length; i++) {
+    const ch = text[i];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (ch === '\\') {
+        escaped = true;
+        continue;
+      }
+      if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      continue;
+    }
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return text.slice(startIdx, i + 1);
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {string} text
+ * @returns {object | null}
+ */
+function parseShopifyAnalyticsMetaObject(text) {
+  if (!text.includes('ShopifyAnalytics') || !text.includes('meta')) return null;
+  const needles = ['ShopifyAnalytics.meta=', 'ShopifyAnalytics.meta ='];
+  for (const needle of needles) {
+    let pos = 0;
+    while ((pos = text.indexOf(needle, pos)) !== -1) {
+      const braceAt = text.indexOf('{', pos + needle.length);
+      if (braceAt === -1) break;
+      const jsonStr = extractBalancedJsonObject(text, braceAt);
+      if (jsonStr) {
+        try {
+          return JSON.parse(jsonStr);
+        } catch {
+          /* ignore */
+        }
+      }
+      pos += needle.length;
+    }
+  }
+  return null;
+}
+
+/**
+ * @param {ParentNode} root
+ * @returns {object | null}
+ */
+function readShopifyAnalyticsMetaFromDocument(root) {
+  for (const script of root.querySelectorAll('script')) {
+    const parsed = parseShopifyAnalyticsMetaObject(script.textContent || '');
+    if (parsed) return parsed;
+  }
+  return null;
+}
+
+/**
+ * Merges product entries used by shop_events_listener / Trekkie on collection pages.
+ *
+ * @param {Record<string, unknown>} target
+ * @param {Record<string, unknown>} incoming
+ */
+function mergeShopifyAnalyticsCollectionProducts(target, incoming) {
+  if (!target || !incoming) return;
+
+  const tp = target.products;
+  const ip = incoming.products;
+  if (Array.isArray(ip)) {
+    if (!Array.isArray(tp)) {
+      target.products = ip.map((p) => (p && typeof p === 'object' ? { .../** @type {object} */ (p) } : p));
+      return;
+    }
+    const seen = new Set(
+      tp.map((p) => (p && typeof p === 'object' && 'id' in p ? /** @type {{ id: unknown }} */ (p).id : null)).filter((id) => id != null)
+    );
+    for (const p of ip) {
+      if (p && typeof p === 'object' && 'id' in p) {
+        const id = /** @type {{ id: unknown }} */ (p).id;
+        if (id != null && !seen.has(id)) {
+          tp.push(p);
+          seen.add(id);
+        }
+      }
+    }
+    return;
+  }
+
+  const tPage = target.page;
+  const iPage = incoming.page;
+  if (tPage && iPage && typeof tPage === 'object' && typeof iPage === 'object') {
+    const bp = /** @type {Record<string, unknown>} */ (tPage).collectionProducts;
+    const ap = /** @type {Record<string, unknown>} */ (iPage).collectionProducts;
+    if (Array.isArray(bp) && Array.isArray(ap)) {
+      const seen = new Set(
+        bp
+          .map((x) => (x && typeof x === 'object' && 'id' in x ? /** @type {{ id: unknown }} */ (x).id : null))
+          .filter((id) => id != null)
+      );
+      for (const x of ap) {
+        if (x && typeof x === 'object' && 'id' in x) {
+          const id = /** @type {{ id: unknown }} */ (x).id;
+          if (id != null && !seen.has(id)) {
+            bp.push(x);
+            seen.add(id);
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @param {Document} doc
+ * @param {string} sectionId
+ * @returns {Element[]}
+ */
+function extractProductCardsFromParsedCollection(doc, sectionId) {
+  const sectionEl = doc.getElementById(buildSectionSelector(sectionId));
+  if (!sectionEl) return [];
+  const grid = sectionEl.querySelector('[ref="grid"]');
+  if (!grid) return [];
+  return Array.from(grid.querySelectorAll(':scope > [ref="cards[]"]'));
+}
+
+/**
+ * @param {Element} node
+ * @returns {Element}
+ */
+function materializeNodeForCurrentDocument(node) {
+  if (!(node instanceof Element)) return node;
+  if (node.ownerDocument === document) return node;
+  return document.importNode(node, true);
+}
 
 /**
  * A custom element that renders a pagniated results list
@@ -54,13 +207,28 @@ export default class ResultsList extends PaginatedList {
 
       const url = new URL(window.location.href);
       url.searchParams.set('page', String(page));
+      url.searchParams.delete('section_id');
       url.hash = '';
 
-      const pageHTML = await sectionRenderer.getSectionHTML(this.sectionId, true, url);
-      const parsedPage = new DOMParser().parseFromString(pageHTML, 'text/html');
-      const pageGrid = parsedPage.querySelector('[ref="grid"]');
-      const pageCards = pageGrid ? Array.from(pageGrid.querySelectorAll(':scope > [ref="cards[]"]')) : [];
-      cardsByPage.set(page, pageCards);
+      const res = await fetch(url.toString(), {
+        credentials: 'same-origin',
+        headers: { Accept: 'text/html' },
+      });
+      if (!res.ok) continue;
+
+      const pageHTML = await res.text();
+      const doc = new DOMParser().parseFromString(pageHTML, 'text/html');
+      const incomingMeta = readShopifyAnalyticsMetaFromDocument(doc);
+      if (incomingMeta) {
+        window.ShopifyAnalytics = window.ShopifyAnalytics || {};
+        window.ShopifyAnalytics.meta = window.ShopifyAnalytics.meta || {};
+        mergeShopifyAnalyticsCollectionProducts(
+          /** @type {Record<string, unknown>} */ (window.ShopifyAnalytics.meta),
+          /** @type {Record<string, unknown>} */ (incomingMeta)
+        );
+      }
+
+      cardsByPage.set(page, extractProductCardsFromParsedCollection(doc, this.sectionId));
     }
 
     const allCards = [];
@@ -83,7 +251,7 @@ export default class ResultsList extends PaginatedList {
       }
     }
 
-    const sortedCards = [...newCards, ...regularCards];
+    const sortedCards = [...newCards, ...regularCards].map((el) => materializeNodeForCurrentDocument(el));
     const isInfiniteScroll = this.getAttribute('infinite-scroll') !== 'false';
 
     if (isInfiniteScroll) {
