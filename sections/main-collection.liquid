@@ -62,32 +62,46 @@
       {% assign products_per_page = section.settings.products_per_page %}
     {% endif %}
 
-    {% paginate collection.products by products_per_page %}
-      {% capture children %}
-        {% for product in collection.products %}
-          <li
-            id="{{ section.id }}-{{ product.id }}"
-            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
-            data-page="{{ paginate.current_page }}"
-            data-product-id="{{ product.id }}"
-            data-is-new="{% if product.metafields.custom.is_new.value == true %}true{% else %}false{% endif %}"
-            ref="cards[]"
-          >
-            {% # theme-check-disable %}
-            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
-            {% # theme-check-enable %}
-          </li>
-        {% endfor %}
-      {% endcapture %}
+    <div class="collection-resort-scope">
+      {% if sort_new_first %}
+        <div
+          class="collection-resort-preloader"
+          ref="collectionResortPreloader"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+        >
+          <span class="collection-resort-preloader__spinner" aria-hidden="true"></span>
+        </div>
+      {% endif %}
 
-      {% render 'product-grid',
-        section: section,
-        children: children,
-        products: collection.products,
-        paginate: paginate,
-        enable_infinite_scroll: section.settings.enable_infinite_scroll
-      %}
-    {% endpaginate %}
+      {% paginate collection.products by products_per_page %}
+        {% capture children %}
+          {% for product in collection.products %}
+            <li
+              id="{{ section.id }}-{{ product.id }}"
+              class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+              data-page="{{ paginate.current_page }}"
+              data-product-id="{{ product.id }}"
+              data-is-new="{% if product.metafields.custom.is_new.value == true %}true{% else %}false{% endif %}"
+              ref="cards[]"
+            >
+              {% # theme-check-disable %}
+              {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+              {% # theme-check-enable %}
+            </li>
+          {% endfor %}
+        {% endcapture %}
+
+        {% render 'product-grid',
+          section: section,
+          children: children,
+          products: collection.products,
+          paginate: paginate,
+          enable_infinite_scroll: section.settings.enable_infinite_scroll
+        %}
+      {% endpaginate %}
+    </div>
   </div>
 </results-list>
 
@@ -194,6 +208,45 @@
     .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .section.section--page-width > *,
     .collection-layout-wrapper__center:has(.collection-sidebar-section--visible) .product-grid-container > * {
       grid-column: unset;
+    }
+  }
+
+  /* Client-side new-first sort: cover product grid until JS finishes reordering */
+  .collection-resort-scope {
+    position: relative;
+  }
+
+  .collection-resort-preloader {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(var(--color-background-rgb) / 0.88);
+    backdrop-filter: blur(2px);
+    transition: opacity 0.28s ease, visibility 0.28s ease;
+  }
+
+  .collection-resort-preloader.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .collection-resort-preloader__spinner {
+    box-sizing: border-box;
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgb(var(--color-foreground-rgb) / 0.12);
+    border-top-color: rgb(var(--color-foreground-rgb) / 0.65);
+    border-radius: 50%;
+    animation: collection-resort-spin 0.75s linear infinite;
+  }
+
+  @keyframes collection-resort-spin {
+    to {
+      transform: rotate(360deg);
     }
   }
 
