@@ -189,83 +189,106 @@ export default class ResultsList extends PaginatedList {
 
   #gridObserver = null;
 
+  #showCollectionResortPreloader() {
+    const el = this.refs.collectionResortPreloader;
+    if (!(el instanceof HTMLElement)) return;
+    el.classList.remove('is-hidden');
+    el.setAttribute('aria-busy', 'true');
+  }
+
+  #hideCollectionResortPreloader() {
+    const el = this.refs.collectionResortPreloader;
+    if (!(el instanceof HTMLElement)) return;
+    el.classList.add('is-hidden');
+    el.setAttribute('aria-busy', 'false');
+  }
+
   async #sortNewProductsAcrossCollection() {
     if (this.dataset.sortNewFirst !== 'true') return;
 
-    const { grid } = this.refs;
-    if (!grid) return;
+    this.#showCollectionResortPreloader();
 
-    const totalPages = Number(grid.dataset.lastPage || 1);
-    if (!Number.isFinite(totalPages) || totalPages < 1) return;
+    try {
+      const { grid } = this.refs;
+      if (!grid) return;
 
-    const currentPage = this.#getCurrentPage();
-    const cardsByPage = new Map();
-    cardsByPage.set(currentPage, Array.from(grid.querySelectorAll(':scope > [ref="cards[]"]')));
+      const totalPages = Number(grid.dataset.lastPage || 1);
+      if (!Number.isFinite(totalPages) || totalPages < 1) return;
 
-    for (let page = 1; page <= totalPages; page++) {
-      if (page === currentPage) continue;
+      const currentPage = this.#getCurrentPage();
+      const cardsByPage = new Map();
+      cardsByPage.set(currentPage, Array.from(grid.querySelectorAll(':scope > [ref="cards[]"]')));
 
-      const url = new URL(window.location.href);
-      url.searchParams.set('page', String(page));
-      url.searchParams.delete('section_id');
-      url.hash = '';
+      for (let page = 1; page <= totalPages; page++) {
+        if (page === currentPage) continue;
 
-      const res = await fetch(url.toString(), {
-        credentials: 'same-origin',
-        headers: { Accept: 'text/html' },
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', String(page));
+        url.searchParams.delete('section_id');
+        url.hash = '';
+
+        const res = await fetch(url.toString(), {
+          credentials: 'same-origin',
+          headers: { Accept: 'text/html' },
+        });
+        if (!res.ok) continue;
+
+        const pageHTML = await res.text();
+        const doc = new DOMParser().parseFromString(pageHTML, 'text/html');
+        const incomingMeta = readShopifyAnalyticsMetaFromDocument(doc);
+        if (incomingMeta) {
+          window.ShopifyAnalytics = window.ShopifyAnalytics || {};
+          window.ShopifyAnalytics.meta = window.ShopifyAnalytics.meta || {};
+          mergeShopifyAnalyticsCollectionProducts(
+            /** @type {Record<string, unknown>} */ (window.ShopifyAnalytics.meta),
+            /** @type {Record<string, unknown>} */ (incomingMeta)
+          );
+        }
+
+        cardsByPage.set(page, extractProductCardsFromParsedCollection(doc, this.sectionId));
+      }
+
+      const allCards = [];
+      const pageSizes = [];
+      for (let page = 1; page <= totalPages; page++) {
+        const pageCards = cardsByPage.get(page) || [];
+        pageSizes.push(pageCards.length);
+        allCards.push(...pageCards);
+      }
+
+      if (allCards.length === 0) return;
+
+      const newCards = [];
+      const regularCards = [];
+      for (const card of allCards) {
+        if (card.dataset.isNew === 'true') {
+          newCards.push(card);
+        } else {
+          regularCards.push(card);
+        }
+      }
+
+      const sortedCards = [...newCards, ...regularCards].map((el) => materializeNodeForCurrentDocument(el));
+      const isInfiniteScroll = this.getAttribute('infinite-scroll') !== 'false';
+
+      if (isInfiniteScroll) {
+        if (this.infinityScrollObserver) this.infinityScrollObserver.disconnect();
+        this.refs.viewMorePrevious?.remove();
+        this.refs.viewMoreNext?.remove();
+        grid.replaceChildren(...sortedCards);
+        return;
+      }
+
+      const pageSize = this.#getPageSize(pageSizes, sortedCards.length);
+      const start = (currentPage - 1) * pageSize;
+      const end = start + pageSize;
+      grid.replaceChildren(...sortedCards.slice(start, end));
+    } finally {
+      await new Promise((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(resolve));
       });
-      if (!res.ok) continue;
-
-      const pageHTML = await res.text();
-      const doc = new DOMParser().parseFromString(pageHTML, 'text/html');
-      const incomingMeta = readShopifyAnalyticsMetaFromDocument(doc);
-      if (incomingMeta) {
-        window.ShopifyAnalytics = window.ShopifyAnalytics || {};
-        window.ShopifyAnalytics.meta = window.ShopifyAnalytics.meta || {};
-        mergeShopifyAnalyticsCollectionProducts(
-          /** @type {Record<string, unknown>} */ (window.ShopifyAnalytics.meta),
-          /** @type {Record<string, unknown>} */ (incomingMeta)
-        );
-      }
-
-      cardsByPage.set(page, extractProductCardsFromParsedCollection(doc, this.sectionId));
+      this.#hideCollectionResortPreloader();
     }
-
-    const allCards = [];
-    const pageSizes = [];
-    for (let page = 1; page <= totalPages; page++) {
-      const pageCards = cardsByPage.get(page) || [];
-      pageSizes.push(pageCards.length);
-      allCards.push(...pageCards);
-    }
-
-    if (allCards.length === 0) return;
-
-    const newCards = [];
-    const regularCards = [];
-    for (const card of allCards) {
-      if (card.dataset.isNew === 'true') {
-        newCards.push(card);
-      } else {
-        regularCards.push(card);
-      }
-    }
-
-    const sortedCards = [...newCards, ...regularCards].map((el) => materializeNodeForCurrentDocument(el));
-    const isInfiniteScroll = this.getAttribute('infinite-scroll') !== 'false';
-
-    if (isInfiniteScroll) {
-      if (this.infinityScrollObserver) this.infinityScrollObserver.disconnect();
-      this.refs.viewMorePrevious?.remove();
-      this.refs.viewMoreNext?.remove();
-      grid.replaceChildren(...sortedCards);
-      return;
-    }
-
-    const pageSize = this.#getPageSize(pageSizes, sortedCards.length);
-    const start = (currentPage - 1) * pageSize;
-    const end = start + pageSize;
-    grid.replaceChildren(...sortedCards.slice(start, end));
   }
 
   #getCurrentPage() {
