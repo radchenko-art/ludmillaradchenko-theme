@@ -159,13 +159,26 @@ function materializeNodeForCurrentDocument(node) {
  * A custom element that renders a pagniated results list
  */
 export default class ResultsList extends PaginatedList {
+  /** @type {number} Supersedes in-flight #sortNewProductsAcrossCollection when section morphs again. */
+  #sortRunId = 0;
+
   connectedCallback() {
     super.connectedCallback();
 
     mediaQueryLarge.addEventListener('change', this.#handleMediaQueryChange);
     this.setAttribute('initialized', '');
     this.#observeGridForNewCards();
-    this.#sortNewProductsAcrossCollection();
+    void this.#sortNewProductsAcrossCollection();
+  }
+
+  /**
+   * Section Rendering API / morph updates this element in place; connectedCallback does not run again.
+   * Re-apply new-first sort and preloader lifecycle when the server sends fresh markup (e.g. sort → manual).
+   */
+  updatedCallback() {
+    super.updatedCallback();
+    this.#observeGridForNewCards();
+    void this.#sortNewProductsAcrossCollection();
   }
 
   disconnectedCallback() {
@@ -177,6 +190,7 @@ export default class ResultsList extends PaginatedList {
    * When in rows view, new cards (e.g. infinite scroll) must get the text wrapper.
    */
   #observeGridForNewCards() {
+    this.#gridObserver?.disconnect();
     const { grid } = this.refs;
     if (!grid) return;
     this.#gridObserver = new MutationObserver(() => {
@@ -206,8 +220,12 @@ export default class ResultsList extends PaginatedList {
   }
 
   async #sortNewProductsAcrossCollection() {
-    if (this.dataset.sortNewFirst !== 'true') return;
+    if (this.dataset.sortNewFirst !== 'true') {
+      this.#hideCollectionResortPreloader();
+      return;
+    }
 
+    const runId = ++this.#sortRunId;
     this.#showCollectionResortPreloader();
 
     try {
@@ -286,6 +304,7 @@ export default class ResultsList extends PaginatedList {
       const end = start + pageSize;
       grid.replaceChildren(...sortedCards.slice(start, end));
     } finally {
+      if (runId !== this.#sortRunId) return;
       await new Promise((resolve) => {
         requestAnimationFrame(() => requestAnimationFrame(resolve));
       });
