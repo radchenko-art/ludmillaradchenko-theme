@@ -56,35 +56,97 @@
 
     {% liquid
       assign current_sort_by = collection.sort_by | default: collection.default_sort_by
-      assign paginate_source = collection.products
+      assign sort_new_first = false
       if current_sort_by == collection.default_sort_by
-        assign new_products = collection.products | where_exp: 'product', 'product.metafields.custom.is_new.value == true'
-        assign regular_products = collection.products | where_exp: 'product', 'product.metafields.custom.is_new.value != true'
-        assign paginate_source = new_products | concat: regular_products
+        assign sort_new_first = true
       endif
     %}
 
-    {% paginate paginate_source by products_per_page %}
+    {% paginate collection.products by products_per_page %}
       {% capture children %}
-        {% for product in paginate_source %}
-          <li
-            id="{{ section.id }}-{{ product.id }}"
-            class="product-grid__item product-grid__item--{{ forloop.index0 }}"
-            data-page="{{ paginate.current_page }}"
-            data-product-id="{{ product.id }}"
-            ref="cards[]"
-          >
-            {% # theme-check-disable %}
-            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
-            {% # theme-check-enable %}
-          </li>
-        {% endfor %}
+        {% if sort_new_first %}
+          {% liquid
+            assign new_products = collection.products | where_exp: 'product', 'product.metafields.custom.is_new.value == true'
+            assign regular_products = collection.products | where_exp: 'product', 'product.metafields.custom.is_new.value != true'
+            assign page_start = paginate.current_offset
+            assign page_limit = paginate.page_size
+            assign remaining = page_limit
+            assign item_index = 0
+            assign new_count = new_products.size
+          %}
+
+          {% if page_start < new_count and remaining > 0 %}
+            {% liquid
+              assign new_offset = page_start
+              assign available_new = new_count | minus: new_offset
+              assign new_limit = remaining
+              if available_new < new_limit
+                assign new_limit = available_new
+              endif
+            %}
+
+            {% for product in new_products limit: new_limit offset: new_offset %}
+              <li
+                id="{{ section.id }}-{{ product.id }}"
+                class="product-grid__item product-grid__item--{{ item_index }}"
+                data-page="{{ paginate.current_page }}"
+                data-product-id="{{ product.id }}"
+                ref="cards[]"
+              >
+                {% # theme-check-disable %}
+                {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+                {% # theme-check-enable %}
+              </li>
+              {% assign item_index = item_index | plus: 1 %}
+            {% endfor %}
+
+            {% assign remaining = remaining | minus: new_limit %}
+          {% endif %}
+
+          {% if remaining > 0 %}
+            {% liquid
+              assign regular_offset = 0
+              if page_start > new_count
+                assign regular_offset = page_start | minus: new_count
+              endif
+            %}
+
+            {% for product in regular_products limit: remaining offset: regular_offset %}
+              <li
+                id="{{ section.id }}-{{ product.id }}"
+                class="product-grid__item product-grid__item--{{ item_index }}"
+                data-page="{{ paginate.current_page }}"
+                data-product-id="{{ product.id }}"
+                ref="cards[]"
+              >
+                {% # theme-check-disable %}
+                {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+                {% # theme-check-enable %}
+              </li>
+              {% assign item_index = item_index | plus: 1 %}
+            {% endfor %}
+          {% endif %}
+        {% else %}
+          {% for product in collection.products %}
+            <li
+              id="{{ section.id }}-{{ product.id }}"
+              class="product-grid__item product-grid__item--{{ forloop.index0 }}"
+              data-page="{{ paginate.current_page }}"
+              data-product-id="{{ product.id }}"
+              ref="cards[]"
+            >
+              {% # theme-check-disable %}
+              {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
+              {% # theme-check-enable %}
+            </li>
+          {% endfor %}
+        {% endif %}
       {% endcapture %}
 
       {% render 'product-grid',
         section: section,
         children: children,
-        products: paginate_source,
+        products: collection.products,
         paginate: paginate,
         enable_infinite_scroll: section.settings.enable_infinite_scroll
       %}
