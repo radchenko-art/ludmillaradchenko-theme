@@ -224,7 +224,7 @@
     "read_more": "Maggiori informazioni...",
     "account_title": "Account",
     "account_title_personalized": "Ciao {{ first_name }}",
-    "account_orders": "Ordini",
+    "account_orders": "Orders",
     "account_profile": "Profilo",
     "discount_code": "Codice sconto",
     "duties_and_taxes_included_shipping_at_checkout_with_policy_without_discounts_html": "Imposte e dazi inclusi. Le spese di spedizione vengono calcolate al check-out.",
