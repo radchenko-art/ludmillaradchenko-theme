@@ -208,15 +208,20 @@
     }
   }
 
-  /* Client-side new-first sort: hide listing until reorder finishes; overlay only this section */
+  /* Client-side new-first sort: collapse listing (no reserved height); overlay fills a viewport-sized host so spinner stays on-screen */
   results-list.product-grid-container {
     position: relative;
     isolation: isolate;
   }
 
+  results-list.collection-resort--loading {
+    min-height: calc(
+      100dvh - var(--header-group-height, var(--header-height, 80px))
+    );
+  }
+
   results-list.collection-resort--loading .collection-wrapper {
-    visibility: hidden;
-    pointer-events: none;
+    display: none;
   }
 
   .collection-resort-preloader {
