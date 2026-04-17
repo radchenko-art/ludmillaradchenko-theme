@@ -208,16 +208,21 @@
     }
   }
 
-  /* Client-side new-first sort: hide listing until reorder finishes; full-viewport loader */
+  /* Client-side new-first sort: hide listing until reorder finishes; overlay only this section */
+  results-list.product-grid-container {
+    position: relative;
+    isolation: isolate;
+  }
+
   results-list.collection-resort--loading .collection-wrapper {
     visibility: hidden;
     pointer-events: none;
   }
 
   .collection-resort-preloader {
-    position: fixed;
+    position: absolute;
     inset: 0;
-    z-index: var(--layer-temporary);
+    z-index: var(--layer-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
