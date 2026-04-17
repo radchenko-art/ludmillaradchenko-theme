@@ -90,7 +90,7 @@
     "slideshow": "Presentazione"
   },
   "actions": {
-    "wishlist": "Lista dei desideri",
+    "wishlist": "My wishlist",
     "sign_in_with_shop": "Sign In with Shop",
     "sort_by": "Ordina per",
     "add_to_cart": "Aggiungi al carrello",
@@ -225,7 +225,7 @@
     "account_title": "Account",
     "account_title_personalized": "Ciao {{ first_name }}",
     "account_orders": "Orders",
-    "account_profile": "Profilo",
+    "account_profile": "Profile",
     "discount_code": "Codice sconto",
     "duties_and_taxes_included_shipping_at_checkout_with_policy_without_discounts_html": "Imposte e dazi inclusi. Le spese di spedizione vengono calcolate al check-out.",
     "duties_and_taxes_included_shipping_at_checkout_without_policy_without_discounts": "Imposte e dazi inclusi. Le spese di spedizione vengono calcolate al check-out.",
