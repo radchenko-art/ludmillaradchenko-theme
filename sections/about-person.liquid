@@ -614,9 +614,15 @@
   }
 
   .page-content__contact-actions .page-content__download-link {
-    white-space: normal;
+    white-space: nowrap;
     text-align: center;
     width: 100%;
+  }
+
+  @media screen and (max-width: 1300px) {
+    .page-content__contact-actions .page-content__download-link {
+      white-space: normal;
+    }
   }
 
   .page-content__contact-form-wrap {
