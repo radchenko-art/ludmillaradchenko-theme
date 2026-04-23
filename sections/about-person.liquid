@@ -154,32 +154,15 @@
 
             <div class="about-person-contact-form__field">
               <label for="{{ about_contact_form_id }}-whatsapp" class="about-person-contact-form__label">WhatsApp</label>
-              <div class="about-person-contact-form__whatsapp-group">
-                <label for="{{ about_contact_form_id }}-whatsapp-country" class="visually-hidden">WhatsApp country code</label>
-                <select
-                  id="{{ about_contact_form_id }}-whatsapp-country"
-                  class="about-person-contact-form__input about-person-contact-form__input--country"
-                  name="contact[WhatsApp country]"
-                  autocomplete="country"
-                >
-                  <option value="+971">🇦🇪 +971</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+49">🇩🇪 +49</option>
-                  <option value="+33">🇫🇷 +33</option>
-                  <option value="+34">🇪🇸 +34</option>
-                  <option value="+39">🇮🇹 +39</option>
-                </select>
-                <input
-                  type="tel"
-                  id="{{ about_contact_form_id }}-whatsapp"
-                  class="about-person-contact-form__input"
-                  autocomplete="tel"
-                  name="contact[WhatsApp]"
-                  pattern="[0-9\\-\\+\\s\\(\\)]*"
-                  placeholder="Phone number"
-                >
-              </div>
+              <input
+                type="tel"
+                id="{{ about_contact_form_id }}-whatsapp"
+                class="about-person-contact-form__input"
+                autocomplete="tel"
+                name="contact[WhatsApp]"
+                pattern="[0-9\\-\\+\\s\\(\\)]*"
+                placeholder="Phone number"
+              >
             </div>
 
             <div class="about-person-contact-form__field">
@@ -630,53 +613,65 @@
   }
 
   .about-person-contact-form__radio-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    position: relative;
+    display: block;
+    cursor: pointer;
   }
 
   .about-person-contact-form__radio-option input[type='radio'] {
-    appearance: none;
-    -webkit-appearance: none;
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
     margin: 0;
+    pointer-events: none;
+  }
+
+  .about-person-contact-form__radio-option span {
+    position: relative;
+    display: inline-block;
+    padding-left: 28px;
+    line-height: 1.4;
+  }
+
+  .about-person-contact-form__radio-option span::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
     width: 18px;
     height: 18px;
     border-radius: 50%;
     border: 2px solid #fff;
     background-color: #fff;
-    display: inline-grid;
-    place-content: center;
-    flex-shrink: 0;
-    cursor: pointer;
+    transform: translateY(-50%);
+    box-sizing: border-box;
   }
 
-  .about-person-contact-form__radio-option input[type='radio']::before {
+  .about-person-contact-form__radio-option span::after {
     content: '';
+    position: absolute;
+    left: 5px;
+    top: 50%;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background-color: darkred;
-    transform: scale(0);
-    transition: transform 0.2s ease-in-out;
+    transform: translateY(-50%) scale(0);
+    transition: transform 0.2s ease;
   }
 
-  .about-person-contact-form__radio-option input[type='radio']:checked {
+  .about-person-contact-form__radio-option input[type='radio']:checked + span::before {
     border-color: darkred;
-    background-color: #fff;
   }
 
-  .about-person-contact-form__radio-option input[type='radio']:checked::before {
-    transform: scale(1);
+  .about-person-contact-form__radio-option input[type='radio']:checked + span::after {
+    transform: translateY(-50%) scale(1);
   }
 
-  .about-person-contact-form__whatsapp-group {
-    display: grid;
-    grid-template-columns: minmax(120px, 180px) 1fr;
-    gap: 12px;
-  }
-
-  .about-person-contact-form__input--country {
-    padding-right: 8px;
+  .about-person-contact-form__radio-option input[type='radio']:focus-visible + span::before {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
   }
 
   .section-about-person .about-person-contact-form :is(input, textarea, select).about-person-contact-form__input {
