@@ -65,12 +65,12 @@
         </div>
       {%- endif -%}
 
-      <div class="contact-form__field">
+      <div class="contact-form__form-row">
         <label
-          class="contact-form__label"
+          class="visually-hidden"
           for="ContactForm-name"
         >
-          Name <span aria-hidden="true">*</span>
+          {{- 'blocks.contact_form.name' | t -}}
         </label>
         <input
           type="text"
@@ -79,57 +79,16 @@
           autocomplete="name"
           name="contact[name]"
           value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
-          required
+          placeholder="{{ 'blocks.contact_form.name' | t }}"
         >
-      </div>
 
-      <div class="contact-form__field">
         <label
-          class="contact-form__label"
-          for="ContactForm-whatsapp"
-        >
-          WhatsApp
-        </label>
-        <div class="contact-form__whatsapp-group">
-          <label
-            class="visually-hidden"
-            for="ContactForm-whatsapp-country"
-          >
-            WhatsApp country code
-          </label>
-          <select
-            id="ContactForm-whatsapp-country"
-            class="contact-form__input contact-form__input--country"
-            name="contact[WhatsApp country]"
-            autocomplete="country"
-          >
-            <option value="+971">🇦🇪 +971</option>
-            <option value="+1">🇺🇸 +1</option>
-            <option value="+44">🇬🇧 +44</option>
-            <option value="+49">🇩🇪 +49</option>
-            <option value="+33">🇫🇷 +33</option>
-            <option value="+34">🇪🇸 +34</option>
-            <option value="+39">🇮🇹 +39</option>
-          </select>
-          <input
-            type="tel"
-            id="ContactForm-whatsapp"
-            class="contact-form__input"
-            autocomplete="tel"
-            name="contact[WhatsApp]"
-            pattern="[0-9\\-\\+\\s\\(\\)]*"
-            placeholder="Phone number"
-          >
-        </div>
-      </div>
-
-      <div class="contact-form__field">
-        <label
-          class="contact-form__label"
+          class="visually-hidden"
           for="ContactForm-email"
         >
-          Email <span aria-hidden="true">*</span>
-        </label>
+          {{- 'blocks.contact_form.email' | t -}}
+          <span aria-hidden="true">*</span></label
+        >
         <input
           type="email"
           id="ContactForm-email"
@@ -140,195 +99,46 @@
           autocapitalize="off"
           value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
           aria-required="true"
-          required
           {% if form.errors contains 'email' and form.id == form_id %}
             aria-invalid="true"
             aria-describedby="ContactForm-email-error"
           {% endif %}
+          placeholder="{{ 'blocks.contact_form.email' | t }}"
         >
       </div>
 
-      <fieldset class="contact-form__fieldset">
-        <legend class="contact-form__legend">I'm interested in: <span aria-hidden="true">*</span></legend>
-        <div class="contact-form__radio-list">
-          <label class="contact-form__radio-option" for="Interest-original">
-            <input
-              id="Interest-original"
-              type="radio"
-              name="contact[I'm interested in]"
-              value="Original artwork/uniquepiece"
-              required
-            >
-            <span>Original artwork/uniquepiece</span>
-          </label>
-          <label class="contact-form__radio-option" for="Interest-multiple">
-            <input
-              id="Interest-multiple"
-              type="radio"
-              name="contact[I'm interested in]"
-              value="Multiple Art- limited edition prints"
-            >
-            <span>Multiple Art- limited edition prints</span>
-          </label>
-          <label class="contact-form__radio-option" for="Interest-commission">
-            <input
-              id="Interest-commission"
-              type="radio"
-              name="contact[I'm interested in]"
-              value="Сommission /personalized order"
-            >
-            <span>Сommission /personalized order</span>
-          </label>
-          <label class="contact-form__radio-option" for="Interest-brand">
-            <input
-              id="Interest-brand"
-              type="radio"
-              name="contact[I'm interested in]"
-              value="Brand Collaboration"
-            >
-            <span>Brand Collaboration</span>
-          </label>
-        </div>
-      </fieldset>
+      <label
+        class="visually-hidden"
+        for="ContactForm-phone"
+      >
+        {{- 'blocks.contact_form.phone' | t -}}
+      </label>
+      <input
+        type="tel"
+        id="ContactForm-phone"
+        class="contact-form__input"
+        autocomplete="tel"
+        name="contact[phone]"
+        pattern="[0-9\\-]*"
+        value="{% if form.phone %}{{ form.phone }}{% elsif customer %}{{ customer.phone }}{% endif %}"
+        placeholder="{{ 'blocks.contact_form.phone' | t }}"
+      >
 
-      <fieldset class="contact-form__fieldset">
-        <legend class="contact-form__legend">Select your budget range <span aria-hidden="true">*</span></legend>
-        <div class="contact-form__radio-list">
-          <label class="contact-form__radio-option" for="Budget-under-2000">
-            <input
-              id="Budget-under-2000"
-              type="radio"
-              name="contact[Select your budget range]"
-              value="Under €2,000"
-              required
-            >
-            <span>Under €2,000</span>
-          </label>
-          <label class="contact-form__radio-option" for="Budget-2000-5000">
-            <input
-              id="Budget-2000-5000"
-              type="radio"
-              name="contact[Select your budget range]"
-              value="€2,000 – €5,000"
-            >
-            <span>€2,000 – €5,000</span>
-          </label>
-          <label class="contact-form__radio-option" for="Budget-5000-10000">
-            <input
-              id="Budget-5000-10000"
-              type="radio"
-              name="contact[Select your budget range]"
-              value="€5,000 – €10,000"
-            >
-            <span>€5,000 – €10,000</span>
-          </label>
-          <label class="contact-form__radio-option" for="Budget-10000-plus">
-            <input
-              id="Budget-10000-plus"
-              type="radio"
-              name="contact[Select your budget range]"
-              value="€10,000+"
-            >
-            <span>€10,000+</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <fieldset class="contact-form__fieldset">
-        <legend class="contact-form__legend">Space Type <span aria-hidden="true">*</span></legend>
-        <div class="contact-form__radio-list">
-          <label class="contact-form__radio-option" for="Space-home">
-            <input
-              id="Space-home"
-              type="radio"
-              name="contact[Space Type]"
-              value="Home"
-              required
-            >
-            <span>Home</span>
-          </label>
-          <label class="contact-form__radio-option" for="Space-office">
-            <input
-              id="Space-office"
-              type="radio"
-              name="contact[Space Type]"
-              value="Office"
-            >
-            <span>Office</span>
-          </label>
-          <label class="contact-form__radio-option" for="Space-hotel">
-            <input
-              id="Space-hotel"
-              type="radio"
-              name="contact[Space Type]"
-              value="Hotel / Restaurant"
-            >
-            <span>Hotel / Restaurant</span>
-          </label>
-          <label class="contact-form__radio-option" for="Space-other">
-            <input
-              id="Space-other"
-              type="radio"
-              name="contact[Space Type]"
-              value="Other"
-            >
-            <span>Other</span>
-          </label>
-        </div>
-      </fieldset>
-
-      <div class="contact-form__field">
-        <label
-          class="contact-form__label"
-          for="ContactForm-location"
-        >
-          Location <span aria-hidden="true">*</span>
-        </label>
-        <input
-          type="text"
-          id="ContactForm-location"
-          class="contact-form__input"
-          name="contact[Location]"
-          placeholder="Country / City"
-          required
-        >
-      </div>
-
-      <div class="contact-form__field">
-        <label
-          class="contact-form__label"
-          for="ContactForm-preferred-size"
-        >
-          Preferred Size <span aria-hidden="true">*</span>
-        </label>
-        <input
-          type="text"
-          id="ContactForm-preferred-size"
-          class="contact-form__input"
-          name="contact[Preferred Size]"
-          placeholder="e.g., 100x100 cm or Custom"
-          required
-        >
-      </div>
-
-      <div class="contact-form__field">
-        <label
-          class="contact-form__label"
-          for="ContactForm-body"
-        >
-          Notes / Details <span aria-hidden="true">*</span>
-        </label>
-        <textarea
-          rows="10"
-          id="ContactForm-body"
-          class="contact-form__input contact-form__input--textarea"
-          name="contact[body]"
-          placeholder="Describe your idea, colors, or theme..."
-          required
-        >
-          {{- form.body -}}
-        </textarea>
-      </div>
+      <label
+        class="visually-hidden"
+        for="ContactForm-body"
+      >
+        {{- 'blocks.contact_form.comment' | t -}}
+      </label>
+      <textarea
+        rows="10"
+        id="ContactForm-body"
+        class="contact-form__input contact-form__input--textarea"
+        name="contact[body]"
+        placeholder="{{ 'blocks.contact_form.comment' | t }}"
+      >
+        {{- form.body -}}
+      </textarea>
 
       {{ submit_button }}
     {%- endform -%}
@@ -416,54 +226,6 @@
   .contact-form__input--textarea {
     resize: vertical;
     min-height: var(--input-textarea-min-height);
-  }
-
-  .contact-form__field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-xs);
-  }
-
-  .contact-form__label,
-  .contact-form__legend {
-    display: block;
-    font: var(--font-body--style) var(--font-body--weight) var(--font-body--size) / var(--font-body--line-height)
-      var(--font-body--family);
-    color: var(--color-foreground);
-  }
-
-  .contact-form__fieldset {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-xs);
-  }
-
-  .contact-form__radio-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-xs);
-  }
-
-  .contact-form__radio-option {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-xs);
-    font: var(--font-body--style) var(--font-body--weight) var(--font-body--size) / var(--font-body--line-height)
-      var(--font-body--family);
-  }
-
-  .contact-form__whatsapp-group {
-    display: grid;
-    grid-template-columns: minmax(120px, 180px) 1fr;
-    gap: var(--gap-sm);
-    width: 100%;
-  }
-
-  .contact-form__input--country {
-    padding-inline-end: var(--padding-lg);
   }
 
   .contact-form__error,

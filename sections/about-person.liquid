@@ -138,22 +138,53 @@
             {%- endif -%}
 
             <div class="about-person-contact-form__field">
-              <label for="{{ about_contact_form_id }}-subject" class="about-person-contact-form__label">
-                {{ 'content.about_person_contact.select_request' | t }}
+              <label for="{{ about_contact_form_id }}-name" class="about-person-contact-form__label">
+                Name <span aria-hidden="true">*</span>
               </label>
-              <select
-                id="{{ about_contact_form_id }}-subject"
+              <input
+                type="text"
+                id="{{ about_contact_form_id }}-name"
                 class="about-person-contact-form__input"
-                name="contact[subject]"
+                autocomplete="name"
+                name="contact[name]"
+                value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+                required
               >
-                <option value="Customer service">{{ 'content.about_person_contact.customer_service' | t }}</option>
-                <option value="Technical support">{{ 'content.about_person_contact.technical_support' | t }}</option>
-              </select>
+            </div>
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-whatsapp" class="about-person-contact-form__label">WhatsApp</label>
+              <div class="about-person-contact-form__whatsapp-group">
+                <label for="{{ about_contact_form_id }}-whatsapp-country" class="visually-hidden">WhatsApp country code</label>
+                <select
+                  id="{{ about_contact_form_id }}-whatsapp-country"
+                  class="about-person-contact-form__input about-person-contact-form__input--country"
+                  name="contact[WhatsApp country]"
+                  autocomplete="country"
+                >
+                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+49">🇩🇪 +49</option>
+                  <option value="+33">🇫🇷 +33</option>
+                  <option value="+34">🇪🇸 +34</option>
+                  <option value="+39">🇮🇹 +39</option>
+                </select>
+                <input
+                  type="tel"
+                  id="{{ about_contact_form_id }}-whatsapp"
+                  class="about-person-contact-form__input"
+                  autocomplete="tel"
+                  name="contact[WhatsApp]"
+                  pattern="[0-9\\-\\+\\s\\(\\)]*"
+                  placeholder="Phone number"
+                >
+              </div>
             </div>
 
             <div class="about-person-contact-form__field">
               <label for="{{ about_contact_form_id }}-email" class="about-person-contact-form__label">
-                {{ 'content.about_person_contact.address_email' | t }}
+                Email <span aria-hidden="true">*</span>
               </label>
               <input
                 type="email"
@@ -165,19 +196,178 @@
                 autocapitalize="off"
                 value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
                 aria-required="true"
+                required
+              >
+            </div>
+
+            <fieldset class="about-person-contact-form__fieldset">
+              <legend class="about-person-contact-form__legend">I'm interested in: <span aria-hidden="true">*</span></legend>
+              <div class="about-person-contact-form__radio-list">
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-interest-original">
+                  <input
+                    id="{{ about_contact_form_id }}-interest-original"
+                    type="radio"
+                    name="contact[I'm interested in]"
+                    value="Original artwork/uniquepiece"
+                    required
+                  >
+                  <span>Original artwork/uniquepiece</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-interest-multiple">
+                  <input
+                    id="{{ about_contact_form_id }}-interest-multiple"
+                    type="radio"
+                    name="contact[I'm interested in]"
+                    value="Multiple Art- limited edition prints"
+                  >
+                  <span>Multiple Art- limited edition prints</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-interest-commission">
+                  <input
+                    id="{{ about_contact_form_id }}-interest-commission"
+                    type="radio"
+                    name="contact[I'm interested in]"
+                    value="Сommission /personalized order"
+                  >
+                  <span>Сommission /personalized order</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-interest-brand">
+                  <input
+                    id="{{ about_contact_form_id }}-interest-brand"
+                    type="radio"
+                    name="contact[I'm interested in]"
+                    value="Brand Collaboration"
+                  >
+                  <span>Brand Collaboration</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="about-person-contact-form__fieldset">
+              <legend class="about-person-contact-form__legend">Select your budget range <span aria-hidden="true">*</span></legend>
+              <div class="about-person-contact-form__radio-list">
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-budget-under-2000">
+                  <input
+                    id="{{ about_contact_form_id }}-budget-under-2000"
+                    type="radio"
+                    name="contact[Select your budget range]"
+                    value="Under €2,000"
+                    required
+                  >
+                  <span>Under €2,000</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-budget-2000-5000">
+                  <input
+                    id="{{ about_contact_form_id }}-budget-2000-5000"
+                    type="radio"
+                    name="contact[Select your budget range]"
+                    value="€2,000 – €5,000"
+                  >
+                  <span>€2,000 – €5,000</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-budget-5000-10000">
+                  <input
+                    id="{{ about_contact_form_id }}-budget-5000-10000"
+                    type="radio"
+                    name="contact[Select your budget range]"
+                    value="€5,000 – €10,000"
+                  >
+                  <span>€5,000 – €10,000</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-budget-10000-plus">
+                  <input
+                    id="{{ about_contact_form_id }}-budget-10000-plus"
+                    type="radio"
+                    name="contact[Select your budget range]"
+                    value="€10,000+"
+                  >
+                  <span>€10,000+</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="about-person-contact-form__fieldset">
+              <legend class="about-person-contact-form__legend">Space Type <span aria-hidden="true">*</span></legend>
+              <div class="about-person-contact-form__radio-list">
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-space-home">
+                  <input
+                    id="{{ about_contact_form_id }}-space-home"
+                    type="radio"
+                    name="contact[Space Type]"
+                    value="Home"
+                    required
+                  >
+                  <span>Home</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-space-office">
+                  <input
+                    id="{{ about_contact_form_id }}-space-office"
+                    type="radio"
+                    name="contact[Space Type]"
+                    value="Office"
+                  >
+                  <span>Office</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-space-hotel">
+                  <input
+                    id="{{ about_contact_form_id }}-space-hotel"
+                    type="radio"
+                    name="contact[Space Type]"
+                    value="Hotel / Restaurant"
+                  >
+                  <span>Hotel / Restaurant</span>
+                </label>
+                <label class="about-person-contact-form__radio-option" for="{{ about_contact_form_id }}-space-other">
+                  <input
+                    id="{{ about_contact_form_id }}-space-other"
+                    type="radio"
+                    name="contact[Space Type]"
+                    value="Other"
+                  >
+                  <span>Other</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-location" class="about-person-contact-form__label">
+                Location <span aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="{{ about_contact_form_id }}-location"
+                class="about-person-contact-form__input"
+                name="contact[Location]"
+                placeholder="Country / City"
+                required
+              >
+            </div>
+
+            <div class="about-person-contact-form__field">
+              <label for="{{ about_contact_form_id }}-preferred-size" class="about-person-contact-form__label">
+                Preferred Size <span aria-hidden="true">*</span>
+              </label>
+              <input
+                type="text"
+                id="{{ about_contact_form_id }}-preferred-size"
+                class="about-person-contact-form__input"
+                name="contact[Preferred Size]"
+                placeholder="e.g., 100x100 cm or Custom"
+                required
               >
             </div>
 
             <div class="about-person-contact-form__field">
               <label for="{{ about_contact_form_id }}-body" class="about-person-contact-form__label">
-                {{ 'content.about_person_contact.request_information' | t }}
+                Notes / Details <span aria-hidden="true">*</span>
               </label>
               <textarea
                 rows="6"
                 id="{{ about_contact_form_id }}-body"
                 class="about-person-contact-form__input about-person-contact-form__input--textarea"
                 name="contact[body]"
-                placeholder="{{ 'content.about_person_contact.message_placeholder' | t }}"
+                placeholder="Describe your idea, colors, or theme..."
+                required
               >{{- form.body -}}</textarea>
             </div>
 
@@ -417,9 +607,42 @@
     margin-bottom: 24px;
   }
 
+  .about-person-contact-form__fieldset {
+    margin: 0 0 24px;
+    padding: 0;
+    border: 0;
+  }
+
+  .about-person-contact-form__legend {
+    display: block;
+    margin-bottom: 8px;
+  }
+
   .about-person-contact-form__label {
     display: block;
     margin-bottom: 8px;
+  }
+
+  .about-person-contact-form__radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .about-person-contact-form__radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .about-person-contact-form__whatsapp-group {
+    display: grid;
+    grid-template-columns: minmax(120px, 180px) 1fr;
+    gap: 12px;
+  }
+
+  .about-person-contact-form__input--country {
+    padding-right: 8px;
   }
 
   .section-about-person .about-person-contact-form :is(input, textarea, select).about-person-contact-form__input {
