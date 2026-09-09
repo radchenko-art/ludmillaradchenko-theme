@@ -48,6 +48,9 @@
   {{ block.shopify_attributes }}
 >
   <div class="product-price__row">
+    {%- if product_resource.metafields.custom.price_on_request -%}
+      <span class="price-on-request">Prezzo su richiesta</span>
+    {%- else -%}
     {% render 'price',
       show_unit_price: true,
       product_resource: product_resource,
@@ -56,6 +59,7 @@
     {% if block_settings.tax_info != blank %}
       <span class="product-price__tax-info">{{ block_settings.tax_info }}</span>
     {% endif %}
+    {%- endif -%}
   </div>
 
   {% if block_settings.show_tax_info %}

@@ -7,6 +7,7 @@
   endif
 
   assign variant = closest.product.selected_or_first_available_variant
+  assign price_on_request = product.metafields.custom.price_on_request
   assign inventory_quantity = variant.inventory_quantity
   assign inventory_policy = variant.inventory_policy
 
@@ -39,7 +40,17 @@
   class="buy-buttons-block buy-buttons-block--{{ block.id }}"
   {{ block.shopify_attributes }}
 >
-  {%- if product != blank -%}
+  {%- if price_on_request and product != blank -%}
+    {%- assign wa_msg = product.title | prepend: "Sono interessato/a all'opera " | append: " della Secret Collection." | url_encode -%}
+    <div class="product-form-buttons">
+      <a
+        class="button add-to-cart-button"
+        href="https://wa.me/971586117826?text={{ wa_msg }}"
+        target="_blank"
+        rel="noopener"
+      >RICHIEDI INFORMAZIONI</a>
+    </div>
+  {%- elsif product != blank -%}
     {%- assign product_form_id = 'BuyButtons-ProductForm-' | append: section.id -%}
     <product-form-component
       data-section-id="{{ section.id }}"
