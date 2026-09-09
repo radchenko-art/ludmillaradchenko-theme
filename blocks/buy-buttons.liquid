@@ -7,7 +7,7 @@
   endif
 
   assign variant = closest.product.selected_or_first_available_variant
-  assign price_on_request = product.metafields.custom.price_on_request
+  assign price_on_request = product.metafields.secret.price_on_request
   assign inventory_quantity = variant.inventory_quantity
   assign inventory_policy = variant.inventory_policy
 

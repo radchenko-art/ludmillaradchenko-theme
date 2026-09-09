@@ -48,7 +48,7 @@
   {{ block.shopify_attributes }}
 >
   <div class="product-price__row">
-    {%- if product_resource.metafields.custom.price_on_request -%}
+    {%- if product_resource.metafields.secret.price_on_request -%}
       <span class="price-on-request">Prezzo su richiesta</span>
     {%- else -%}
     {% render 'price',

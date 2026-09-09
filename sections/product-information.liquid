@@ -24,7 +24,8 @@
   {% content_for 'blocks' %}
 {% endcapture %}
 
-{% if section.settings.enable_sticky_add_to_cart %}
+{% assign _por = product.metafields.secret.price_on_request %}
+{% if section.settings.enable_sticky_add_to_cart and _por == blank %}
   {% liquid
     assign current_variant = product.selected_or_first_available_variant
     # Get the initial quantity based on quantity rules
