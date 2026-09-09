@@ -117,16 +117,10 @@
       }
     },
     "art_reborn_products_R8x2Qm": {
-      "type": "product-list",
+      "type": "custom-liquid",
       "settings": {
-        "collection": "art-garage",
-        "layout_type": "grid",
-        "carousel_on_mobile": false,
-        "max_products": 16,
-        "columns": 4,
-        "mobile_columns": "2",
-        "columns_gap": 12,
-        "rows_gap": 16
+        "custom_liquid": "{% assign coll = collections['art-garage'] %}<style>.ag-grid{max-width:1200px;margin:0 auto;padding:8px 16px 8px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px 20px;}@media(max-width:749px){.ag-grid{grid-template-columns:repeat(2,1fr);gap:20px 14px;}}.ag-card{display:block;text-decoration:none;color:#1A1A1A;font-family:Helvetica,Arial,sans-serif;}.ag-card img{width:100%;height:auto;display:block;border-radius:2px;}.ag-name{margin-top:10px;font-size:14px;font-weight:700;letter-spacing:.3px;line-height:1.3;}.ag-price{margin-top:3px;font-size:11px;color:#6B6B6B;letter-spacing:1.5px;}</style><div class=\"ag-grid\">{% for product in coll.products %}<a class=\"ag-card\" href=\"{{ product.url }}\">{% if product.featured_image %}<img src=\"{{ product.featured_image | image_url: width: 700 }}\" alt=\"{{ product.title | escape }}\" loading=\"lazy\" width=\"{{ product.featured_image.width }}\" height=\"{{ product.featured_image.height }}\">{% endif %}<div class=\"ag-name\">{{ product.title }}</div><div class=\"ag-price\">{{ product.price | money }}</div></a>{% endfor %}</div>",
+        "section_width": "page-width"
       }
     },
     "ag_hero_banner": {
