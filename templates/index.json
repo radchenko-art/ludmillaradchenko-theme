@@ -115,9 +115,16 @@
         "padding_left": 25,
         "padding_right": 26
       }
+    },
+    "catalogs_block": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<div style=\"max-width:1200px;margin:0 auto;padding:24px 16px 32px;text-align:center;\"><a href=\"/pages/catalogue-art-garage-en\" style=\"display:block;text-decoration:none;\"><img src=\"https://cdn.shopify.com/s/files/1/0944/0057/7802/files/home_last_dinner_of_power.jpg?v=1791117414\" alt=\"Last Dinner of Power, Ludmilla Radchenko\" style=\"width:100%;height:auto;display:block;border-radius:4px;\" loading=\"lazy\"></a><div style=\"margin-top:20px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:2px;color:#C4262E;font-weight:700;\">THE CATALOGUES</div><div style=\"margin-top:14px;\"><a href=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/catalogo-dubai-2026.pdf?v=1788165161\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block;min-width:300px;max-width:100%;box-sizing:border-box;background:#1A1A1A;color:#EFE9DC;border:1px solid #1A1A1A;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:14px 26px;border-radius:2px;\">Download the Dubai catalogue</a><div style=\"margin-top:6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#6B6B6B;\">Works in Dubai</div></div><div style=\"margin-top:14px;\"><a href=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/artworks_catalogue.pdf?v=1788236046\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block;min-width:300px;max-width:100%;box-sizing:border-box;background:transparent;color:#1A1A1A;border:1px solid #1A1A1A;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:14px 26px;border-radius:2px;\">Download the main works catalogue</a><div style=\"margin-top:6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#6B6B6B;\">Pop Catalog · original works</div></div><div style=\"margin-top:14px;\"><a href=\"https://cdn.shopify.com/s/files/1/0944/0057/7802/files/1/0944/0057/7802\" target=\"_blank\" rel=\"noopener\" style=\"display:inline-block;min-width:300px;max-width:100%;box-sizing:border-box;background:transparent;color:#1A1A1A;border:1px solid #1A1A1A;font-family:Helvetica,Arial,sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;text-decoration:none;padding:14px 26px;border-radius:2px;\">Download the Art Garage catalogue</a><div style=\"margin-top:6px;font-family:Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#6B6B6B;\">An accessible collection · unique pieces and multiples</div></div></div>"
+      }
     }
   },
   "order": [
+    "catalogs_block",
     "hero_jVaWmY",
     "featured_offers_ANt6fJ"
   ]
