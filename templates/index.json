@@ -115,9 +115,16 @@
         "padding_left": 25,
         "padding_right": 26
       }
+    },
+    "video_hero": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<style>\n.lr-vh{position:relative;width:100%;overflow:hidden;background:#111;}\n.lr-vh video{display:block;width:100%;height:auto;}\n.lr-vh .m{display:none;}\n@media(max-width:749px){.lr-vh .d{display:none;}.lr-vh .m{display:block;}}\n.lr-vh .ov{position:absolute;left:0;right:0;bottom:0;padding:28px 16px 34px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap;\nbackground:linear-gradient(transparent,rgba(0,0,0,.45));}\n.lr-vh a{font-family:Helvetica,Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;text-decoration:none;\npadding:14px 26px;border-radius:2px;}\n.lr-vh a.p{background:#fff;color:#111;} .lr-vh a.s{border:1px solid #fff;color:#fff;}\n</style>\n<div class=\"lr-vh\">\n<video class=\"d\" autoplay muted loop playsinline preload=\"auto\" poster=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/hero_poster.jpg?v=1792511479\"><source src=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/hero_desktop.mp4?v=1792511471\" type=\"video/mp4\"></video>\n<video class=\"m\" autoplay muted loop playsinline preload=\"metadata\" poster=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/hero_poster.jpg?v=1792511479\"><source src=\"https://cdn.shopify.com/s/files/1/0959/0633/2999/files/hero_mobile.mp4?v=1792511476\" type=\"video/mp4\"></video>\n<div class=\"ov\"><a class=\"p\" href=\"/collections/born-to-bloom\">Discover the new collection</a><a class=\"s\" href=\"https://www.instagram.com/reel/Del7NbJNsr0/\" target=\"_blank\" rel=\"noopener\">&#9654; Watch on Instagram</a></div>\n</div>"
+      }
     }
   },
   "order": [
+    "video_hero",
     "hero_jVaWmY",
     "featured_offers_ANt6fJ"
   ]
