@@ -34,6 +34,9 @@
       assign add_to_cart_text = 'products.product.unavailable' | t
     endif
   endif
+  if can_add_to_cart and product.selling_plan_groups.size > 0 and product.tags contains 'coming-soon'
+    assign add_to_cart_text = 'PRENOTA · ACCONTO 20%'
+  endif
 %}
 
 <span
@@ -74,6 +77,7 @@
           ref="variantId"
           value="{{ product.selected_or_first_available_variant.id }}"
         >
+        {%- if product.selling_plan_groups.size > 0 and product.tags contains 'coming-soon' -%}<input type="hidden" name="selling_plan" value="{{ product.selling_plan_groups.first.selling_plans.first.id }}">{%- endif -%}
         {%- if block_settings.gift_card_form and product.gift_card? -%}
           {%- render 'gift-card-recipient-form', product: product, form: form, section: section, block: block -%}
         {%- endif -%}
