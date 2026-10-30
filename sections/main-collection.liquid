@@ -33,7 +33,8 @@
 {% liquid
   assign current_sort_by = collection.sort_by | default: collection.default_sort_by
   assign sort_new_first = false
-  if current_sort_by == collection.default_sort_by
+  # 2026-10-30: Art Works / Available Works keep Ludmilla's manual order (no new-first resort)
+  if current_sort_by == collection.default_sort_by and collection.handle != 'art-works' and collection.handle != 'available-works'
     assign sort_new_first = true
   endif
 %}
