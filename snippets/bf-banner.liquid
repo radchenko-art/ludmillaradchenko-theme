@@ -1,0 +1,13 @@
+{%- comment -%} Black Friday 2026 banner. Remove after 30.11.2026. {%- endcomment -%}
+<a id="bf-banner" href="/collections/black-friday" style="display:none;background:#0d0d0d;color:#fff;text-align:center;
+ font:600 13px/1.4 Montserrat,Helvetica,Arial,sans-serif;letter-spacing:.06em;padding:10px 16px;text-decoration:none">
+ <span id="bf-text"></span> <span style="color:#d4af37;text-decoration:underline;margin-left:6px">Scopri →</span></a>
+<script>
+(function(){
+  var now = Date.now(), s = Date.parse('2026-11-26T23:00:00Z'), e = Date.parse('2026-11-30T22:59:59Z');
+  if (now > e) return;
+  var b = document.getElementById('bf-banner');
+  document.getElementById('bf-text').textContent = now < s ? "BLACK FRIDAY · 27–30 novembre · −20% su tutti i foulard FullArt" : "BLACK FRIDAY · −20% su tutti i foulard FullArt · fino al 30 novembre · sconto automatico, nessun codice";
+  b.style.display = 'block';
+})();
+</script>
