@@ -1,0 +1,75 @@
+{%- comment -%} Welcome popup: newsletter -> personal -10% code for 7 days (n8n WF Welcome Discount). {%- endcomment -%}
+{%- unless template.name == 'cart' or template.name contains 'customers' or template.name == 'password' -%}
+<div id="lrw" role="dialog" aria-modal="true" aria-labelledby="lrw-t" hidden>
+ <div class="lrw-box">
+  <button type="button" class="lrw-x" aria-label="Chiudi">×</button>
+  <p class="lrw-k">NEWSLETTER</p>
+  <h2 id="lrw-t">−10% sul tuo primo acquisto</h2>
+  <form id="lrw-f" novalidate>
+   <p class="lrw-p">Iscriviti e ricevi subito il tuo codice personale, valido 7 giorni su tutto il sito.</p>
+   <input name="name" type="text" placeholder="Nome" autocomplete="given-name">
+   <input name="email" type="email" placeholder="La tua email" autocomplete="email" required>
+   <button type="submit" class="lrw-b">Ricevi il codice</button>
+   <p class="lrw-e" aria-live="polite"></p>
+   <p class="lrw-l">Iscrivendoti accetti di ricevere la newsletter di Ludmilla Radchenko. Puoi disiscriverti in qualsiasi momento.</p>
+  </form>
+  <div id="lrw-ok" hidden>
+   <p class="lrw-p">Ecco il tuo codice personale</p>
+   <div class="lrw-c"><code id="lrw-code"></code><button type="button" class="lrw-b lrw-cp">Copia</button></div>
+   <p class="lrw-l">Valido fino al <span id="lrw-exp"></span></p>
+  </div>
+ </div>
+</div>
+<style>
+#lrw{position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+#lrw[hidden]{display:none}
+#lrw .lrw-box{position:relative;background:#fff;color:#111;max-width:420px;width:100%;padding:32px 28px 24px;text-align:center;
+ font-family:Montserrat,Helvetica,Arial,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+#lrw .lrw-x{position:absolute;top:6px;right:10px;background:none;border:0;font-size:28px;line-height:1;cursor:pointer;color:#111;padding:6px}
+#lrw .lrw-k{font-size:11px;letter-spacing:.25em;color:#8a6d1f;margin:0 0 8px}
+#lrw h2{font-size:24px;line-height:1.2;margin:0 0 12px;font-weight:700;text-transform:uppercase}
+#lrw .lrw-p{font-size:14px;line-height:1.5;margin:0 0 16px;color:#333}
+#lrw input{display:block;width:100%;box-sizing:border-box;border:1px solid #ccc;padding:12px;font-size:16px;margin:0 0 10px;border-radius:0}
+#lrw .lrw-b{background:#111;color:#fff;border:0;padding:13px 18px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;width:100%}
+#lrw .lrw-b:active{transform:scale(.98)}
+#lrw .lrw-e{color:#b3261e;font-size:13px;min-height:1em;margin:8px 0 0}
+#lrw .lrw-l{font-size:11px;color:#777;line-height:1.4;margin:8px 0 0}
+#lrw .lrw-c{display:flex;gap:8px;align-items:stretch}
+#lrw .lrw-c code{flex:1;border:2px dashed #8a6d1f;padding:12px;font-size:18px;font-weight:700;letter-spacing:.08em;background:#faf6ea}
+#lrw .lrw-cp{width:auto}
+</style>
+<script>
+(function(){
+ var K='lr_welcome_seen', d=document.getElementById('lrw'); if(!d) return;
+ function seen(){ try{ return localStorage.getItem(K); }catch(e){ return null; } }
+ function mark(v){ try{ localStorage.setItem(K, v); }catch(e){} }
+ function close(){ d.hidden=true; if(!seen()) mark('closed'); }
+ if(seen()) return;
+ setTimeout(function(){ if(!seen()) d.hidden=false; }, 12000);
+ d.querySelector('.lrw-x').onclick=close;
+ d.addEventListener('click', function(e){ if(e.target===d) close(); });
+ document.addEventListener('keydown', function(e){ if(e.key==='Escape' && !d.hidden) close(); });
+ var f=document.getElementById('lrw-f'), err=d.querySelector('.lrw-e'), b=f.querySelector('.lrw-b');
+ f.onsubmit=function(e){
+  e.preventDefault(); err.textContent='';
+  var em=f.email.value.trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ err.textContent="Inserisci un'email valida."; return; }
+  b.disabled=true;
+  fetch('https://n8n.ludmillaradchenko.art/webhook/welcome-discount-7Kq2',{method:'POST',headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({email:em,name:f.name.value.trim(),store:'eu'})})
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+   if(!j.ok) throw 0;
+   mark('signed');
+   document.getElementById('lrw-code').textContent=j.code;
+   document.getElementById('lrw-exp').textContent=j.expires.split('-').reverse().join('.');
+   f.hidden=true; document.getElementById('lrw-ok').hidden=false;
+  }).catch(function(){ err.textContent="Qualcosa non ha funzionato. Riprova."; b.disabled=false; });
+ };
+ d.querySelector('.lrw-cp').onclick=function(){
+  var t=document.getElementById('lrw-code').textContent, btn=this;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ btn.textContent="Copiato"; }).catch(function(){});
+ };
+})();
+</script>
+{%- endunless -%}
