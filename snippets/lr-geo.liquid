@@ -1,0 +1,53 @@
+{%- comment -%} Store routing by country + twin product link (site fixes 2026-11-24). {%- endcomment -%}
+<script>
+window.lrCounterpart = {{ product.metafields.custom.counterpart_url.value | default: '' | json }};
+(function(){
+ var STORE='eu', KEY='lr_preferred_store';
+ var EU_SET='AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE GB CH NO MC SM VA LI'.split(' ');
+ if(/bot|crawl|spider|lighthouse|preview/i.test(navigator.userAgent) || navigator.webdriver) return;
+ if(/^\/(cart|checkout|account|challenge|password)/.test(location.pathname)) return;
+ if(/[?&]lr_stay=1/.test(location.search)) return;
+ function chosen(){
+  var raw=null, m=document.cookie.match(/(?:^|;\s*)lr_preferred_store=([^;]+)/);
+  if(m){ try{ raw=decodeURIComponent(m[1]); }catch(e){} }
+  if(!raw){ try{ raw=localStorage.getItem(KEY); }catch(e){} }
+  try{ var p=JSON.parse(raw); return p && p.region && p.expiresAt > Date.now() ? p.region : null; }catch(e){ return null; }
+ }
+ if(chosen()) return;
+ function target(origin){
+  var u=new URL(window.lrCounterpart || (location.pathname + location.search), origin);
+  return u.toString();
+ }
+ function country(){
+  var c=null; try{ c=sessionStorage.getItem('lr_cc'); }catch(e){}
+  if(c) return Promise.resolve(c);
+  return fetch('/browsing_context_suggestions.json',{credentials:'same-origin'}).then(function(r){return r.json();})
+   .then(function(d){ return d.detected_values.country.handle; })
+   .catch(function(){ return fetch('https://get.geojs.io/v1/ip/country.json').then(function(r){return r.json();}).then(function(d){return d.country;}); })
+   .then(function(cc){ cc=String(cc||'').toUpperCase(); try{ sessionStorage.setItem('lr_cc',cc); }catch(e){} return cc; });
+ }
+ country().then(function(cc){
+  if(STORE==='eu' && cc==='AE'){ location.replace(target('https://uae.ludmillaradchenko.art')); return; }
+  if(STORE==='uae' && EU_SET.indexOf(cc)>-1){
+   try{ if(sessionStorage.getItem('lr_eu_bar')) return; }catch(e){}
+   var show=function(){
+    var b=document.createElement('div'); b.id='lr-eubar';
+    b.innerHTML='<span>Shopping from Europe? Our European store has prices in euro and delivery across Europe.</span>'+
+     '<a href="'+target('https://ludmillaradchenko.art')+'">Go to the EU store</a><button type="button" aria-label="Close">×</button>';
+    b.querySelector('a').onclick=function(){ try{ localStorage.setItem(KEY, JSON.stringify({region:'italy',expiresAt:Date.now()+72e5})); }catch(e){} };
+    b.querySelector('button').onclick=function(){ b.remove(); try{ sessionStorage.setItem('lr_eu_bar','1'); }catch(e){} };
+    document.body.appendChild(b);
+   };
+   document.body ? show() : document.addEventListener('DOMContentLoaded', show);
+  }
+ }).catch(function(){});
+})();
+</script>
+<style>
+#lr-eubar{position:fixed;left:12px;right:12px;bottom:12px;z-index:2147482000;background:#111;color:#fff;display:flex;gap:12px;align-items:center;
+ padding:12px 14px;font:13px/1.4 Montserrat,Helvetica,Arial,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:640px;margin:0 auto}
+#lr-eubar span{flex:1}
+#lr-eubar a{color:#111;background:#fff;padding:8px 12px;text-decoration:none;white-space:nowrap;font-weight:600;letter-spacing:.04em}
+#lr-eubar button{background:none;border:0;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:4px}
+@media (max-width:560px){#lr-eubar{flex-wrap:wrap}#lr-eubar span{flex-basis:calc(100% - 40px)}}
+</style>
