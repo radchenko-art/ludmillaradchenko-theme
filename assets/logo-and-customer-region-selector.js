@@ -51,9 +51,16 @@ document.addEventListener(
 
     try {
       const url = new URL(origin);
-      url.pathname = window.location.pathname;
-      url.search = window.location.search;
-      url.hash = window.location.hash;
+      const twin = window.lrCounterpart;  // product twin in the other store (metafield custom.counterpart_url)
+      if (twin) {
+        const t = new URL(twin, origin);
+        url.pathname = t.pathname;
+        url.search = t.search;
+      } else {
+        url.pathname = window.location.pathname;
+        url.search = window.location.search;
+        url.hash = window.location.hash;
+      }
       window.location.assign(url.toString());
     } catch {
       window.location.assign(link.href);
